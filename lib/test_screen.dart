@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -192,7 +193,7 @@ class _TestPage extends State<TestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final content = Column(
       children: [
         if (currentAyah.numberInSurah < ayahs.length)
           Container(
@@ -575,5 +576,16 @@ class _TestPage extends State<TestScreen> {
         ),
       ],
     );
+
+    if (kIsWeb) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: content,
+        ),
+      );
+    }
+
+    return content;
   }
 }

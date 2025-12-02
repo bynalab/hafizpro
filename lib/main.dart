@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/splash_screen.dart';
+import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/util/app_theme.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/services/rating_service.dart';
@@ -121,7 +122,7 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.values.byName(_themeController.mode),
-      home: const SplashScreen(),
+      home: kIsWeb ? const MainMenu() : const SplashScreen(),
     );
   }
 }

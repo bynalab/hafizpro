@@ -32,14 +32,12 @@ class AudioServices {
   /// On the web, this method ensures that playback:
   /// 1. Stops any existing audio without tracking the event.
   /// 2. Sets the new audio source for the player.
-  /// 3. Starts playback immediately.
   ///
   /// Any errors encountered are caught and printed for debugging.
   Future<void> setWebAudioSource(AudioSource audioSource) async {
     try {
       await stop(trackEvent: false);
       await audioPlayer.setAudioSource(audioSource);
-      await play();
     } catch (e) {
       debugPrint(e.toString());
     }
