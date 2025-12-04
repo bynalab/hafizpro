@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/splash_screen.dart';
 import 'package:hafiz_test/util/app_theme.dart';
@@ -8,6 +10,8 @@ import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/user_identification_service.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+
+final GlobalKey<_QuranHafizState> quranHafizKey = GlobalKey<_QuranHafizState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +42,7 @@ void main() async {
     }
   }
 
-  runApp(const QuranHafiz());
+  runApp(QuranHafiz(key: quranHafizKey));
 }
 
 class QuranHafiz extends StatefulWidget {
@@ -51,6 +55,7 @@ class QuranHafiz extends StatefulWidget {
 class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
   late final ThemeController _themeController;
   bool _sessionEnded = false;
+  Locale _locale = const Locale('en');
 
   @override
   void initState() {
@@ -121,7 +126,25 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.values.byName(_themeController.mode),
+      locale: _locale,
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ar'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const SplashScreen(),
     );
+  }
+
+  void setLocale(Locale locale) {
+    if (!mounted) return;
+    setState(() {
+      _locale = locale;
+    });
   }
 }

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/reciters.dart';
 import 'package:hafiz_test/extension/collection.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/main.dart';
 import 'package:hafiz_test/model/reciter.model.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -31,12 +32,14 @@ class _SettingDialogState extends State<SettingDialog> {
 
   String? reciter;
   late ThemeMode themeMode;
+  String language = 'en';
 
   void init() {
     try {
       autoPlay = storageServices.checkAutoPlay();
       reciter = storageServices.getReciter();
       themeMode = ThemeMode.values.byName(themeController.mode);
+      language = storageServices.getString('language') ?? 'en';
     } catch (e) {
       debugPrint('Error $e');
     } finally {
@@ -154,6 +157,41 @@ class _SettingDialogState extends State<SettingDialog> {
                               'theme', oldValue.name, mode.name);
                         },
                       )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Language',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      DropdownButton<String>(
+                        value: language,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'en',
+                            child: Text('English'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ar',
+                            child: Text('Arabic'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value == null) return;
+                          final oldValue = language;
+                          setState(() => language = value);
+                          AnalyticsService.trackSettingsChanged(
+                              'language', oldValue, value);
+                          quranHafizKey.currentState?.setLocale(Locale(value));
+                          storageServices.setString('language', value);
+                        },
+                      ),
                     ],
                   ),
                 ],
