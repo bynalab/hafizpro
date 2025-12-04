@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/splash_screen.dart';
+import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/util/app_theme.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/services/rating_service.dart';
@@ -137,7 +138,7 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const SplashScreen(),
+      home: kIsWeb ? const MainMenu() : const SplashScreen(),
     );
   }
 
