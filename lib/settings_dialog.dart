@@ -59,200 +59,228 @@ class _SettingDialogState extends State<SettingDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Container(
-        width: MediaQuery.of(context).size.width - 32,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: Container(
+          width: MediaQuery.of(context).size.width - 32,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Settings',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  GestureDetector(
+                    child: Icon(
+                      Icons.close,
+                      size: 30,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
+                    onTap: () => Navigator.pop(context),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (isLoading)
+                const Center(child: CircularProgressIndicator.adaptive())
+              else ...[
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Autoplay verse',
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        Switch(
+                          value: autoPlay,
+                          onChanged: (_) {
+                            final oldValue = autoPlay;
+                            setState(() => autoPlay = !autoPlay);
+                            AnalyticsService.trackSettingsChanged(
+                                'autoplay', oldValue, !oldValue);
+                          },
+                          activeTrackColor:
+                              Theme.of(context).colorScheme.primary,
+                          activeColor: Colors.white,
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Theme',
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        DropdownButton<ThemeMode>(
+                          value: themeMode,
+                          items: const [
+                            DropdownMenuItem(
+                              value: ThemeMode.system,
+                              child: Text('System'),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.light,
+                              child: Text('Light'),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.dark,
+                              child: Text('Dark'),
+                            ),
+                          ],
+                          onChanged: (mode) {
+                            if (mode == null) return;
+                            final oldValue = themeMode;
+                            setState(() => themeMode = mode);
+                            AnalyticsService.trackSettingsChanged(
+                                'theme', oldValue.name, mode.name);
+                          },
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
                 Text(
-                  'Settings',
+                  'Select your favorite reciter',
                   style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                GestureDetector(
-                  child: Icon(
-                    Icons.close,
-                    size: 30,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
+                SearchableDropdown<Reciter>(
+                  items: reciters,
+                  selectedItem: reciters.firstWhereOrNull(
+                    (reciter) => reciter.identifier == this.reciter,
                   ),
-                  onTap: () => Navigator.pop(context),
-                )
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (isLoading)
-              const Center(child: CircularProgressIndicator.adaptive())
-            else ...[
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Autoplay verse',
-                        style: GoogleFonts.montserrat(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      Switch(
-                        value: autoPlay,
-                        onChanged: (_) {
-                          final oldValue = autoPlay;
-                          setState(() => autoPlay = !autoPlay);
-                          AnalyticsService.trackSettingsChanged(
-                              'autoplay', oldValue, !oldValue);
-                        },
-                        activeTrackColor: Theme.of(context).colorScheme.primary,
-                        activeColor: Colors.white,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Theme',
-                        style: GoogleFonts.montserrat(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      DropdownButton<ThemeMode>(
-                        value: themeMode,
-                        items: const [
-                          DropdownMenuItem(
-                            value: ThemeMode.system,
-                            child: Text('System'),
-                          ),
-                          DropdownMenuItem(
-                            value: ThemeMode.light,
-                            child: Text('Light'),
-                          ),
-                          DropdownMenuItem(
-                            value: ThemeMode.dark,
-                            child: Text('Dark'),
-                          ),
-                        ],
-                        onChanged: (mode) {
-                          if (mode == null) return;
-                          final oldValue = themeMode;
-                          setState(() => themeMode = mode);
-                          AnalyticsService.trackSettingsChanged(
-                              'theme', oldValue.name, mode.name);
-                        },
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Text(
-                'Select your favorite reciter',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              SearchableDropdown<Reciter>(
-                items: reciters,
-                selectedItem: reciters.firstWhereOrNull(
-                  (reciter) => reciter.identifier == this.reciter,
-                ),
-                getDisplayText: (reciter) => reciter.englishName,
-                getSubText: (reciter) =>
-                    reciter.name != reciter.englishName ? reciter.name : '',
-                getItemId: (reciter) => reciter.identifier,
-                hintText: 'Select your favorite reciter',
-                searchHint: 'Search reciters...',
-                onChanged: (selectedReciter) {
-                  final oldValue = reciter;
-                  setState(() {
-                    reciter = selectedReciter?.identifier;
-                  });
+                  getDisplayText: (reciter) => reciter.englishName,
+                  getSubText: (reciter) =>
+                      reciter.name != reciter.englishName ? reciter.name : '',
+                  getItemId: (reciter) => reciter.identifier,
+                  hintText: 'Select your favorite reciter',
+                  searchHint: 'Search reciters...',
+                  onChanged: (selectedReciter) {
+                    final oldValue = reciter;
+                    setState(() {
+                      reciter = selectedReciter?.identifier;
+                    });
 
-                  AnalyticsService.trackSettingsChanged(
-                    'reciter',
-                    oldValue,
-                    selectedReciter?.identifier,
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              LinkButton(
-                icon: Icons.language,
-                title: 'Visit Our Website',
-                onTap: () {
-                  launchInBrowser(context, 'https://hafizpro.com', 'Website');
-                },
-              ),
-              const SizedBox(height: 12),
-              LinkButton(
-                icon: Icons.star_rate,
-                title: 'Rate This App',
-                onTap: () => _showInAppRating(context),
-              ),
-              const SizedBox(height: 20),
-              if (kDebugMode) ...[
-                // Debug button for rating system (remove in production)
-                Button(
-                  height: 32,
-                  color: Colors.orange,
-                  child: Text(
-                    'Debug Rating System',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    showDialog(
-                      context: context,
-                      builder: (_) => const RatingDebugDialog(),
+                    AnalyticsService.trackSettingsChanged(
+                      'reciter',
+                      oldValue,
+                      selectedReciter?.identifier,
                     );
                   },
                 ),
-                const SizedBox(height: 10),
-              ],
-              Button(
-                height: 36,
-                color: Theme.of(context).colorScheme.primary,
-                child: Text(
-                  'Save',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+                const SizedBox(height: 20),
+                LinkButton(
+                  icon: Icons.language,
+                  title: 'Visit Our Website',
+                  onTap: () {
+                    launchInBrowser(context, 'https://hafizpro.com', 'Website');
+                  },
                 ),
-                onPressed: () {
-                  AnalyticsService.trackEvent('Settings Saved', properties: {
-                    'autoplay': autoPlay,
-                    'theme': themeMode.name,
-                    'reciter': reciter ?? 'none',
-                  });
-                  storageServices.setAutoPlay(autoPlay);
-                  storageServices.setReciter(reciter ?? '');
-                  themeController.setMode(themeMode.name);
-                  Navigator.pop(context);
-                },
-              )
+                const SizedBox(height: 12),
+                LinkButton(
+                  icon: Icons.chat,
+                  title: 'Join WhatsApp Channel',
+                  onTap: () {
+                    launchInBrowser(
+                      context,
+                      'https://whatsapp.com/channel/0029Vb7FCqkFHWpx566byH0Y',
+                      'WhatsApp Channel',
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                LinkButton(
+                  icon: Icons.group,
+                  title: 'WhatsApp Feedback Group',
+                  onTap: () {
+                    launchInBrowser(
+                      context,
+                      'https://chat.whatsapp.com/EuF6FS3qL9TElJSNQBHEdp',
+                      'WhatsApp Feedback Group',
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                LinkButton(
+                  icon: Icons.star_rate,
+                  title: 'Rate This App',
+                  onTap: () => _showInAppRating(context),
+                ),
+                const SizedBox(height: 20),
+                if (kDebugMode) ...[
+                  // Debug button for rating system (remove in production)
+                  Button(
+                    height: 32,
+                    color: Colors.orange,
+                    child: Text(
+                      'Debug Rating System',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (_) => const RatingDebugDialog(),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                Button(
+                  height: 36,
+                  color: Theme.of(context).colorScheme.primary,
+                  child: Text(
+                    'Save',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                  onPressed: () {
+                    AnalyticsService.trackEvent('Settings Saved', properties: {
+                      'autoplay': autoPlay,
+                      'theme': themeMode.name,
+                      'reciter': reciter ?? 'none',
+                    });
+                    storageServices.setAutoPlay(autoPlay);
+                    storageServices.setReciter(reciter ?? '');
+                    themeController.setMode(themeMode.name);
+                    Navigator.pop(context);
+                  },
+                )
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

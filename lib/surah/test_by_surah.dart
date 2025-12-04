@@ -10,6 +10,7 @@ import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/test_screen.dart';
+import 'package:hafiz_test/quran/widgets/error.dart';
 
 class TestBySurah extends StatefulWidget {
   final int? surahNumber;
@@ -25,6 +26,8 @@ class _TestPage extends State<TestBySurah> {
   final surahServices = getIt<SurahServices>();
 
   bool isLoading = false;
+  bool hasError = false;
+  String? errorMessage;
 
   late int surahNumber;
   late Ayah currentAyah;
@@ -39,24 +42,46 @@ class _TestPage extends State<TestBySurah> {
   Surah surah = Surah();
 
   Future<void> init() async {
-    setState(() => isLoading = true);
+    if (!mounted) return;
 
-    if (widget.surahNumber == null) {
-      surahNumber = surahServices.getRandomSurahNumber();
-    } else {
-      surahNumber = widget.surahNumber!;
+    setState(() {
+      isLoading = true;
+      hasError = false;
+      errorMessage = null;
+    });
+
+    try {
+      if (widget.surahNumber == null) {
+        surahNumber = surahServices.getRandomSurahNumber();
+      } else {
+        surahNumber = widget.surahNumber!;
+      }
+
+      if (surah.ayahs.isEmpty) {
+        // Avoid refetching surah if it's ayahs are already loaded
+        surah = await surahServices.getSurah(surahNumber);
+      }
+
+      currentAyah = _getAyahForSurah();
+
+      await getIt<AudioServices>().setAudioSource(currentAyah.audioSource);
+
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+        hasError = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading surah for test: $e');
+
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+        hasError = true;
+        errorMessage = e.toString();
+      });
     }
-
-    if (surah.ayahs.isEmpty) {
-      // Avoid refetching surah if it's ayahs are already loaded
-      surah = await surahServices.getSurah(surahNumber);
-    }
-
-    currentAyah = _getAyahForSurah();
-
-    await getIt<AudioServices>().setAudioSource(currentAyah.audioSource);
-
-    setState(() => isLoading = false);
   }
 
   Ayah _getAyahForSurah() {
@@ -117,6 +142,17 @@ class _TestPage extends State<TestBySurah> {
                   backgroundColor: Colors.blueGrey,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
+              )
+            else if (hasError)
+              CustomErrorWidget(
+                title: 'Failed to Load Test',
+                message:
+                    'Unable to load the surah for testing. Please check your connection and try again.',
+                icon: Icons.quiz_outlined,
+                color: Colors.orange.shade700,
+                onRetry: () async {
+                  await init();
+                },
               )
             else
               SingleChildScrollView(

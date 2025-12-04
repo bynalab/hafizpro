@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -92,6 +93,33 @@ class _MainMenuState extends State<_MainMenu> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsAction = ShowCase(
+      widgetKey: _settingKey,
+      title: 'Settings',
+      description: 'Change autoplay settings and select your favorite reciter',
+      child: IconButton(
+        onPressed: () {
+          AnalyticsService.trackButtonClick('Settings', screen: 'Main Menu');
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (_) {
+              return const SettingDialog();
+            },
+          );
+        },
+        icon: SvgPicture.asset(
+          'assets/img/settings.svg',
+          colorFilter: ColorFilter.mode(
+            Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.onSurface
+                : const Color(0xFF222222),
+            BlendMode.srcIn,
+          ),
+        ),
+      ),
+    );
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: onMainMenuPopInvoked,
@@ -106,158 +134,161 @@ class _MainMenuState extends State<_MainMenu> {
               : const Color(0xFF004B40),
           scrolledUnderElevation: 10,
           automaticallyImplyLeading: false,
-          title: Image.asset(
-            'assets/img/logo.png',
-            width: 100,
-            height: 100,
-          ),
-          actions: [
-            ShowCase(
-              widgetKey: _settingKey,
-              title: 'Settings',
-              description:
-                  'Change autoplay settings and select your favorite reciter',
-              child: IconButton(
-                onPressed: () {
-                  AnalyticsService.trackButtonClick('Settings',
-                      screen: 'Main Menu');
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (_) {
-                      return const SettingDialog();
-                    },
-                  );
-                },
-                icon: SvgPicture.asset(
-                  'assets/img/settings.svg',
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).brightness == Brightness.dark
-                        ? Theme.of(context).colorScheme.onSurface
-                        : const Color(0xFF222222),
-                    BlendMode.srcIn,
+          title: kIsWeb
+              ? Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          'assets/img/logo.png',
+                          width: 100,
+                          height: 100,
+                        ),
+                        settingsAction,
+                      ],
+                    ),
                   ),
+                )
+              : Image.asset(
+                  'assets/img/logo.png',
+                  width: 100,
+                  height: 100,
                 ),
-              ),
-            ),
-          ],
+          actions: kIsWeb ? [] : [settingsAction],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LastReadCard(lastReadKey: _lastReadKey),
-              const SizedBox(height: 34),
-              Row(
+          child: Builder(
+            builder: (context) {
+              final content = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: ShowCase(
-                      widgetKey: _quranCardKey,
-                      title: 'Read Quran',
-                      description:
-                          'Read or listen to the Holy Quran with your preferred reciter.',
-                      child: TestMenuCard(
-                        title: 'Read/Listen to Quran',
-                        image: 'card_quran',
-                        color: const Color(0xFF2BFF00),
-                        onTap: () {
-                          AnalyticsService.trackButtonClick('Read Quran',
-                              screen: 'Main Menu');
-                          navigateTo(
-                            const SurahListScreen(
-                              actionType: SurahSelectionAction.read,
-                            ),
-                          );
-                        },
+                  LastReadCard(lastReadKey: _lastReadKey),
+                  const SizedBox(height: 34),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ShowCase(
+                          widgetKey: _quranCardKey,
+                          title: 'Read Quran',
+                          description:
+                              'Read or listen to the Holy Quran with your preferred reciter.',
+                          child: TestMenuCard(
+                            title: 'Read/Listen to Quran',
+                            image: 'card_quran',
+                            color: const Color(0xFF2BFF00),
+                            onTap: () {
+                              AnalyticsService.trackButtonClick('Read Quran',
+                                  screen: 'Main Menu');
+                              navigateTo(
+                                const SurahListScreen(
+                                  actionType: SurahSelectionAction.read,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 17),
+                  Text(
+                    'Tests',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).colorScheme.onSurface
+                          : const Color(0xFF222222),
                     ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ShowCase(
+                          widgetKey: _surahCardKey,
+                          title: 'By Surah',
+                          description:
+                              'Begin your test journey by selecting a specific Surah.',
+                          child: TestMenuCard(
+                            height: 160,
+                            title: 'By Surah',
+                            image: 'card_surah',
+                            color: const Color(0xFFFF8E6F),
+                            onTap: () {
+                              AnalyticsService.trackButtonClick('Test By Surah',
+                                  screen: 'Main Menu');
+                              navigateTo(
+                                const SurahListScreen(
+                                  actionType: SurahSelectionAction.test,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 17),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ShowCase(
+                          widgetKey: _juzCardKey,
+                          title: 'By Juz',
+                          description:
+                              'Begin your test journey by selecting a specific Juz of the Quran.',
+                          child: TestMenuCard(
+                            height: 160,
+                            title: 'By Juz',
+                            image: 'card_juz',
+                            color: const Color(0xFFFBBE15),
+                            onTap: () {
+                              AnalyticsService.trackButtonClick('Test By Juz',
+                                  screen: 'Main Menu');
+                              navigateTo(const JuzListScreen());
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 17),
+                      Expanded(
+                        child: ShowCase(
+                          widgetKey: _randomCardKey,
+                          title: 'Random Test',
+                          description:
+                              'Challenge yourself with verses selected at random from across the Holy Quran.',
+                          child: TestMenuCard(
+                            height: 160,
+                            title: 'Randomly',
+                            image: 'card_random',
+                            color: const Color(0xFF6E81F6),
+                            onTap: () {
+                              AnalyticsService.trackButtonClick('Random Test',
+                                  screen: 'Main Menu');
+                              navigateTo(const TestBySurah());
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-              const SizedBox(height: 17),
-              Text(
-                'Tests',
-                style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).colorScheme.onSurface
-                      : const Color(0xFF222222),
-                ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: ShowCase(
-                      widgetKey: _surahCardKey,
-                      title: 'By Surah',
-                      description:
-                          'Begin your test journey by selecting a specific Surah.',
-                      child: TestMenuCard(
-                        height: 160,
-                        title: 'By Surah',
-                        image: 'card_surah',
-                        color: const Color(0xFFFF8E6F),
-                        onTap: () {
-                          AnalyticsService.trackButtonClick('Test By Surah',
-                              screen: 'Main Menu');
-                          navigateTo(
-                            const SurahListScreen(
-                              actionType: SurahSelectionAction.test,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+              );
+
+              if (kIsWeb) {
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: content,
                   ),
-                ],
-              ),
-              const SizedBox(height: 17),
-              Row(
-                children: [
-                  Expanded(
-                    child: ShowCase(
-                      widgetKey: _juzCardKey,
-                      title: 'By Juz',
-                      description:
-                          'Begin your test journey by selecting a specific Juz of the Quran.',
-                      child: TestMenuCard(
-                        height: 160,
-                        title: 'By Juz',
-                        image: 'card_juz',
-                        color: const Color(0xFFFBBE15),
-                        onTap: () {
-                          AnalyticsService.trackButtonClick('Test By Juz',
-                              screen: 'Main Menu');
-                          navigateTo(const JuzListScreen());
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 17),
-                  Expanded(
-                    child: ShowCase(
-                      widgetKey: _randomCardKey,
-                      title: 'Random Test',
-                      description:
-                          'Challenge yourself with verses selected at random from across the Holy Quran.',
-                      child: TestMenuCard(
-                        height: 160,
-                        title: 'Randomly',
-                        image: 'card_random',
-                        color: const Color(0xFF6E81F6),
-                        onTap: () {
-                          AnalyticsService.trackButtonClick('Random Test',
-                              screen: 'Main Menu');
-                          navigateTo(const TestBySurah());
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                );
+              }
+
+              return content;
+            },
           ),
         ),
       ),

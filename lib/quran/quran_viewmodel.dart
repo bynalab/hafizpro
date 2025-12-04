@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/model/surah.model.dart';
@@ -122,8 +123,7 @@ class QuranViewModel {
     itemScrollController.scrollTo(
       index: index,
       alignment: 0.5,
-      duration: const Duration(milliseconds: 1500),
-      curve: Curves.easeInOutQuart,
+      duration: const Duration(),
     );
   }
 
