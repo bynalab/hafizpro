@@ -15,7 +15,29 @@ class AudioServices {
   Future<void> setAudioSource(AudioSource audioSource,
       {bool preload = true}) async {
     try {
+      if (kIsWeb) {
+        await setWebAudioSource(audioSource);
+
+        return;
+      }
+
       await audioPlayer.setAudioSource(audioSource, preload: preload);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Sets the [audioSource] for audio playback specifically optimized for the web platform.
+  ///
+  /// On the web, this method ensures that playback:
+  /// 1. Stops any existing audio without tracking the event.
+  /// 2. Sets the new audio source for the player.
+  ///
+  /// Any errors encountered are caught and printed for debugging.
+  Future<void> setWebAudioSource(AudioSource audioSource) async {
+    try {
+      await stop(trackEvent: false);
+      await audioPlayer.setAudioSource(audioSource);
     } catch (e) {
       debugPrint(e.toString());
     }
