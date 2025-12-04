@@ -42,6 +42,8 @@ class _TestPage extends State<TestBySurah> {
   Surah surah = Surah();
 
   Future<void> init() async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
       hasError = false;
@@ -64,12 +66,16 @@ class _TestPage extends State<TestBySurah> {
 
       await getIt<AudioServices>().setAudioSource(currentAyah.audioSource);
 
+      if (!mounted) return;
+
       setState(() {
         isLoading = false;
         hasError = false;
       });
     } catch (e) {
       debugPrint('Error loading surah for test: $e');
+
+      if (!mounted) return;
       setState(() {
         isLoading = false;
         hasError = true;
