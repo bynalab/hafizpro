@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -99,9 +100,9 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  "Master the Quran, one Ayah at a time",
-                  style: TextStyle(
+                Text(
+                  context.l10n.splashTagline,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontStyle: FontStyle.italic,
                     color: Colors.white70,
@@ -130,12 +131,12 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Text(
-                          "\"And We have certainly made the Qur'an easy for remembrance, so is there any who will remember?\" (Q54:17)",
+                          context.l10n.splashAyahTranslation,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
                             color: Colors.white70,

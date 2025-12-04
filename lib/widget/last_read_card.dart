@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
@@ -53,13 +54,13 @@ class LastReadCard extends StatelessWidget {
             children: [
               ShowCase(
                 widgetKey: lastReadKey,
-                title: 'Last Read',
-                description: 'This shows your last read Surah and Ayah.',
+                title: context.l10n.lastReadTitle,
+                description: context.l10n.lastReadDescription,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Last Read',
+                      context.l10n.lastReadTitle,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: Theme.of(context).brightness == Brightness.dark
@@ -125,7 +126,7 @@ class LastReadCard extends StatelessWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'Continue',
+                      context.l10n.lastReadContinue,
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -159,7 +160,7 @@ class LastReadWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (lastRead == null) {
       return Text(
-        'No last read',
+        context.l10n.lastReadNone,
         style: GoogleFonts.inter(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -187,7 +188,7 @@ class LastReadWidget extends StatelessWidget {
           ),
         ),
         Text(
-          'Ayah no. ${ayah.numberInSurah}',
+          context.l10n.lastReadAyahNumber(ayah.numberInSurah),
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w300,

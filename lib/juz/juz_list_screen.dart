@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/juz/test_by_juz.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class JuzListScreen extends StatefulWidget {
   const JuzListScreen({super.key});
@@ -43,7 +44,8 @@ class _JuzListScreenState extends State<JuzListScreen> {
         title: isSearching
             ? TextField(
                 autofocus: true,
-                decoration: const InputDecoration(hintText: 'Search Juz'),
+                decoration:
+                    InputDecoration(hintText: context.l10n.juzListSearchHint),
                 onChanged: (juzName) {
                   juzList = searchJuz(juzName);
 
@@ -58,7 +60,7 @@ class _JuzListScreenState extends State<JuzListScreen> {
                   ),
                   const SizedBox(width: 13),
                   Text(
-                    'Juz List',
+                    context.l10n.juzListTitle,
                     style: GoogleFonts.montserrat(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

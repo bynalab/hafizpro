@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/data/reciters.dart';
 import 'package:hafiz_test/extension/collection.dart';
 import 'package:hafiz_test/locator.dart';
@@ -75,7 +76,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Settings',
+                    context.l10n.settings,
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -105,7 +106,7 @@ class _SettingDialogState extends State<SettingDialog> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Autoplay verse',
+                          context.l10n.autoplayVerse,
                           style: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -130,7 +131,7 @@ class _SettingDialogState extends State<SettingDialog> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Theme',
+                          context.l10n.theme,
                           style: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -138,18 +139,18 @@ class _SettingDialogState extends State<SettingDialog> {
                         ),
                         DropdownButton<ThemeMode>(
                           value: themeMode,
-                          items: const [
+                          items: [
                             DropdownMenuItem(
                               value: ThemeMode.system,
-                              child: Text('System'),
+                              child: Text(context.l10n.themeSystem),
                             ),
                             DropdownMenuItem(
                               value: ThemeMode.light,
-                              child: Text('Light'),
+                              child: Text(context.l10n.themeLight),
                             ),
                             DropdownMenuItem(
                               value: ThemeMode.dark,
-                              child: Text('Dark'),
+                              child: Text(context.l10n.themeDark),
                             ),
                           ],
                           onChanged: (mode) {
@@ -167,7 +168,7 @@ class _SettingDialogState extends State<SettingDialog> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Language',
+                          context.l10n.language,
                           style: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -175,14 +176,14 @@ class _SettingDialogState extends State<SettingDialog> {
                         ),
                         DropdownButton<String>(
                           value: language,
-                          items: const [
+                          items: [
                             DropdownMenuItem(
                               value: 'en',
-                              child: Text('English'),
+                              child: Text(context.l10n.languageEnglish),
                             ),
                             DropdownMenuItem(
                               value: 'ar',
-                              child: Text('Arabic'),
+                              child: Text(context.l10n.languageArabic),
                             ),
                           ],
                           onChanged: (value) {
@@ -191,9 +192,6 @@ class _SettingDialogState extends State<SettingDialog> {
                             setState(() => language = value);
                             AnalyticsService.trackSettingsChanged(
                                 'language', oldValue, value);
-                            quranHafizKey.currentState
-                                ?.setLocale(Locale(value));
-                            storageServices.setString('language', value);
                           },
                         ),
                       ],
@@ -202,7 +200,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  'Select your favorite reciter',
+                  context.l10n.selectFavoriteReciter,
                   style: GoogleFonts.montserrat(
                     fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -217,8 +215,8 @@ class _SettingDialogState extends State<SettingDialog> {
                   getSubText: (reciter) =>
                       reciter.name != reciter.englishName ? reciter.name : '',
                   getItemId: (reciter) => reciter.identifier,
-                  hintText: 'Select your favorite reciter',
-                  searchHint: 'Search reciters...',
+                  hintText: context.l10n.selectFavoriteReciter,
+                  searchHint: context.l10n.searchReciters,
                   onChanged: (selectedReciter) {
                     final oldValue = reciter;
                     setState(() {
@@ -235,7 +233,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 const SizedBox(height: 20),
                 LinkButton(
                   icon: Icons.language,
-                  title: 'Visit Our Website',
+                  title: context.l10n.visitWebsite,
                   onTap: () {
                     launchInBrowser(context, 'https://hafizpro.com', 'Website');
                   },
@@ -243,7 +241,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 const SizedBox(height: 12),
                 LinkButton(
                   icon: Icons.chat,
-                  title: 'Join WhatsApp Channel',
+                  title: context.l10n.joinWhatsappChannel,
                   onTap: () {
                     launchInBrowser(
                       context,
@@ -255,7 +253,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 const SizedBox(height: 12),
                 LinkButton(
                   icon: Icons.group,
-                  title: 'WhatsApp Feedback Group',
+                  title: context.l10n.whatsappFeedbackGroup,
                   onTap: () {
                     launchInBrowser(
                       context,
@@ -267,7 +265,7 @@ class _SettingDialogState extends State<SettingDialog> {
                 const SizedBox(height: 12),
                 LinkButton(
                   icon: Icons.star_rate,
-                  title: 'Rate This App',
+                  title: context.l10n.rateThisApp,
                   onTap: () => _showInAppRating(context),
                 ),
                 const SizedBox(height: 20),
@@ -277,7 +275,7 @@ class _SettingDialogState extends State<SettingDialog> {
                     height: 32,
                     color: Colors.orange,
                     child: Text(
-                      'Debug Rating System',
+                      context.l10n.debugRatingSystem,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -298,7 +296,7 @@ class _SettingDialogState extends State<SettingDialog> {
                   height: 36,
                   color: Theme.of(context).colorScheme.primary,
                   child: Text(
-                    'Save',
+                    context.l10n.save,
                     style: GoogleFonts.montserrat(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -310,10 +308,13 @@ class _SettingDialogState extends State<SettingDialog> {
                       'autoplay': autoPlay,
                       'theme': themeMode.name,
                       'reciter': reciter ?? 'none',
+                      'language': language,
                     });
                     storageServices.setAutoPlay(autoPlay);
                     storageServices.setReciter(reciter ?? '');
                     themeController.setMode(themeMode.name);
+                    quranHafizKey.currentState?.setLocale(Locale(language));
+                    storageServices.setString('language', language);
                     Navigator.pop(context);
                   },
                 )
@@ -344,7 +345,10 @@ class _SettingDialogState extends State<SettingDialog> {
       }
     } catch (e) {
       if (context.mounted) {
-        _showErrorSnackBar(context, 'Error launching URL: $url. Error: $e');
+        _showErrorSnackBar(
+          context,
+          context.l10n.errorLaunchingUrl(url, e.toString()),
+        );
       }
     }
   }
@@ -367,7 +371,10 @@ class _SettingDialogState extends State<SettingDialog> {
       await RatingService.showRatingDialog(context);
     } catch (e) {
       if (context.mounted) {
-        _showErrorSnackBar(context, 'Error opening rating dialog: $e');
+        _showErrorSnackBar(
+          context,
+          context.l10n.errorOpeningRatingDialog(e.toString()),
+        );
       }
     }
   }
