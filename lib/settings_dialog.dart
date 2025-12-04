@@ -137,29 +137,33 @@ class _SettingDialogState extends State<SettingDialog> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        DropdownButton<ThemeMode>(
-                          value: themeMode,
-                          items: [
-                            DropdownMenuItem(
-                              value: ThemeMode.system,
-                              child: Text(context.l10n.themeSystem),
-                            ),
-                            DropdownMenuItem(
-                              value: ThemeMode.light,
-                              child: Text(context.l10n.themeLight),
-                            ),
-                            DropdownMenuItem(
-                              value: ThemeMode.dark,
-                              child: Text(context.l10n.themeDark),
-                            ),
-                          ],
-                          onChanged: (mode) {
-                            if (mode == null) return;
-                            final oldValue = themeMode;
-                            setState(() => themeMode = mode);
-                            AnalyticsService.trackSettingsChanged(
-                                'theme', oldValue.name, mode.name);
-                          },
+                        SizedBox(
+                          width: 170,
+                          child: DropdownButton<ThemeMode>(
+                            value: themeMode,
+                            isExpanded: true,
+                            items: [
+                              DropdownMenuItem(
+                                value: ThemeMode.system,
+                                child: Text(context.l10n.themeSystem),
+                              ),
+                              DropdownMenuItem(
+                                value: ThemeMode.light,
+                                child: Text(context.l10n.themeLight),
+                              ),
+                              DropdownMenuItem(
+                                value: ThemeMode.dark,
+                                child: Text(context.l10n.themeDark),
+                              ),
+                            ],
+                            onChanged: (mode) {
+                              if (mode == null) return;
+                              final oldValue = themeMode;
+                              setState(() => themeMode = mode);
+                              AnalyticsService.trackSettingsChanged(
+                                  'theme', oldValue.name, mode.name);
+                            },
+                          ),
                         )
                       ],
                     ),
@@ -174,25 +178,29 @@ class _SettingDialogState extends State<SettingDialog> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        DropdownButton<String>(
-                          value: language,
-                          items: [
-                            DropdownMenuItem(
-                              value: 'en',
-                              child: Text(context.l10n.languageEnglish),
-                            ),
-                            DropdownMenuItem(
-                              value: 'ar',
-                              child: Text(context.l10n.languageArabic),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value == null) return;
-                            final oldValue = language;
-                            setState(() => language = value);
-                            AnalyticsService.trackSettingsChanged(
-                                'language', oldValue, value);
-                          },
+                        SizedBox(
+                          width: 170,
+                          child: DropdownButton<String>(
+                            value: language,
+                            isExpanded: true,
+                            items: [
+                              DropdownMenuItem(
+                                value: 'en',
+                                child: Text(context.l10n.languageEnglish),
+                              ),
+                              DropdownMenuItem(
+                                value: 'ar',
+                                child: Text(context.l10n.languageArabic),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value == null) return;
+                              final oldValue = language;
+                              setState(() => language = value);
+                              AnalyticsService.trackSettingsChanged(
+                                  'language', oldValue, value);
+                            },
+                          ),
                         ),
                       ],
                     ),

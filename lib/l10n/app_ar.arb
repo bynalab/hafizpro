@@ -53,6 +53,7 @@
   "mainMenuJuzCardDescription": "ابدأ الاختبار باختيار جزء معيّن من القرآن.",
   "mainMenuRandomCardTitle": "عشوائي",
   "mainMenuRandomCardDescription": "تحدَّ نفسك بآيات مختارة عشوائيًا من أنحاء المصحف.",
+  "mainMenuTestsHeader": "الاختبارات",
   "mainMenuExitDialogTitle": "هل أنت متأكد؟",
   "mainMenuExitDialogContent": "هل تريد الخروج من التطبيق؟",
   "commonNo": "لا",

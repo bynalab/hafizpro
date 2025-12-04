@@ -53,6 +53,7 @@
   "mainMenuJuzCardDescription": "Begin your test journey by selecting a specific Juz of the Quran.",
   "mainMenuRandomCardTitle": "Randomly",
   "mainMenuRandomCardDescription": "Challenge yourself with verses selected at random from across the Holy Quran.",
+  "mainMenuTestsHeader": "Tests",
   "mainMenuExitDialogTitle": "Are you sure?",
   "mainMenuExitDialogContent": "Do you want to exit?",
   "commonNo": "No",

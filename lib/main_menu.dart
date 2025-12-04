@@ -196,8 +196,7 @@ class _MainMenuState extends State<_MainMenu> {
                   ),
                   const SizedBox(height: 17),
                   Text(
-                    // Keeping "Tests" label in English for now; add l10n key later if needed.
-                    'Tests',
+                    context.l10n.mainMenuTestsHeader,
                     style: GoogleFonts.montserrat(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
