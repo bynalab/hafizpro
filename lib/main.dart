@@ -12,7 +12,7 @@ import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/user_identification_service.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
-final GlobalKey<_QuranHafizState> quranHafizKey = GlobalKey<_QuranHafizState>();
+final quranHafizKey = GlobalKey<_QuranHafizState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
