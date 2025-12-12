@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 
@@ -13,6 +14,12 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _iconController;
+
+  static const String _verseTitle = 'Al-Qamar (57): Verse 20';
+  static const String _verseArabic =
+      'وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ';
+  static const String _verseTranslation =
+      "And We have certainly made the Qur'an easy for remembrance, so is there anyone who will be mindful?";
 
   @override
   void initState() {
@@ -49,103 +56,147 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF0D324D),
-                  Color(0xFF093028),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: StarPainter(),
-              ),
-            ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedBuilder(
-                  animation: _iconController,
-                  builder: (context, child) {
-                    double offset = sin(_iconController.value * 2 * pi) * 10;
-                    return Transform.translate(
-                      offset: Offset(0, offset),
-                      child: child,
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.nightlight_round,
-                        size: 80,
-                        color: Colors.amber.shade300,
+      body: SafeArea(
+        top: false,
+        child: Container(
+          color: const Color(0xFF205B5F),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double bottomSectionHeight =
+                  min(260.0, constraints.maxHeight * 0.35);
+
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(
+                        painter: GridPainter(),
                       ),
-                      Image.asset(
-                        'assets/img/logo.png',
-                        height: 200,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  "Master the Quran, one Ayah at a time",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(seconds: 2),
-                  child: Column(
-                    children: [
-                      Text(
-                        "وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.tealAccent.shade100,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 15,
-                              color: Colors.tealAccent.shade100,
-                              offset: const Offset(0, 0),
-                            ),
-                          ],
-                        ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(
+                        painter: StarPainter(),
                       ),
-                      const SizedBox(height: 10),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Text(
-                          "\"And We have certainly made the Qur'an easy for remembrance, so is there any who will remember?\" (Q54:17)",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.white70,
+                    ),
+                  ),
+                  Center(
+                    child: AnimatedBuilder(
+                      animation: _iconController,
+                      builder: (context, child) {
+                        final double scale =
+                            1 + (sin(_iconController.value * 2 * pi) * 0.015);
+                        return Transform.scale(scale: scale, child: child);
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/img/logo.png',
+                            height: 120,
+                            fit: BoxFit.contain,
                           ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Master The Quran, One ayah at a time',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Color(0xFFECF8F9),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      height: bottomSectionHeight,
+                      width: double.infinity,
+                      color: const Color(0xFF205B5F),
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: _VerseCard(
+                          title: _verseTitle,
+                          arabic: _verseArabic,
+                          translation: _verseTranslation,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VerseCard extends StatelessWidget {
+  const _VerseCard({
+    required this.title,
+    required this.arabic,
+    required this.translation,
+  });
+
+  final String title;
+  final String arabic;
+  final String translation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD9F0F2),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              fontSize: 16,
+              color: Color(0xFF121212),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            arabic,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.amiri(
+              fontSize: 24,
+              color: Color(0xFF121212),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            translation,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Color(0xFF121212),
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],
@@ -154,20 +205,66 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-class StarPainter extends CustomPainter {
-  final Random random = Random();
-
+class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.8);
-    for (int i = 0; i < 50; i++) {
-      final dx = random.nextDouble() * size.width;
-      final dy = random.nextDouble() * size.height;
-      final radius = random.nextDouble() * 1.5;
-      canvas.drawCircle(Offset(dx, dy), radius, paint);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .5
+      ..color = Colors.white.withValues(alpha: 0.08);
+
+    const double step = 48;
+    for (double x = 0; x <= size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class StarPainter extends CustomPainter {
+  StarPainter() : _random = Random(7) {
+    _stars = List.generate(70, (_) {
+      return _Star(
+        x: _random.nextDouble(),
+        y: _random.nextDouble(),
+        r: _random.nextDouble() * 1.3 + 0.2,
+        a: _random.nextDouble() * 0.35 + 0.05,
+      );
+    });
+  }
+
+  late final Random _random;
+  late final List<_Star> _stars;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    for (final s in _stars) {
+      paint.color = Colors.white.withValues(alpha: s.a);
+      canvas.drawCircle(
+          Offset(s.x * size.width, s.y * size.height), s.r, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _Star {
+  const _Star({
+    required this.x,
+    required this.y,
+    required this.r,
+    required this.a,
+  });
+
+  final double x;
+  final double y;
+  final double r;
+  final double a;
 }
