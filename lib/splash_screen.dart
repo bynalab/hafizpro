@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: SafeArea(
         top: false,
         child: Container(
-          color: const Color(0xFF205B5F),
+          color: AppColors.green500,
           child: LayoutBuilder(
             builder: (context, constraints) {
               final double bottomSectionHeight =
@@ -104,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(
                               fontSize: 14,
-                              color: Color(0xFFECF8F9),
+                              color: AppColors.gray50,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -117,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Container(
                       height: bottomSectionHeight,
                       width: double.infinity,
-                      color: const Color(0xFF205B5F),
+                      color: AppColors.green500,
                       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                       child: Align(
                         alignment: Alignment.bottomCenter,
@@ -156,13 +157,18 @@ class _VerseCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       decoration: BoxDecoration(
-        color: const Color(0xFFD9F0F2),
+        color: AppColors.green100,
+        border: Border.all(
+          color: AppColors.black100,
+          width: 1,
+        ),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 18,
-            offset: Offset(0, 8),
+            color: Color(0x3DE4E5E7),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -175,7 +181,7 @@ class _VerseCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               fontSize: 16,
-              color: Color(0xFF121212),
+              color: AppColors.black500,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -185,7 +191,7 @@ class _VerseCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.amiri(
               fontSize: 24,
-              color: Color(0xFF121212),
+              color: AppColors.black500,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -195,7 +201,7 @@ class _VerseCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Color(0xFF121212),
+              color: AppColors.black500,
               fontWeight: FontWeight.w400,
             ),
           ),
