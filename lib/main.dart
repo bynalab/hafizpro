@@ -144,8 +144,7 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
 
   void setLocale(Locale locale) {
     if (!mounted) return;
-    setState(() {
-      _locale = locale;
-    });
+
+    setState(() => _locale = locale);
   }
 }
