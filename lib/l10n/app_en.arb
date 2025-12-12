@@ -1,0 +1,82 @@
+{
+  "@@locale": "en",
+  "appTitle": "Quran Hafiz",
+  "hello": "Hello",
+  "start": "Start",
+  "settings": "Settings",
+  "autoplayVerse": "Autoplay verse",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageArabic": "Arabic",
+  "selectFavoriteReciter": "Select your favorite reciter",
+  "searchReciters": "Search reciters...",
+  "visitWebsite": "Visit Our Website",
+  "joinWhatsappChannel": "Join WhatsApp Channel",
+  "whatsappFeedbackGroup": "WhatsApp Feedback Group",
+  "rateThisApp": "Rate This App",
+  "debugRatingSystem": "Debug Rating System",
+  "save": "Save",
+  "errorLaunchingUrl": "Error launching URL: {url}. Error: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "Error opening rating dialog: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "Master the Quran, one Ayah at a time",
+  "splashAyahTranslation": "\"And We have certainly made the Qur'an easy for remembrance, so is there any who will remember?\" (Q54:17)",
+  "mainMenuSettingsShowcaseTitle": "Settings",
+  "mainMenuSettingsShowcaseDescription": "Change autoplay settings and select your favorite reciter",
+  "mainMenuLastReadShowcaseTitle": "Last Read",
+  "mainMenuLastReadShowcaseDescription": "This shows your last read Surah and Ayah.",
+  "mainMenuQuranCardTitle": "Read Quran",
+  "mainMenuQuranCardDescription": "Start your memorization journey by reading and listening to each Surah.",
+  "mainMenuSurahCardTitle": "By Surah",
+  "mainMenuSurahCardDescription": "Test your memorization by selecting a specific Surah.",
+  "mainMenuJuzCardTitle": "By Juz",
+  "mainMenuJuzCardDescription": "Begin your test journey by selecting a specific Juz of the Quran.",
+  "mainMenuRandomCardTitle": "Randomly",
+  "mainMenuRandomCardDescription": "Challenge yourself with verses selected at random from across the Holy Quran.",
+  "mainMenuTestsHeader": "Tests",
+  "mainMenuExitDialogTitle": "Are you sure?",
+  "mainMenuExitDialogContent": "Do you want to exit?",
+  "commonNo": "No",
+  "commonYes": "Yes",
+  "surahListTitle": "Surah List",
+  "surahListSearchHint": "Search Surah",
+  "surahListDesktopPlaceholder": "Select a Surah",
+  "juzListTitle": "Juz List",
+  "juzListSearchHint": "Search Juz",
+  "lastReadTitle": "Last Read",
+  "lastReadDescription": "This shows your last read Surah and Ayah.",
+  "lastReadContinue": "Continue",
+  "lastReadNone": "No last read",
+  "lastReadAyahNumber": "Ayah no. {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "Failed to Load Surah",
+  "quranViewErrorMessage": "Please check your internet connection or try again shortly.",
+  "quranViewPlayFullSurah": "Play Full Surah",
+  "quranViewPlayingFullSurah": "Playing Full Surah"
+}

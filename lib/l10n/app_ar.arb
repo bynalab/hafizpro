@@ -1,0 +1,82 @@
+{
+  "@@locale": "ar",
+  "appTitle": "حافظ القرآن",
+  "hello": "مرحبا",
+  "start": "ابدأ",
+  "settings": "الإعدادات",
+  "autoplayVerse": "تشغيل الآية تلقائيًا",
+  "theme": "السمة",
+  "themeSystem": "النظام",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "language": "اللغة",
+  "languageEnglish": "الإنجليزية",
+  "languageArabic": "العربية",
+  "selectFavoriteReciter": "اختر قارئك المفضل",
+  "searchReciters": "ابحث عن القرّاء...",
+  "visitWebsite": "زيارة موقعنا",
+  "joinWhatsappChannel": "انضم إلى قناة الواتساب",
+  "whatsappFeedbackGroup": "مجموعة ملاحظات الواتساب",
+  "rateThisApp": "قيّم هذا التطبيق",
+  "debugRatingSystem": "تصحيح نظام التقييم",
+  "save": "حفظ",
+  "errorLaunchingUrl": "حدث خطأ أثناء فتح الرابط: {url}. الخطأ: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "حدث خطأ أثناء فتح نافذة التقييم: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "أتقن القرآن، آية بعد آية",
+  "splashAyahTranslation": "\"ولقد يسرنا القرآن للذكر فهل من مدكر\" (القمر: 17)",
+  "mainMenuSettingsShowcaseTitle": "الإعدادات",
+  "mainMenuSettingsShowcaseDescription": "غيّر إعدادات التشغيل التلقائي واختر قارئك المفضل",
+  "mainMenuLastReadShowcaseTitle": "آخر موضع قراءة",
+  "mainMenuLastReadShowcaseDescription": "يُظهر آخر سورة وآية قرأتها.",
+  "mainMenuQuranCardTitle": "قراءة القرآن",
+  "mainMenuQuranCardDescription": "ابدأ رحلة الحفظ بقراءة كل سورة والاستماع إليها.",
+  "mainMenuSurahCardTitle": "حسب السورة",
+  "mainMenuSurahCardDescription": "اختبر حفظك باختيار سورة معيّنة.",
+  "mainMenuJuzCardTitle": "حسب الجزء",
+  "mainMenuJuzCardDescription": "ابدأ الاختبار باختيار جزء معيّن من القرآن.",
+  "mainMenuRandomCardTitle": "عشوائي",
+  "mainMenuRandomCardDescription": "تحدَّ نفسك بآيات مختارة عشوائيًا من أنحاء المصحف.",
+  "mainMenuTestsHeader": "الاختبارات",
+  "mainMenuExitDialogTitle": "هل أنت متأكد؟",
+  "mainMenuExitDialogContent": "هل تريد الخروج من التطبيق؟",
+  "commonNo": "لا",
+  "commonYes": "نعم",
+  "surahListTitle": "قائمة السور",
+  "surahListSearchHint": "ابحث عن سورة",
+  "surahListDesktopPlaceholder": "اختر سورة",
+  "juzListTitle": "قائمة الأجزاء",
+  "juzListSearchHint": "ابحث عن جزء",
+  "lastReadTitle": "آخر موضع قراءة",
+  "lastReadDescription": "يُظهر آخر سورة وآية قرأتها.",
+  "lastReadContinue": "تابع",
+  "lastReadNone": "لا يوجد آخر موضع قراءة",
+  "lastReadAyahNumber": "الآية رقم {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "فشل في تحميل السورة",
+  "quranViewErrorMessage": "يرجى التحقق من اتصالك بالإنترنت أو المحاولة مرة أخرى لاحقًا.",
+  "quranViewPlayFullSurah": "تشغيل السورة كاملة",
+  "quranViewPlayingFullSurah": "يتم تشغيل السورة كاملة الآن"
+}

@@ -7,6 +7,7 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class SurahListScreen extends StatefulWidget {
   final SurahSelectionAction actionType;
@@ -157,7 +158,8 @@ class _SurahListScreenState extends State<SurahListScreen> {
                     ? Theme.of(context).colorScheme.surface
                     : Colors.grey[100],
                 child: selectedSurah == null
-                    ? const Center(child: Text("Select a Surah"))
+                    ? Center(
+                        child: Text(context.l10n.surahListDesktopPlaceholder))
                     : widget.actionType == SurahSelectionAction.read
                         ? QuranView(
                             key: ValueKey(selectedSurah?.number),
@@ -188,7 +190,9 @@ class _SurahListScreenState extends State<SurahListScreen> {
           title: isSearching
               ? TextField(
                   autofocus: true,
-                  decoration: const InputDecoration(hintText: 'Search Surah'),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.surahListSearchHint,
+                  ),
                   onChanged: (juzName) {
                     surahList = searchSurah(juzName);
                     setState(() {});
@@ -202,7 +206,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
                     ),
                     const SizedBox(width: 13),
                     Text(
-                      'Surah List',
+                      context.l10n.surahListTitle,
                       style: GoogleFonts.montserrat(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

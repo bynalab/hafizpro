@@ -8,6 +8,7 @@ import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
@@ -57,9 +58,8 @@ class _QuranViewState extends State<QuranView> {
     if (viewModel.hasError) {
       return Scaffold(
         body: CustomErrorWidget(
-          title: 'Failed to Load Surah',
-          message:
-              'Please check your internet connection or try again shortly.',
+          title: context.l10n.quranViewErrorTitle,
+          message: context.l10n.quranViewErrorMessage,
           icon: Icons.menu_book_rounded,
           color: Colors.green.shade700,
           onRetry: () async {
@@ -103,7 +103,7 @@ class _QuranViewState extends State<QuranView> {
               final ayahs = viewModel.surah.ayahs;
               final valid = index != null && index >= 0 && index < ayahs.length;
               final verseText = valid
-                  ? ' - Verse ${ayahs[index].numberInSurah} of ${viewModel.surah.numberOfAyahs}'
+                  ? ' - ${ayahs[index].numberInSurah}/${viewModel.surah.numberOfAyahs}'
                   : '';
               return Text(
                 '${viewModel.surah.englishName}$verseText',
@@ -173,8 +173,8 @@ class _QuranViewState extends State<QuranView> {
                         children: [
                           Text(
                             viewModel.isPlayingPlaylist
-                                ? 'Playing Full Surah'
-                                : 'Play Full Surah',
+                                ? context.l10n.quranViewPlayingFullSurah
+                                : context.l10n.quranViewPlayFullSurah,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

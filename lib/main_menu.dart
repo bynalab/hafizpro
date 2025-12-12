@@ -16,6 +16,7 @@ import 'package:hafiz_test/surah/surah_list_screen.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/widget/test_menu_card.dart';
 import 'package:hafiz_test/services/rating_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class MainMenu extends StatelessWidget {
   const MainMenu({super.key});
@@ -95,8 +96,8 @@ class _MainMenuState extends State<_MainMenu> {
   Widget build(BuildContext context) {
     final settingsAction = ShowCase(
       widgetKey: _settingKey,
-      title: 'Settings',
-      description: 'Change autoplay settings and select your favorite reciter',
+      title: context.l10n.mainMenuSettingsShowcaseTitle,
+      description: context.l10n.mainMenuSettingsShowcaseDescription,
       child: IconButton(
         onPressed: () {
           AnalyticsService.trackButtonClick('Settings', screen: 'Main Menu');
@@ -172,11 +173,11 @@ class _MainMenuState extends State<_MainMenu> {
                       Expanded(
                         child: ShowCase(
                           widgetKey: _quranCardKey,
-                          title: 'Read Quran',
+                          title: context.l10n.mainMenuQuranCardTitle,
                           description:
-                              'Read or listen to the Holy Quran with your preferred reciter.',
+                              context.l10n.mainMenuQuranCardDescription,
                           child: TestMenuCard(
-                            title: 'Read/Listen to Quran',
+                            title: context.l10n.mainMenuQuranCardTitle,
                             image: 'card_quran',
                             color: const Color(0xFF2BFF00),
                             onTap: () {
@@ -195,7 +196,7 @@ class _MainMenuState extends State<_MainMenu> {
                   ),
                   const SizedBox(height: 17),
                   Text(
-                    'Tests',
+                    context.l10n.mainMenuTestsHeader,
                     style: GoogleFonts.montserrat(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -209,12 +210,12 @@ class _MainMenuState extends State<_MainMenu> {
                       Expanded(
                         child: ShowCase(
                           widgetKey: _surahCardKey,
-                          title: 'By Surah',
+                          title: context.l10n.mainMenuSurahCardTitle,
                           description:
-                              'Begin your test journey by selecting a specific Surah.',
+                              context.l10n.mainMenuSurahCardDescription,
                           child: TestMenuCard(
                             height: 160,
-                            title: 'By Surah',
+                            title: context.l10n.mainMenuSurahCardTitle,
                             image: 'card_surah',
                             color: const Color(0xFFFF8E6F),
                             onTap: () {
@@ -237,12 +238,11 @@ class _MainMenuState extends State<_MainMenu> {
                       Expanded(
                         child: ShowCase(
                           widgetKey: _juzCardKey,
-                          title: 'By Juz',
-                          description:
-                              'Begin your test journey by selecting a specific Juz of the Quran.',
+                          title: context.l10n.mainMenuJuzCardTitle,
+                          description: context.l10n.mainMenuJuzCardDescription,
                           child: TestMenuCard(
                             height: 160,
-                            title: 'By Juz',
+                            title: context.l10n.mainMenuJuzCardTitle,
                             image: 'card_juz',
                             color: const Color(0xFFFBBE15),
                             onTap: () {
@@ -257,12 +257,12 @@ class _MainMenuState extends State<_MainMenu> {
                       Expanded(
                         child: ShowCase(
                           widgetKey: _randomCardKey,
-                          title: 'Random Test',
+                          title: context.l10n.mainMenuRandomCardTitle,
                           description:
-                              'Challenge yourself with verses selected at random from across the Holy Quran.',
+                              context.l10n.mainMenuRandomCardDescription,
                           child: TestMenuCard(
                             height: 160,
-                            title: 'Randomly',
+                            title: context.l10n.mainMenuRandomCardTitle,
                             image: 'card_random',
                             color: const Color(0xFF6E81F6),
                             onTap: () {
@@ -301,16 +301,16 @@ class _MainMenuState extends State<_MainMenu> {
     final shouldExit = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Are you sure?'),
-        content: const Text('Do you want to exit?'),
+        title: Text(context.l10n.mainMenuExitDialogTitle),
+        content: Text(context.l10n.mainMenuExitDialogContent),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('No'),
+            child: Text(context.l10n.commonNo),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Yes'),
+            child: Text(context.l10n.commonYes),
           ),
         ],
       ),
