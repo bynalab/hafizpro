@@ -5,7 +5,7 @@ import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
-import 'package:hafiz_test/services/audio_services.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:just_audio/just_audio.dart';
@@ -22,7 +22,7 @@ class QuranView extends StatefulWidget {
 
 class _QuranViewState extends State<QuranView> {
   final viewModel = QuranViewModel(
-    audioService: getIt<AudioServices>(),
+    audioCenter: getIt<AudioCenter>(),
     surahService: getIt<SurahServices>(),
   );
 
@@ -228,7 +228,7 @@ class _QuranViewState extends State<QuranView> {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
-                                        await viewModel.audioPlayer.stop();
+                                        await viewModel.audioCenter.stop();
                                         viewModel.playingIndexNotifier.value =
                                             null;
                                         viewModel.isPlayingNotifier.value =
@@ -252,12 +252,20 @@ class _QuranViewState extends State<QuranView> {
                                 ),
                                 const SizedBox(height: 10),
                                 StreamBuilder<Duration>(
-                                  stream: viewModel.audioPlayer.positionStream,
+                                  stream: viewModel.audioCenter.isCurrentSurah(
+                                          viewModel.surah.number)
+                                      ? viewModel.audioPlayer.positionStream
+                                      : const Stream<Duration>.empty(),
                                   builder: (context, snap) {
-                                    final pos = snap.data ?? Duration.zero;
-                                    final total =
-                                        viewModel.audioPlayer.duration ??
-                                            Duration.zero;
+                                    final matches = viewModel.audioCenter
+                                        .isCurrentSurah(viewModel.surah.number);
+                                    final pos = matches
+                                        ? (snap.data ?? Duration.zero)
+                                        : Duration.zero;
+                                    final total = matches
+                                        ? (viewModel.audioPlayer.duration ??
+                                            Duration.zero)
+                                        : Duration.zero;
                                     final totalMs = total.inMilliseconds;
                                     final value = totalMs == 0
                                         ? 0.0
@@ -295,20 +303,28 @@ class _QuranViewState extends State<QuranView> {
                                           ),
                                           child: Slider(
                                             value: value,
-                                            onChanged: (v) async {
-                                              final ms = (totalMs * v).round();
-                                              await viewModel.audioService
-                                                  .pause();
-                                              await viewModel.audioPlayer.seek(
-                                                  Duration(milliseconds: ms));
-                                            },
-                                            onChangeEnd: (v) async {
-                                              final ms = (totalMs * v).round();
-                                              await viewModel.audioPlayer.seek(
-                                                  Duration(milliseconds: ms));
-                                              await viewModel.audioService
-                                                  .play();
-                                            },
+                                            onChanged: matches
+                                                ? (v) async {
+                                                    final ms =
+                                                        (totalMs * v).round();
+                                                    await viewModel.audioPlayer
+                                                        .pause();
+                                                    await viewModel.audioPlayer
+                                                        .seek(Duration(
+                                                            milliseconds: ms));
+                                                  }
+                                                : null,
+                                            onChangeEnd: matches
+                                                ? (v) async {
+                                                    final ms =
+                                                        (totalMs * v).round();
+                                                    await viewModel.audioPlayer
+                                                        .seek(Duration(
+                                                            milliseconds: ms));
+                                                    await viewModel.audioPlayer
+                                                        .play();
+                                                  }
+                                                : null,
                                           ),
                                         ),
                                         Padding(

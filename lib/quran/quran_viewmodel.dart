@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/model/surah.model.dart';
-import 'package:hafiz_test/services/audio_services.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -12,12 +12,12 @@ import 'package:just_audio/just_audio.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class QuranViewModel {
-  final AudioServices audioService;
+  final AudioCenter audioCenter;
   final SurahServices surahService;
 
   final itemScrollController = ItemScrollController();
 
-  QuranViewModel({required this.audioService, required this.surahService});
+  QuranViewModel({required this.audioCenter, required this.surahService});
 
   late Surah surah;
   bool isLoading = true;
@@ -30,7 +30,7 @@ class QuranViewModel {
   final playingIndexNotifier = ValueNotifier<int?>(null);
   final isPlayingNotifier = ValueNotifier<bool>(false);
 
-  AudioPlayer get audioPlayer => audioService.audioPlayer;
+  AudioPlayer get audioPlayer => audioCenter.audioPlayer;
 
   Future<void> initialize(int surahNumber) async {
     try {
@@ -38,7 +38,24 @@ class QuranViewModel {
       surah = await surahService.getSurah(surahNumber);
       if (surah.ayahs.isEmpty) return;
 
-      await audioService.setPlaylistAudio(surah.audioSources);
+      // Only reflect existing playback state if the currently playing surah
+      // matches the surah being viewed.
+      if (audioCenter.isCurrentSurah(surahNumber)) {
+        final seqLen = audioPlayer.sequence.length;
+        isPlaylist = seqLen > 1;
+
+        isPlayingNotifier.value = audioPlayer.playing;
+
+        if (isPlaylist) {
+          final idx = audioPlayer.currentIndex;
+          if (idx != null) playingIndexNotifier.value = idx;
+        }
+      } else {
+        isPlaylist = false;
+        playingIndexNotifier.value = null;
+        isPlayingNotifier.value = false;
+      }
+
       hasError = false;
     } catch (e) {
       debugPrint('Error loading surah: $e');
@@ -50,6 +67,14 @@ class QuranViewModel {
 
   void initiateListeners() {
     _playerStateSub = audioPlayer.playerStateStream.listen((state) {
+      final matches = audioCenter.isCurrentSurah(surah.number);
+      if (!matches) {
+        if (isPlayingNotifier.value != false) {
+          isPlayingNotifier.value = false;
+        }
+        return;
+      }
+
       isPlayingNotifier.value = state.playing;
 
       if (state.playing && state.processingState == ProcessingState.ready) {
@@ -76,6 +101,14 @@ class QuranViewModel {
     });
 
     _currentIndexSub = audioPlayer.currentIndexStream.listen((index) {
+      final matches = audioCenter.isCurrentSurah(surah.number);
+      if (!matches) {
+        if (playingIndexNotifier.value != null) {
+          playingIndexNotifier.value = null;
+        }
+        return;
+      }
+
       if (index != null && isPlaylist) {
         playingIndexNotifier.value = index;
         scrollToVerse(index);
@@ -85,9 +118,10 @@ class QuranViewModel {
 
   Future<void> _togglePlayback() async {
     if (isPlayingNotifier.value) {
-      await audioService.pause(audioName: surah.englishName);
+      await audioPlayer.pause();
     } else {
-      await audioService.play(audioName: surah.englishName);
+      // Use AudioCenter so global state (dashboard) stays in sync.
+      await audioCenter.toggleSurah(surah);
     }
   }
 
@@ -111,10 +145,7 @@ class QuranViewModel {
     isPlaylist = true;
     playingIndexNotifier.value = 0;
 
-    await audioService.setPlaylistAudio(surah.audioSources);
-    await audioPlayer.seek(Duration.zero, index: 0);
-
-    await audioService.play();
+    await audioCenter.toggleSurah(surah, startIndex: 0);
   }
 
   void scrollToVerse(int? index) {
@@ -131,23 +162,18 @@ class QuranViewModel {
   void playSingleAyah(int index) {
     isPlaylist = false;
     playingIndexNotifier.value = index;
-    audioService.setAudioSource(surah.ayahs[index].audioSource);
-
-    _togglePlayback();
+    audioCenter.playSingleAyah(surah, surah.ayahs[index].audioSource);
   }
 
   void onAyahControlPressed(int index) async {
     if (isPlaylist) {
-      await audioPlayer.seek(Duration.zero, index: index);
-      await audioService.play();
+      await audioCenter.playFromAyahIndex(surah, index);
     } else {
       playSingleAyah(index);
     }
   }
 
   void dispose() {
-    audioService.resetAudioPlayer();
-
     _playerStateSub?.cancel();
     _currentIndexSub?.cancel();
   }

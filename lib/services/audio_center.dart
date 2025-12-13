@@ -36,7 +36,29 @@ class AudioCenter extends ChangeNotifier {
 
   bool isCurrentSurah(int surahNumber) => currentSurahNumber == surahNumber;
 
-  Future<void> toggleSurah(Surah surah) async {
+  void setCurrentSurah(Surah surah) {
+    currentSurahNumber = surah.number;
+    currentSurahName = surah.englishName;
+    notifyListeners();
+  }
+
+  Future<void> playSingleAyah(Surah surah, AudioSource source) async {
+    if (isLoading) return;
+
+    isLoading = true;
+    setCurrentSurah(surah);
+
+    try {
+      await _audioServices.setAudioSource(source);
+      isPlaying = true;
+      unawaited(_audioServices.play(audioName: currentSurahName));
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> toggleSurah(Surah surah, {int startIndex = 0}) async {
     if (isLoading) return;
 
     final audioPlayer = _audioServices.audioPlayer;
@@ -65,7 +87,7 @@ class AudioCenter extends ChangeNotifier {
 
       currentSurahName = fullSurah.englishName;
       await _audioServices.setPlaylistAudio(fullSurah.audioSources);
-      await audioPlayer.seek(Duration.zero, index: 0);
+      await audioPlayer.seek(Duration.zero, index: startIndex);
       unawaited(_audioServices.play(audioName: fullSurah.englishName));
 
       isPlaying = true;
@@ -75,6 +97,17 @@ class AudioCenter extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> playFromAyahIndex(Surah surah, int index) async {
+    await toggleSurah(surah, startIndex: index);
+  }
+
+  Future<void> stop() async {
+    if (isLoading) return;
+    isPlaying = false;
+    notifyListeners();
+    await _audioServices.stop(audioName: currentSurahName);
   }
 
   @override
