@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
-import 'package:hafiz_test/settings_dialog.dart';
+import 'package:hafiz_test/settings/settings_screen.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/locator.dart';
 
@@ -84,10 +84,9 @@ class _MainMenuShellState extends State<MainMenuShell> {
 
   Future<void> _openSettings() async {
     AnalyticsService.trackButtonClick('Settings', screen: 'Main Menu');
-    await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (_) => const SettingDialog(),
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
     );
     if (!mounted) return;
     setState(() {});
