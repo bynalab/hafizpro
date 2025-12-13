@@ -295,7 +295,7 @@ class SurahListWidget extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) {
         final s = surahs[i];
-        return SurahRow(
+        return SurahCard(
           surah: s,
           onPlay: () {
             AnalyticsService.trackSurahSelected(s.englishName, s.number);
@@ -310,65 +310,75 @@ class SurahListWidget extends StatelessWidget {
   }
 }
 
-class SurahRow extends StatelessWidget {
+class SurahCard extends StatelessWidget {
   final Surah surah;
-  final VoidCallback onPlay;
+  final VoidCallback? onPlay;
+  final VoidCallback? onTap;
 
-  const SurahRow({super.key, required this.surah, required this.onPlay});
+  const SurahCard({
+    super.key,
+    required this.surah,
+    this.onPlay,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        children: [
-          StarburstIcon(text: '${surah.number}'),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  surah.englishName,
-                  style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Row(
+          children: [
+            StarburstIcon(text: '${surah.number}'),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    surah.englishName,
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF111827),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Tap to open',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF9CA3AF),
+                  const SizedBox(height: 2),
+                  Text(
+                    surah.englishNameTranslation,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF9CA3AF),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: onPlay,
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF111827), width: 1.4),
-              ),
-              child: const Icon(
-                Icons.play_arrow_rounded,
-                color: Color(0xFF111827),
+                ],
               ),
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: onPlay,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: const Color(0xFF111827), width: 1.4),
+                ),
+                child: const Icon(
+                  Icons.play_arrow_rounded,
+                  color: Color(0xFF111827),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

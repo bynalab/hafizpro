@@ -212,17 +212,20 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
               itemCount: displaySurahs.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, i) {
-                final s = displaySurahs[i];
-                return SurahRow(
-                  surah: s,
-                  onPlay: () {
+                final surah = displaySurahs[i];
+
+                return SurahCard(
+                  surah: surah,
+                  onTap: () {
                     AnalyticsService.trackSurahSelected(
-                        s.englishName, s.number);
+                        surah.englishName, surah.number);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => QuranView(surah: s)),
+                      MaterialPageRoute(
+                          builder: (_) => QuranView(surah: surah)),
                     );
                   },
+                  onPlay: () {},
                 );
               },
             )
