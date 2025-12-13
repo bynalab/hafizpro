@@ -2,7 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/main_menu.dart';
+import 'package:hafiz_test/onboarding_screen.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,6 +18,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _iconController;
+  late final IStorageService _storage;
 
   static const String _verseTitle = 'Al-Qamar (57): Verse 20';
   static const String _verseArabic =
@@ -26,6 +30,8 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
+    _storage = getIt<IStorageService>();
+
     // Track splash screen view
     AnalyticsService.trackScreenView('Splash Screen');
 
@@ -34,17 +40,25 @@ class _SplashScreenState extends State<SplashScreen>
           ..repeat(reverse: true);
 
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 900),
-            pageBuilder: (_, __, ___) => const MainMenu(),
-            transitionsBuilder: (_, animation, __, child) =>
-                FadeTransition(opacity: animation, child: child),
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      final completedOnboarding =
+          _storage.getString(OnboardingScreen.completedKey) == 'true';
+
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 900),
+          pageBuilder: (_, __, ___) {
+            return completedOnboarding
+                ? const MainMenu()
+                : const OnboardingScreen();
+          },
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
     });
   }
 
