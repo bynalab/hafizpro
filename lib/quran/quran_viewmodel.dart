@@ -120,10 +120,11 @@ class QuranViewModel {
   void scrollToVerse(int? index) {
     if (index == null) return;
 
+    if (!itemScrollController.isAttached) return;
+
     itemScrollController.scrollTo(
       index: index,
-      alignment: 0.5,
-      duration: const Duration(),
+      duration: const Duration(milliseconds: 250),
     );
   }
 

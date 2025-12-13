@@ -5,6 +5,7 @@ class Ayah {
   final String audio;
   final List<String> audioSecondary;
   final String text;
+  final String? translation;
   final int numberInSurah;
   final int juz;
   final int manzil;
@@ -19,6 +20,7 @@ class Ayah {
     this.audio = '',
     this.audioSecondary = const [],
     this.text = '',
+    this.translation,
     this.numberInSurah = 0,
     this.juz = 0,
     this.manzil = 0,
@@ -35,6 +37,10 @@ class Ayah {
       audio: json['audio'] ?? '',
       audioSecondary: ((json['audioSecondary'] ?? []) as List).cast<String>(),
       text: json['text'],
+      translation: (json['translation'] ??
+              json['textTranslation'] ??
+              json['englishTranslation'])
+          ?.toString(),
       numberInSurah: json['numberInSurah'],
       juz: json['juz'],
       manzil: json['manzil'],
@@ -52,6 +58,7 @@ class Ayah {
       'audio': audio,
       'audioSecondary': audioSecondary,
       'text': text,
+      'translation': translation,
       'numberInSurah': numberInSurah,
       'juz': juz,
       'manzil': manzil,

@@ -6,12 +6,14 @@ class AyahCard extends StatelessWidget {
   final int index;
   final ValueNotifier<int?> playingIndexNotifier;
   final void Function(int)? onPlayPressed;
+  final Color backgroundColor;
 
   const AyahCard({
     super.key,
     required this.ayah,
     required this.index,
     required this.playingIndexNotifier,
+    this.backgroundColor = Colors.white,
     this.onPlayPressed,
   });
 
@@ -22,110 +24,113 @@ class AyahCard extends StatelessWidget {
       builder: (context, currentPlayingIndex, _) {
         final isActive = currentPlayingIndex == index;
 
+        const hardcodedTransliteration =
+            'Wala takuloo amwalakum baynakum bialbatili\n'
+            'watudloo biha ila alhukkami litakuloo fareegan\n'
+            'min amwali annasi\n'
+            'bialithmi waantum taAAlamoona';
+
+        const hardcodedTranslation =
+            "You 'alone' we worship and You 'alone' we ask\nfor help.";
+
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 24),
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.topLeft,
-                    radius: 2,
-                    colors: isActive
-                        ? Theme.of(context).brightness == Brightness.dark
-                            ? [
-                                Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withValues(alpha: 0.1),
-                                Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withValues(alpha: 0.2)
-                              ]
-                            : [Colors.green.shade50, Colors.green.shade100]
-                        : Theme.of(context).brightness == Brightness.dark
-                            ? [
-                                Theme.of(context).colorScheme.surface,
-                                Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest
-                              ]
-                            : [Colors.white, Colors.grey.shade100],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Theme.of(context)
-                            .colorScheme
-                            .outline
-                            .withValues(alpha: 0.3)
-                        : Colors.green.shade100,
-                    width: 0.5,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 6),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isActive
+                    ? const Color(0xFF78B7C6)
+                    : const Color(0xFFE5E7EB),
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Center(
-                      child: Text.rich(
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.center,
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: ayah.text,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontFamily: 'Quran',
-                                height: 2,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "    \u{fd3f}${ayah.numberInSurah}\u{fd3e}",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Quran',
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          ],
+                    Container(
+                      width: 34,
+                      height: 34,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF111827)),
+                      ),
+                      child: Text(
+                        '${ayah.numberInSurah}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF111827),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => onPlayPressed?.call(index),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF111827)),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isActive ? Icons.stop : Icons.play_arrow_rounded,
+                            size: 20,
+                            color: const Color(0xFF111827),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              Positioned(
-                bottom: 5,
-                right: 5,
-                child: GestureDetector(
-                  onTap: () => onPlayPressed?.call(index),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? Colors.red.shade600.withValues(alpha: 0.8)
-                          : Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isActive ? Icons.stop : Icons.play_arrow,
-                      color: Colors.white,
-                      size: 15,
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    ayah.text,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'Quran',
+                      height: 2,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    hardcodedTransliteration,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.7,
+                      color: Color(0xFF111827),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    hardcodedTranslation,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.6,
+                      color: Color(0xFF111827),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
