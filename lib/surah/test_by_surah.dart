@@ -110,21 +110,38 @@ class _TestPage extends State<TestBySurah> {
           surfaceTintColor: Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).colorScheme.primary
               : const Color(0xFF004B40),
-          scrolledUnderElevation: 10,
+          scrolledUnderElevation: 0,
           centerTitle: false,
           automaticallyImplyLeading: false,
           title: Row(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset('assets/img/arrow_back.svg'),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHigh
+                        .withValues(alpha: 0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/img/arrow_back.svg',
+                    width: 18,
+                    height: 18,
+                  ),
+                ),
               ),
-              const SizedBox(width: 13),
+              const SizedBox(width: 14),
               Text(
                 surah.englishName,
                 style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Theme.of(context).colorScheme.onSurface
                       : const Color(0xFF222222),

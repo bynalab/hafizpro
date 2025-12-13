@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/enum/surah_select_action.dart';
@@ -18,7 +19,8 @@ class SurahListScreen extends StatefulWidget {
 }
 
 class _SurahListScreenState extends State<SurahListScreen> {
-  bool isSearching = false;
+  final _searchController = TextEditingController();
+  String _query = '';
   Surah? selectedSurah;
 
   @override
@@ -27,86 +29,64 @@ class _SurahListScreenState extends State<SurahListScreen> {
 
     // Track surah list screen view
     AnalyticsService.trackScreenView('Surah List Screen');
+
+    _searchController.addListener(() {
+      final next = _searchController.text;
+      if (next == _query) return;
+      setState(() => _query = next);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isWideScreen = MediaQuery.of(context).size.width >= 600;
 
-    final surahListView = ListView.separated(
-      padding: const EdgeInsets.all(15),
-      itemCount: surahList.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
+    final displaySurahs =
+        _query.trim().isEmpty ? surahList : searchSurah(_query);
+
+    final list = ListView.separated(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 24),
+      itemCount: displaySurahs.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 14),
       itemBuilder: (_, index) {
-        final surah = surahList[index];
+        final surah = displaySurahs[index];
         final surahNumber = surah.number;
 
-        return GestureDetector(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF23364F).withValues(alpha: 0.1),
-                  spreadRadius: 0,
-                  blurRadius: 30,
-                  offset: const Offset(4, 4),
-                ),
-              ],
-              color: selectedSurah?.number == surah.number
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '$surahNumber. ${surah.englishName}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: selectedSurah?.number == surah.number
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  size: 15,
-                  color: selectedSurah?.number == surah.number
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-              ],
-            ),
-          ),
+        return _SelectListRow(
+          numberText: '$surahNumber',
+          title: surah.englishName,
+          subtitle:
+              '${surah.englishNameTranslation} • ${surah.numberOfAyahs} Verses',
           onTap: () {
-            // Track surah selection
             AnalyticsService.trackSurahSelected(surah.englishName, surahNumber);
 
             if (isWideScreen) {
               setState(() {
                 selectedSurah = surah;
               });
-            } else {
-              switch (widget.actionType) {
-                case SurahSelectionAction.read:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
-                  );
-                  break;
-                default:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) {
-                        return TestBySurah(surahNumber: surahNumber);
-                      },
-                    ),
-                  );
-              }
+              return;
+            }
+
+            switch (widget.actionType) {
+              case SurahSelectionAction.read:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
+                );
+                break;
+              default:
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => TestBySurah(surahNumber: surahNumber),
+                  ),
+                );
             }
           },
         );
@@ -115,47 +95,30 @@ class _SurahListScreenState extends State<SurahListScreen> {
 
     if (isWideScreen) {
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.surface
-              : Colors.white,
-          surfaceTintColor: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.primary
-              : const Color(0xFF004B40),
-          scrolledUnderElevation: 10,
-          title: Text(
-            'Surah List',
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Theme.of(context).colorScheme.onSurface
-                  : const Color(0xFF222222),
-            ),
-          ),
-        ),
+        backgroundColor: const Color(0xFFF9FAFB),
         body: Row(
           children: [
             // Left: List
             Expanded(
               flex: 2,
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/img/surah_background.png"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: surahListView,
+              child: _SelectListScaffold(
+                headerBackground: const Color(0xFFFADDE5),
+                title: 'Surah List',
+                descriptionTitle: 'Select a Surah',
+                descriptionBody:
+                    'Listen to a verse from a surah and\nguess the next verse.',
+                headerImageAsset: 'assets/img/star_crecent.png',
+                searchHint: 'Search by Surah',
+                searchController: _searchController,
+                list: list,
+                onBack: () => Navigator.pop(context),
               ),
             ),
             // Right: Details
             Expanded(
               flex: 3,
               child: Container(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).colorScheme.surface
-                    : Colors.grey[100],
+                color: Colors.white,
                 child: selectedSurah == null
                     ? const Center(child: Text("Select a Surah"))
                     : widget.actionType == SurahSelectionAction.read
@@ -173,74 +136,314 @@ class _SurahListScreenState extends State<SurahListScreen> {
         ),
       );
     } else {
-      // Original small-screen view
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.surface
-              : Colors.white,
-          surfaceTintColor: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).colorScheme.primary
-              : const Color(0xFF004B40),
-          scrolledUnderElevation: 10,
-          centerTitle: false,
-          automaticallyImplyLeading: false,
-          title: isSearching
-              ? TextField(
-                  autofocus: true,
-                  decoration: const InputDecoration(hintText: 'Search Surah'),
-                  onChanged: (juzName) {
-                    surahList = searchSurah(juzName);
-                    setState(() {});
-                  },
-                )
-              : Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: SvgPicture.asset('assets/img/arrow_back.svg'),
-                    ),
-                    const SizedBox(width: 13),
-                    Text(
-                      'Surah List',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Theme.of(context).colorScheme.onSurface
-                            : const Color(0xFF222222),
-                      ),
-                    ),
-                  ],
-                ),
-          actions: [
-            if (isSearching)
-              IconButton(
-                onPressed: () {
-                  setSurahList();
-                  setState(() => isSearching = false);
-                },
-                icon: const Icon(Icons.close),
-              )
-            else
-              IconButton(
-                onPressed: () {
-                  setState(() => isSearching = true);
-                },
-                icon: SvgPicture.asset('assets/img/search.svg'),
-              )
-          ],
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/img/surah_background.png"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: surahListView,
+        backgroundColor: const Color(0xFFF9FAFB),
+        body: _SelectListScaffold(
+          headerBackground: const Color(0xFFFADDE5),
+          title: 'Surah List',
+          descriptionTitle: 'Select a Surah',
+          descriptionBody:
+              'Listen to a verse from a surah and\nguess the next verse.',
+          headerImageAsset: 'assets/img/star_crecent.png',
+          searchHint: 'Search by Surah',
+          searchController: _searchController,
+          list: list,
+          onBack: () => Navigator.pop(context),
         ),
       );
     }
+  }
+}
+
+class _SelectListScaffold extends StatelessWidget {
+  const _SelectListScaffold({
+    required this.headerBackground,
+    required this.title,
+    required this.descriptionTitle,
+    required this.descriptionBody,
+    required this.headerImageAsset,
+    required this.searchHint,
+    required this.searchController,
+    required this.list,
+    required this.onBack,
+  });
+
+  final Color headerBackground;
+  final String title;
+  final String descriptionTitle;
+  final String descriptionBody;
+  final String headerImageAsset;
+  final String searchHint;
+  final TextEditingController searchController;
+  final Widget list;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          color: headerBackground,
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+          child: SafeArea(
+            bottom: false,
+            child: SizedBox(
+              height: 170,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: GestureDetector(
+                      onTap: onBack,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 18,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(
+                        title,
+                        style: GoogleFonts.cairo(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF111827),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 120),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            descriptionTitle,
+                            style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF111827),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            descriptionBody,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF111827),
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: -20,
+                    bottom: -30,
+                    child: Image.asset(
+                      headerImageAsset,
+                      width: 180,
+                      height: 180,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Color(0xFF9CA3AF)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            hintText: searchHint,
+                            hintStyle: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF9CA3AF),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(child: list),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SelectListRow extends StatelessWidget {
+  const _SelectListRow({
+    required this.numberText,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final String numberText;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: CustomPaint(
+                painter: _StarburstPainter(color: const Color(0xFF111827)),
+                child: Center(
+                  child: Text(
+                    numberText,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF111827),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF9CA3AF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF111827), width: 1.4),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  size: 20,
+                  color: Color(0xFF111827),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StarburstPainter extends CustomPainter {
+  _StarburstPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final outer = size.width * 0.48;
+    final inner = size.width * 0.36;
+
+    final path = Path();
+    const points = 8;
+    for (var i = 0; i < points * 2; i++) {
+      final isOuter = i.isEven;
+      final r = isOuter ? outer : inner;
+      final a = (-90 + (360 / (points * 2)) * i) * (pi / 180);
+      final p = Offset(center.dx + r * cos(a), center.dy + r * sin(a));
+      if (i == 0) {
+        path.moveTo(p.dx, p.dy);
+      } else {
+        path.lineTo(p.dx, p.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarburstPainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
