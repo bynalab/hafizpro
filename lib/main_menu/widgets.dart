@@ -7,6 +7,7 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/widget/star_burst_icon.dart';
 
 class SearchField extends StatelessWidget {
   final TextEditingController controller;
@@ -326,24 +327,7 @@ class SurahRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
-            ),
-            child: Text(
-              '${surah.number}',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF111827),
-              ),
-            ),
-          ),
+          StarburstIcon(text: '${surah.number}'),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -378,8 +362,10 @@ class SurahRow extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFF111827), width: 1.4),
               ),
-              child: const Icon(Icons.play_arrow_rounded,
-                  color: Color(0xFF111827)),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Color(0xFF111827),
+              ),
             ),
           ),
         ],
@@ -402,70 +388,78 @@ class JuzListWidget extends StatelessWidget {
       itemBuilder: (context, i) {
         final juzNumber = i + 1;
         final name = juzNames[i];
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
-                child: Text(
-                  '$juzNumber',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  name,
-                  style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  AnalyticsService.trackJuzSelected(juzNumber);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const JuzListScreen()),
-                  );
-                },
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF111827),
-                      width: 1.4,
-                    ),
-                  ),
-                  child: const Icon(Icons.play_arrow_rounded,
-                      color: Color(0xFF111827)),
-                ),
-              ),
-            ],
-          ),
+
+        return JuzCard(
+          juzNumber: juzNumber,
+          name: name,
+          onTap: () {
+            AnalyticsService.trackJuzSelected(juzNumber);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const JuzListScreen()),
+            );
+          },
         );
       },
+    );
+  }
+}
+
+class JuzCard extends StatelessWidget {
+  final int juzNumber;
+  final String name;
+  final VoidCallback onTap;
+
+  const JuzCard({
+    super.key,
+    required this.juzNumber,
+    required this.name,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Row(
+        children: [
+          StarburstIcon(text: '$juzNumber'),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              name,
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF111827),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF111827),
+                  width: 1.4,
+                ),
+              ),
+              child: const Icon(
+                Icons.play_arrow_rounded,
+                color: Color(0xFF111827),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

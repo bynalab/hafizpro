@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/surah_list.dart';
@@ -8,6 +6,7 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/widget/star_burst_icon.dart';
 
 class SurahListScreen extends StatefulWidget {
   final SurahSelectionAction actionType;
@@ -16,6 +15,85 @@ class SurahListScreen extends StatefulWidget {
 
   @override
   State<SurahListScreen> createState() => _SurahListScreenState();
+}
+
+class _SelectListRow extends StatelessWidget {
+  const _SelectListRow({
+    required this.numberText,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final String numberText;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Row(
+          children: [
+            StarburstIcon(text: numberText),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF9CA3AF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF111827), width: 1.4),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  size: 20,
+                  color: Color(0xFF111827),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SurahListScreenState extends State<SurahListScreen> {
@@ -311,139 +389,5 @@ class _SelectListScaffold extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _SelectListRow extends StatelessWidget {
-  const _SelectListRow({
-    required this.numberText,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final String numberText;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 44,
-              height: 44,
-              child: CustomPaint(
-                painter: _StarburstPainter(color: const Color(0xFF111827)),
-                child: Center(
-                  child: Text(
-                    numberText,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cairo(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF111827), width: 1.4),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: 20,
-                  color: Color(0xFF111827),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StarburstPainter extends CustomPainter {
-  _StarburstPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final outer = size.width * 0.48;
-    final inner = size.width * 0.36;
-
-    final path = Path();
-    const points = 8;
-    for (var i = 0; i < points * 2; i++) {
-      final isOuter = i.isEven;
-      final r = isOuter ? outer : inner;
-      final a = (-90 + (360 / (points * 2)) * i) * (pi / 180);
-      final p = Offset(center.dx + r * cos(a), center.dy + r * sin(a));
-      if (i == 0) {
-        path.moveTo(p.dx, p.dy);
-      } else {
-        path.lineTo(p.dx, p.dy);
-      }
-    }
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _StarburstPainter oldDelegate) {
-    return oldDelegate.color != color;
   }
 }

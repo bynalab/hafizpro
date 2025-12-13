@@ -233,73 +233,17 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
               itemBuilder: (context, i) {
                 final juzNumber = i + 1;
                 final name = displayJuz[i];
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9FAFB),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
-                        ),
-                        child: Text(
-                          '$juzNumber',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: GoogleFonts.cairo(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          AnalyticsService.trackJuzSelected(juzNumber);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const JuzListScreen(),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFF111827),
-                              width: 1.4,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            color: Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+
+                return JuzCard(
+                  juzNumber: juzNumber,
+                  name: name,
+                  onTap: () {
+                    AnalyticsService.trackJuzSelected(juzNumber);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const JuzListScreen()),
+                    );
+                  },
                 );
               },
             ),
