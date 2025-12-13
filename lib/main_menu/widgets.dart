@@ -314,12 +314,16 @@ class SurahCard extends StatelessWidget {
   final Surah surah;
   final VoidCallback? onPlay;
   final VoidCallback? onTap;
+  final bool isPlaying;
+  final bool isLoading;
 
   const SurahCard({
     super.key,
     required this.surah,
     this.onPlay,
     this.onTap,
+    this.isPlaying = false,
+    this.isLoading = false,
   });
 
   @override
@@ -362,7 +366,7 @@ class SurahCard extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: onPlay,
+              onTap: isLoading ? null : onPlay,
               child: Container(
                 width: 34,
                 height: 34,
@@ -371,10 +375,22 @@ class SurahCard extends StatelessWidget {
                   border:
                       Border.all(color: const Color(0xFF111827), width: 1.4),
                 ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: Color(0xFF111827),
-                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFF111827)),
+                        ),
+                      )
+                    : Icon(
+                        isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
+                        color: const Color(0xFF111827),
+                      ),
               ),
             ),
           ],

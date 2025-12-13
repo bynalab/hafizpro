@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
@@ -27,6 +28,13 @@ Future<void> setupLocator() async {
       networkServices: getIt<NetworkServices>(),
       storageServices: getIt<IStorageService>(),
       surahPicker: getIt<SurahPicker>(),
+    ),
+  );
+
+  getIt.registerSingleton<AudioCenter>(
+    AudioCenter(
+      audioServices: getIt<AudioServices>(),
+      surahServices: getIt<SurahServices>(),
     ),
   );
 

@@ -10,7 +10,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
-import 'package:hafiz_test/services/audio_services.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
@@ -46,6 +46,8 @@ class QuranDashboardPage extends StatefulWidget {
 class _QuranDashboardPageState extends State<QuranDashboardPage> {
   bool get _isSearching => widget.query.trim().isNotEmpty;
 
+  final _audioCenter = getIt<AudioCenter>();
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
@@ -60,200 +62,216 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
 
     final lastRead = getIt<IStorageService>().getLastRead();
 
-    final audioServices = getIt<AudioServices>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    CircleIconButton(
-                      background: AppColors.green500,
-                      icon: SvgPicture.asset(
-                        'assets/img/quran-01.svg',
-                        width: 20,
-                        height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
+      child: AnimatedBuilder(
+        animation: _audioCenter,
+        builder: (context, _) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      CircleIconButton(
+                        background: AppColors.green500,
+                        icon: SvgPicture.asset(
+                          'assets/img/quran-01.svg',
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
+                        onTap: () {},
                       ),
-                      onTap: () {},
-                    ),
-                    const Spacer(),
-                    CircleIconButton(
-                      background: const Color(0xFFF2F2F2),
-                      icon: Icon(
-                        Theme.of(context).brightness == Brightness.dark
-                            ? Icons.light_mode
-                            : Icons.dark_mode,
-                        color: const Color(0xFF111827),
+                      const Spacer(),
+                      CircleIconButton(
+                        background: const Color(0xFFF2F2F2),
+                        icon: Icon(
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Icons.light_mode
+                              : Icons.dark_mode,
+                          color: const Color(0xFF111827),
+                        ),
+                        onTap: widget.onToggleTheme,
                       ),
-                      onTap: widget.onToggleTheme,
-                    ),
-                    const SizedBox(width: 10),
-                    CircleIconButton(
-                      background: const Color(0xFFF2F2F2),
-                      icon: const Icon(
-                        Icons.settings,
-                        color: Color(0xFF111827),
+                      const SizedBox(width: 10),
+                      CircleIconButton(
+                        background: const Color(0xFFF2F2F2),
+                        icon: const Icon(
+                          Icons.settings,
+                          color: Color(0xFF111827),
+                        ),
+                        onTap: widget.onOpenSettings,
                       ),
-                      onTap: widget.onOpenSettings,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                SearchField(
-                  controller: widget.searchController,
-                  hintText: widget.segmentIndex == 0
-                      ? 'Search by Surah'
-                      : 'Search by Juz',
-                ),
-                const SizedBox(height: 14),
-                if (!_isSearching) ...[
-                  if (lastRead == null)
-                    DashboardFeatureCard(
-                      background: const Color(0xFFBFE7EA),
-                      title: 'Challenge yourself',
-                      onTap: () {
-                        AnalyticsService.trackButtonClick('Challenge Yourself',
-                            screen: 'Main Menu');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const TestBySurah(),
-                          ),
-                        );
-                      },
-                      right: Image.asset(
-                        'assets/img/quran_question_icon.png',
-                        width: 72,
-                        height: 72,
-                        fit: BoxFit.contain,
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/img/brain.svg',
-                            width: 22,
-                            height: 22,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF111827),
-                              BlendMode.srcIn,
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  SearchField(
+                    controller: widget.searchController,
+                    hintText: widget.segmentIndex == 0
+                        ? 'Search by Surah'
+                        : 'Search by Juz',
+                  ),
+                  const SizedBox(height: 14),
+                  if (!_isSearching) ...[
+                    if (lastRead == null)
+                      DashboardFeatureCard(
+                        background: const Color(0xFFBFE7EA),
+                        title: 'Challenge yourself',
+                        onTap: () {
+                          AnalyticsService.trackButtonClick(
+                              'Challenge Yourself',
+                              screen: 'Main Menu');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const TestBySurah(),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Listen to an ayah of\nthe Quran and guess\nthe next one.',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF111827),
+                          );
+                        },
+                        right: Image.asset(
+                          'assets/img/quran_question_icon.png',
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.contain,
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/img/brain.svg',
+                              width: 22,
+                              height: 22,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF111827),
+                                BlendMode.srcIn,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward,
-                            color: Color(0xFF111827),
-                          ),
-                        ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Listen to an ayah of\nthe Quran and guess\nthe next one.',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF111827),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_forward,
+                              color: Color(0xFF111827),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      _ContinueLastTestCard(lastRead: lastRead),
+                    const SizedBox(height: 14),
+                    _NowPlayingCard(
+                      audioPlayer: _audioCenter.audioPlayer,
+                      title: _audioCenter.currentSurahName ?? 'Recitation',
+                    ),
+                    const SizedBox(height: 14),
+                    _ContinueReadingCard(lastRead: lastRead),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Listen/Read',
+                      style: GoogleFonts.cairo(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF111827),
                       ),
-                    )
-                  else
-                    _ContinueLastTestCard(lastRead: lastRead),
-                  const SizedBox(height: 14),
-                  _NowPlayingCard(audioPlayer: audioServices.audioPlayer),
-                  const SizedBox(height: 14),
-                  _ContinueReadingCard(lastRead: lastRead),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Listen/Read',
-                    style: GoogleFonts.cairo(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ],
+              ),
+            ),
+            if (!_isSearching)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PinnedSegmentHeaderDelegate(
+                  minExtent: 58,
+                  maxExtent: 58,
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: SegmentedSwitch(
+                      leftLabel: 'Surah',
+                      rightLabel: 'Juz',
+                      index: widget.segmentIndex,
+                      onChanged: widget.onSegmentChanged,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                ],
-              ],
-            ),
-          ),
-          if (!_isSearching)
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _PinnedSegmentHeaderDelegate(
-                minExtent: 58,
-                maxExtent: 58,
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: SegmentedSwitch(
-                    leftLabel: 'Surah',
-                    rightLabel: 'Juz',
-                    index: widget.segmentIndex,
-                    onChanged: widget.onSegmentChanged,
-                  ),
                 ),
+              )
+            else
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            if (widget.segmentIndex == 0)
+              SliverList.separated(
+                itemCount: displaySurahs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final surah = displaySurahs[i];
+
+                  return SurahCard(
+                    surah: surah,
+                    onTap: () {
+                      AnalyticsService.trackSurahSelected(
+                        surah.englishName,
+                        surah.number,
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => QuranView(surah: surah),
+                        ),
+                      );
+                    },
+                    onPlay: () async {
+                      await _audioCenter.toggleSurah(surah);
+                    },
+                    isPlaying: _audioCenter.isCurrentSurah(surah.number) &&
+                        _audioCenter.isPlaying,
+                    isLoading: _audioCenter.isCurrentSurah(surah.number) &&
+                        _audioCenter.isLoading,
+                  );
+                },
+              )
+            else
+              SliverList.separated(
+                itemCount: displayJuz.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final juzNumber = i + 1;
+                  final name = displayJuz[i];
+
+                  return JuzCard(
+                    juzNumber: juzNumber,
+                    name: name,
+                    onTap: () {
+                      AnalyticsService.trackJuzSelected(juzNumber);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const JuzListScreen()),
+                      );
+                    },
+                  );
+                },
               ),
-            )
-          else
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-          if (widget.segmentIndex == 0)
-            SliverList.separated(
-              itemCount: displaySurahs.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, i) {
-                final surah = displaySurahs[i];
-
-                return SurahCard(
-                  surah: surah,
-                  onTap: () {
-                    AnalyticsService.trackSurahSelected(
-                        surah.englishName, surah.number);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => QuranView(surah: surah)),
-                    );
-                  },
-                  onPlay: () {},
-                );
-              },
-            )
-          else
-            SliverList.separated(
-              itemCount: displayJuz.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, i) {
-                final juzNumber = i + 1;
-                final name = displayJuz[i];
-
-                return JuzCard(
-                  juzNumber: juzNumber,
-                  name: name,
-                  onTap: () {
-                    AnalyticsService.trackJuzSelected(juzNumber);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const JuzListScreen()),
-                    );
-                  },
-                );
-              },
+            SliverToBoxAdapter(
+              child: SizedBox(height: bottomNavReserved + bottomInset + 12),
             ),
-          SliverToBoxAdapter(
-            child: SizedBox(height: bottomNavReserved + bottomInset + 12),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -457,9 +475,10 @@ class _ContinueReadingCard extends StatelessWidget {
 }
 
 class _NowPlayingCard extends StatelessWidget {
-  const _NowPlayingCard({required this.audioPlayer});
+  const _NowPlayingCard({required this.audioPlayer, required this.title});
 
   final AudioPlayer audioPlayer;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -487,7 +506,7 @@ class _NowPlayingCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recitation',
+                      title,
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
