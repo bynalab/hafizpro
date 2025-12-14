@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
@@ -27,6 +28,24 @@ class SharedPrefsStorageService implements IStorageService {
   @override
   String getReciter() {
     return prefs.getString('reciter') ?? 'ar.alafasy';
+  }
+
+  @override
+  Future<bool> setReciterId(String reciterId) async {
+    return prefs.setString('reciter_id', reciterId);
+  }
+
+  @override
+  String getReciterId() {
+    final existing = prefs.getString('reciter_id');
+    if (existing != null && existing.isNotEmpty) return existing;
+
+    // Backward compatibility: migrate from legacy `reciter` (provider-specific)
+    // to stable `reciter_id`. For now we use the legacy identifier as the id;
+    // the resolver layer can map it to provider-specific identifiers.
+    final legacy = getReciter();
+    unawaited(setReciterId(legacy));
+    return legacy;
   }
 
   @override

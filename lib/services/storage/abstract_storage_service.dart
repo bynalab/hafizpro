@@ -13,6 +13,12 @@ abstract class IStorageService {
   /// returns 'ar.alafasy' as the default.
   String getReciter();
 
+  Future<bool> setReciterId(String reciterId);
+
+  /// Returns a stable reciter id (provider-agnostic). If not present, this may
+  /// migrate from the legacy `reciter` value.
+  String getReciterId();
+
   Future<bool> saveLastRead(Surah surah, Ayah ayah);
   (Surah, Ayah)? getLastRead();
 

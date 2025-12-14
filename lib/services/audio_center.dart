@@ -19,6 +19,12 @@ class AudioCenter extends ChangeNotifier {
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
   PlaybackSnapshot? _readingSnapshot;
 
+  bool _isSurahLevelAudio(Surah surah) {
+    if (surah.ayahs.isEmpty) return false;
+    final urls = surah.ayahs.map((a) => a.audio).toSet();
+    return urls.length == 1;
+  }
+
   PlaybackOwner get playbackOwner => _playbackOwner;
 
   bool _tryAutoAdvanceToNextSurah() {
@@ -234,8 +240,15 @@ class AudioCenter extends ChangeNotifier {
       if (fullSurah.ayahs.isEmpty) return;
 
       currentSurahName = fullSurah.englishName;
-      await _audioServices.setPlaylistAudio(fullSurah.audioSources);
-      await audioPlayer.seek(Duration.zero, index: startIndex);
+
+      if (_isSurahLevelAudio(fullSurah)) {
+        await _audioServices
+            .setPlaylistAudio([fullSurah.ayahs.first.audioSource]);
+        await audioPlayer.seek(Duration.zero, index: 0);
+      } else {
+        await _audioServices.setPlaylistAudio(fullSurah.audioSources);
+        await audioPlayer.seek(Duration.zero, index: startIndex);
+      }
       unawaited(_audioServices.play(audioName: fullSurah.englishName));
 
       isPlaying = true;

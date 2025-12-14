@@ -26,7 +26,32 @@ class NetworkServices {
     String url, {
     Map<String, dynamic>? queryParameters,
   }) async {
-    final normalizedUrl = url.startsWith('/') ? url : '/$url';
+    final isAbsolute = url.startsWith('http://') || url.startsWith('https://');
+    final normalizedUrl =
+        isAbsolute ? url : (url.startsWith('/') ? url : '/$url');
     return await _dio.get(normalizedUrl, queryParameters: queryParameters);
+  }
+
+  Future<Response> head(
+    String url, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final isAbsolute = url.startsWith('http://') || url.startsWith('https://');
+    final normalizedUrl =
+        isAbsolute ? url : (url.startsWith('/') ? url : '/$url');
+    return await _dio.head(normalizedUrl, queryParameters: queryParameters);
+  }
+
+  Future<bool> urlExists(String url) async {
+    try {
+      await head(url);
+      return true;
+    } on DioException catch (e) {
+      final code = e.response?.statusCode;
+      if (code == 400 || code == 404) return false;
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 }

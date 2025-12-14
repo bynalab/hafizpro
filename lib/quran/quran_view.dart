@@ -140,7 +140,7 @@ class _QuranViewState extends State<QuranView> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          viewModel.surah.englishName,
+                          viewModel.surah?.englishName ?? '',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -169,7 +169,7 @@ class _QuranViewState extends State<QuranView> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            viewModel.surah.englishName,
+                            viewModel.surah?.englishName ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -180,12 +180,17 @@ class _QuranViewState extends State<QuranView> {
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: QuranAyahList(
-                          surah: viewModel.surah,
-                          playingIndexNotifier: viewModel.playingIndexNotifier,
-                          scrollController: viewModel.itemScrollController,
-                          onControlPressed: viewModel.onAyahControlPressed,
-                        ),
+                        child: viewModel.surah == null
+                            ? const SizedBox.shrink()
+                            : QuranAyahList(
+                                surah: viewModel.surah!,
+                                playingIndexNotifier:
+                                    viewModel.playingIndexNotifier,
+                                scrollController:
+                                    viewModel.itemScrollController,
+                                onControlPressed:
+                                    viewModel.onAyahControlPressed,
+                              ),
                       ),
                       const SizedBox(height: 150),
                     ],
@@ -201,14 +206,19 @@ class _QuranViewState extends State<QuranView> {
                         child: ValueListenableBuilder<int?>(
                           valueListenable: viewModel.playingIndexNotifier,
                           builder: (context, index, _) {
-                            final ayahs = viewModel.surah.ayahs;
+                            final surah = viewModel.surah;
+                            if (surah == null) {
+                              return const SizedBox.shrink();
+                            }
+
+                            final ayahs = surah.ayahs;
                             final i = index;
                             final valid =
                                 i != null && i >= 0 && i < ayahs.length;
                             final current = valid ? ayahs[i] : null;
                             final title = current == null
-                                ? viewModel.surah.englishName
-                                : '${viewModel.surah.englishName}: ${current.numberInSurah}';
+                                ? surah.englishName
+                                : '${surah.englishName}: ${current.numberInSurah}';
 
                             return Column(
                               mainAxisSize: MainAxisSize.min,
@@ -232,13 +242,13 @@ class _QuranViewState extends State<QuranView> {
                                 ),
                                 const SizedBox(height: 16),
                                 StreamBuilder<Duration>(
-                                  stream: viewModel.audioCenter.isCurrentSurah(
-                                          viewModel.surah.number)
+                                  stream: viewModel.audioCenter
+                                          .isCurrentSurah(surah.number)
                                       ? viewModel.audioPlayer.positionStream
                                       : const Stream<Duration>.empty(),
                                   builder: (context, snap) {
                                     final matches = viewModel.audioCenter
-                                        .isCurrentSurah(viewModel.surah.number);
+                                        .isCurrentSurah(surah.number);
                                     final pos = matches
                                         ? (snap.data ?? Duration.zero)
                                         : Duration.zero;

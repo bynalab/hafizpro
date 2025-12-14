@@ -19,7 +19,7 @@ class QuranViewModel {
 
   QuranViewModel({required this.audioCenter, required this.surahService});
 
-  late Surah surah;
+  Surah? surah;
   bool isLoading = true;
   bool hasError = false;
   bool isPlaylist = false;
@@ -36,7 +36,7 @@ class QuranViewModel {
     try {
       isLoading = true;
       surah = await surahService.getSurah(surahNumber);
-      if (surah.ayahs.isEmpty) return;
+      if (surah?.ayahs.isEmpty ?? true) return;
 
       // Only reflect existing playback state if the currently playing surah
       // matches the surah being viewed.
@@ -67,7 +67,10 @@ class QuranViewModel {
 
   void initiateListeners() {
     _playerStateSub = audioPlayer.playerStateStream.listen((state) {
-      final matches = audioCenter.isCurrentSurah(surah.number);
+      final currentSurah = surah;
+      if (currentSurah == null) return;
+
+      final matches = audioCenter.isCurrentSurah(currentSurah.number);
       if (!matches) {
         if (isPlayingNotifier.value != false) {
           isPlayingNotifier.value = false;
@@ -79,8 +82,8 @@ class QuranViewModel {
 
       if (state.playing && state.processingState == ProcessingState.ready) {
         AnalyticsService.trackAudioStart(
-          surah.englishName,
-          surahName: surah.englishName,
+          currentSurah.englishName,
+          surahName: currentSurah.englishName,
           isPlaylist: isPlaylist,
         );
       }
@@ -90,8 +93,8 @@ class QuranViewModel {
         isPlaylist = false;
 
         AnalyticsService.trackAudioComplete(
-          surah.englishName,
-          surahName: surah.englishName,
+          currentSurah.englishName,
+          surahName: currentSurah.englishName,
           wasPlaylist: true,
         );
 
@@ -101,7 +104,10 @@ class QuranViewModel {
     });
 
     _currentIndexSub = audioPlayer.currentIndexStream.listen((index) {
-      final matches = audioCenter.isCurrentSurah(surah.number);
+      final currentSurah = surah;
+      if (currentSurah == null) return;
+
+      final matches = audioCenter.isCurrentSurah(currentSurah.number);
       if (!matches) {
         if (playingIndexNotifier.value != null) {
           playingIndexNotifier.value = null;
@@ -117,11 +123,14 @@ class QuranViewModel {
   }
 
   Future<void> _togglePlayback() async {
+    final currentSurah = surah;
+    if (currentSurah == null) return;
+
     if (isPlayingNotifier.value) {
       await audioPlayer.pause();
     } else {
       // Use AudioCenter so global state (dashboard) stays in sync.
-      await audioCenter.toggleSurah(surah);
+      await audioCenter.toggleSurah(currentSurah);
     }
   }
 
@@ -136,16 +145,19 @@ class QuranViewModel {
   }
 
   Future<void> _initializePlaylist() async {
+    final currentSurah = surah;
+    if (currentSurah == null) return;
+
     AnalyticsService.trackAudioStart(
-      surah.englishName,
-      surahName: surah.englishName,
+      currentSurah.englishName,
+      surahName: currentSurah.englishName,
       isPlaylist: isPlaylist,
     );
 
     isPlaylist = true;
     playingIndexNotifier.value = 0;
 
-    await audioCenter.toggleSurah(surah, startIndex: 0);
+    await audioCenter.toggleSurah(currentSurah, startIndex: 0);
   }
 
   void scrollToVerse(int? index) {
@@ -160,14 +172,21 @@ class QuranViewModel {
   }
 
   void playSingleAyah(int index) {
+    final currentSurah = surah;
+    if (currentSurah == null) return;
+
     isPlaylist = false;
     playingIndexNotifier.value = index;
-    audioCenter.playSingleAyah(surah, surah.ayahs[index].audioSource);
+    audioCenter.playSingleAyah(
+        currentSurah, currentSurah.ayahs[index].audioSource);
   }
 
   void onAyahControlPressed(int index) async {
+    final currentSurah = surah;
+    if (currentSurah == null) return;
+
     if (isPlaylist) {
-      await audioCenter.playFromAyahIndex(surah, index);
+      await audioCenter.playFromAyahIndex(currentSurah, index);
     } else {
       playSingleAyah(index);
     }

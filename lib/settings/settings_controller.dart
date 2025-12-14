@@ -26,7 +26,7 @@ class SettingsController extends ChangeNotifier {
   void load() {
     try {
       autoPlay = _storage.checkAutoPlay();
-      reciter = _storage.getReciter();
+      reciter = _storage.getReciterId();
       themeMode = ThemeMode.values.byName(_theme.mode);
 
       final rawEnabled = _storage.getString('notifications_enabled');
@@ -64,7 +64,7 @@ class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     AnalyticsService.trackSettingsChanged('reciter', oldValue, identifier);
-    await _storage.setReciter(identifier);
+    await _storage.setReciterId(identifier);
   }
 
   Future<void> setNotifications({
