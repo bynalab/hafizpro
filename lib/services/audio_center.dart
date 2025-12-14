@@ -162,6 +162,7 @@ class AudioCenter extends ChangeNotifier {
       // (and playing is typically false). We need to reset our shared UI state
       // so dashboard/QuranView stop showing an active "Now Playing" session.
       if (state.processingState == ProcessingState.completed) {
+        if (_isAutoAdvancing) return;
         _handlePlaybackCompleted();
         return;
       }
