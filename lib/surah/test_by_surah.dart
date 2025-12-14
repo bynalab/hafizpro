@@ -5,6 +5,7 @@ import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -24,6 +25,7 @@ class TestBySurah extends StatefulWidget {
 
 class _TestPage extends State<TestBySurah> {
   final surahServices = getIt<SurahServices>();
+  final audioCenter = getIt<AudioCenter>();
 
   bool isLoading = false;
   bool hasError = false;
@@ -36,7 +38,14 @@ class _TestPage extends State<TestBySurah> {
   void initState() {
     super.initState();
 
+    audioCenter.beginTestSession();
     init();
+  }
+
+  @override
+  void dispose() {
+    audioCenter.endTestSession();
+    super.dispose();
   }
 
   Surah surah = Surah();

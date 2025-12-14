@@ -9,6 +9,7 @@ import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/surah/view_full_surah.dart';
@@ -40,6 +41,7 @@ class TestScreen extends StatefulWidget {
 class _TestPage extends State<TestScreen> {
   final audioServices = getIt<AudioServices>();
   final storageServices = getIt<IStorageService>();
+  final audioCenter = getIt<AudioCenter>();
 
   AudioPlayer get audioPlayer => audioServices.audioPlayer;
 
@@ -168,7 +170,7 @@ class _TestPage extends State<TestScreen> {
 
   @override
   dispose() {
-    audioServices.stop();
+    audioCenter.endTestSession();
     _playerStateSub?.cancel();
 
     super.dispose();
