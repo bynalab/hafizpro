@@ -14,10 +14,11 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
-import 'package:hafiz_test/surah/surah_list_screen.dart';
-import 'package:hafiz_test/enum/surah_select_action.dart';
+// import 'package:hafiz_test/surah/surah_list_screen.dart';
+// import 'package:hafiz_test/enum/surah_select_action.dart';
 import 'package:hafiz_test/juz/juz_list_screen.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+// import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
 
@@ -172,13 +173,45 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       )
                     else
                       _ContinueLastTestCard(lastRead: lastRead),
-                    const SizedBox(height: 14),
-                    _NowPlayingCard(
-                      audioPlayer: _audioCenter.audioPlayer,
-                      title: _audioCenter.currentSurahName ?? 'Recitation',
+                    ListenableBuilder(
+                      listenable: _audioCenter,
+                      builder: (context, _) {
+                        if (_audioCenter.currentSurahNumber == null ||
+                            _audioCenter.currentSurahName == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Column(
+                          children: [
+                            const SizedBox(height: 14),
+                            _NowPlayingCard(
+                              audioPlayer: _audioCenter.audioPlayer,
+                              title: _audioCenter.currentSurahName!,
+                              onTap: () {
+                                final surah = Surah(
+                                  number: _audioCenter.currentSurahNumber!,
+                                  englishName: _audioCenter.currentSurahName!,
+                                );
+
+                                AnalyticsService.trackSurahSelected(
+                                  surah.englishName,
+                                  surah.number,
+                                );
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => QuranView(surah: surah),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+                        );
+                      },
                     ),
-                    const SizedBox(height: 14),
-                    _ContinueReadingCard(lastRead: lastRead),
+                    // _ContinueReadingCard(lastRead: lastRead),
                     const SizedBox(height: 16),
                     Text(
                       'Listen/Read',
@@ -383,106 +416,112 @@ class _ContinueLastTestCard extends StatelessWidget {
   }
 }
 
-class _ContinueReadingCard extends StatelessWidget {
-  const _ContinueReadingCard({required this.lastRead});
+// class _ContinueReadingCard extends StatelessWidget {
+//   const _ContinueReadingCard({required this.lastRead});
 
-  final (Surah, Ayah)? lastRead;
+//   final (Surah, Ayah)? lastRead;
 
-  @override
-  Widget build(BuildContext context) {
-    return DashboardFeatureCard(
-      background: const Color(0xFFF7CFC7),
-      title: 'Continue Reading',
-      onTap: () {
-        if (lastRead == null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const SurahListScreen(
-                actionType: SurahSelectionAction.read,
-              ),
-            ),
-          );
-          return;
-        }
+//   @override
+//   Widget build(BuildContext context) {
+//     return DashboardFeatureCard(
+//       background: const Color(0xFFF7CFC7),
+//       title: 'Continue Reading',
+//       onTap: () {
+//         if (lastRead == null) {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder: (_) => const SurahListScreen(
+//                 actionType: SurahSelectionAction.read,
+//               ),
+//             ),
+//           );
+//           return;
+//         }
 
-        final surah = lastRead!.$1;
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
-        );
-      },
-      right: Image.asset(
-        'assets/img/open_book_glass_icon.png',
-        width: 84,
-        height: 84,
-        fit: BoxFit.contain,
-      ),
-      child: Row(
-        children: [
-          const Icon(CupertinoIcons.book, color: Color(0xFF111827)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (lastRead == null) ...[
-                  Text(
-                    'Pick a Surah',
-                    style: GoogleFonts.cairo(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Start reading where you want',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
-                    ),
-                  ),
-                ] else ...[
-                  Text(
-                    lastRead!.$1.englishName,
-                    style: GoogleFonts.cairo(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Verse ${lastRead!.$2.numberInSurah}',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward, color: Color(0xFF111827)),
-        ],
-      ),
-    );
-  }
-}
+//         final surah = lastRead!.$1;
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
+//         );
+//       },
+//       right: Image.asset(
+//         'assets/img/open_book_glass_icon.png',
+//         width: 84,
+//         height: 84,
+//         fit: BoxFit.contain,
+//       ),
+//       child: Row(
+//         children: [
+//           const Icon(CupertinoIcons.book, color: Color(0xFF111827)),
+//           const SizedBox(width: 12),
+//           Expanded(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 if (lastRead == null) ...[
+//                   Text(
+//                     'Pick a Surah',
+//                     style: GoogleFonts.cairo(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w700,
+//                       color: const Color(0xFF111827),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     'Start reading where you want',
+//                     style: GoogleFonts.inter(
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w500,
+//                       color: const Color(0xFF9CA3AF),
+//                     ),
+//                   ),
+//                 ] else ...[
+//                   Text(
+//                     lastRead!.$1.englishName,
+//                     style: GoogleFonts.cairo(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w700,
+//                       color: const Color(0xFF111827),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     'Verse ${lastRead!.$2.numberInSurah}',
+//                     style: GoogleFonts.inter(
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w500,
+//                       color: const Color(0xFF9CA3AF),
+//                     ),
+//                   ),
+//                 ],
+//               ],
+//             ),
+//           ),
+//           const SizedBox(width: 8),
+//           const Icon(Icons.arrow_forward, color: Color(0xFF111827)),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _NowPlayingCard extends StatelessWidget {
-  const _NowPlayingCard({required this.audioPlayer, required this.title});
-
-  final AudioPlayer audioPlayer;
   final String title;
+  final AudioPlayer audioPlayer;
+  final VoidCallback onTap;
+
+  const _NowPlayingCard({
+    required this.audioPlayer,
+    required this.title,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return DashboardFeatureCard(
+      onTap: onTap,
       background: const Color(0xFFE6BDEB),
       title: 'Now Playing',
       right: Image.asset(
@@ -495,7 +534,10 @@ class _NowPlayingCard extends StatelessWidget {
         stream: audioPlayer.playerStateStream,
         builder: (context, snap) {
           final state = snap.data;
-          final playing = state?.playing ?? audioPlayer.playing;
+          final processingState =
+              state?.processingState ?? audioPlayer.processingState;
+          final playing = (state?.playing ?? audioPlayer.playing) &&
+              processingState != ProcessingState.completed;
 
           return Row(
             children: [
@@ -507,26 +549,46 @@ class _NowPlayingCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.cairo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF111827),
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black500,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    // const SizedBox(height: 10),
+                    // CumulativePlaylistProgressBar(
+                    //   audioPlayer: audioPlayer,
+                    //   minHeight: 4,
+                    //   backgroundColor:
+                    //       const Color(0xFF111827).withValues(alpha: 0.15),
+                    //   valueColor: const Color(0xFF111827),
+                    // ),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         IconButton(
                           onPressed: audioPlayer.hasPrevious
                               ? () => audioPlayer.seekToPrevious()
                               : null,
-                          icon: const Icon(CupertinoIcons.backward_fill),
+                          icon: SvgPicture.asset(
+                            'assets/icons/previous.svg',
+                            width: 22,
+                            height: 22,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF111827),
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
                         IconButton(
                           onPressed: () async {
                             if (playing) {
                               await audioPlayer.pause();
                             } else {
+                              if (processingState ==
+                                  ProcessingState.completed) {
+                                await audioPlayer.seek(Duration.zero, index: 0);
+                              }
                               await audioPlayer.play();
                             }
                           },
@@ -541,7 +603,15 @@ class _NowPlayingCard extends StatelessWidget {
                           onPressed: audioPlayer.hasNext
                               ? () => audioPlayer.seekToNext()
                               : null,
-                          icon: const Icon(CupertinoIcons.forward_fill),
+                          icon: SvgPicture.asset(
+                            'assets/icons/next.svg',
+                            width: 22,
+                            height: 22,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF111827),
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
                       ],
                     )

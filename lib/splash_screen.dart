@@ -186,40 +186,42 @@ class _VerseCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 5,
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              color: AppColors.black500,
-              fontWeight: FontWeight.w600,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 5,
+          children: [
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                color: AppColors.black500,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            arabic,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.amiri(
-              fontSize: 24,
-              color: AppColors.black500,
-              fontWeight: FontWeight.w400,
+            const SizedBox(height: 10),
+            Text(
+              arabic,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.amiri(
+                fontSize: 24,
+                color: AppColors.black500,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            translation,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: AppColors.black500,
-              fontWeight: FontWeight.w400,
+            const SizedBox(height: 10),
+            Text(
+              translation,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.black500,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

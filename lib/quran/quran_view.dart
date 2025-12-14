@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
@@ -8,6 +9,7 @@ import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/app_colors.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -219,38 +221,16 @@ class _QuranViewState extends State<QuranView> {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(
+                                        style: GoogleFonts.cairo(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          color: Color(0xFF111827),
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        await viewModel.audioCenter.stop();
-                                        viewModel.playingIndexNotifier.value =
-                                            null;
-                                        viewModel.isPlayingNotifier.value =
-                                            false;
-                                      },
-                                      child: Container(
-                                        width: 28,
-                                        height: 28,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Color(0xFF111827),
+                                          color: AppColors.black500,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 16),
                                 StreamBuilder<Duration>(
                                   stream: viewModel.audioCenter.isCurrentSurah(
                                           viewModel.surah.number)
@@ -284,80 +264,93 @@ class _QuranViewState extends State<QuranView> {
                                       return '$m:$s';
                                     }
 
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.min,
+                                    return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        SliderTheme(
-                                          data:
-                                              SliderTheme.of(context).copyWith(
-                                            trackHeight: 4,
-                                            thumbShape:
-                                                const RoundSliderThumbShape(
-                                                    enabledThumbRadius: 0),
-                                            overlayShape:
-                                                SliderComponentShape.noOverlay,
-                                            activeTrackColor:
-                                                const Color(0xFF111827),
-                                            inactiveTrackColor: Colors.black
-                                                .withValues(alpha: 0.25),
-                                          ),
-                                          child: Slider(
-                                            value: value,
-                                            onChanged: matches
-                                                ? (v) async {
-                                                    final ms =
-                                                        (totalMs * v).round();
-                                                    await viewModel.audioPlayer
-                                                        .pause();
-                                                    await viewModel.audioPlayer
-                                                        .seek(Duration(
-                                                            milliseconds: ms));
-                                                  }
-                                                : null,
-                                            onChangeEnd: matches
-                                                ? (v) async {
-                                                    final ms =
-                                                        (totalMs * v).round();
-                                                    await viewModel.audioPlayer
-                                                        .seek(Duration(
-                                                            milliseconds: ms));
-                                                    await viewModel.audioPlayer
-                                                        .play();
-                                                  }
-                                                : null,
+                                        Text(
+                                          fmt(pos),
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.black500,
                                           ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                fmt(pos),
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF111827),
-                                                ),
-                                              ),
-                                              Text(
-                                                fmt(total),
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF111827),
-                                                ),
-                                              ),
-                                            ],
+                                        const SizedBox(width: 9),
+                                        Expanded(
+                                          child: SliderTheme(
+                                            data: SliderTheme.of(context)
+                                                .copyWith(
+                                              trackHeight: 4,
+                                              thumbShape:
+                                                  const RoundSliderThumbShape(
+                                                      enabledThumbRadius: 0),
+                                              overlayShape: SliderComponentShape
+                                                  .noOverlay,
+                                              activeTrackColor:
+                                                  AppColors.green500,
+                                              inactiveTrackColor: AppColors
+                                                  .black500
+                                                  .withValues(alpha: 0.30),
+                                            ),
+                                            child: Slider(
+                                              value: value,
+                                              onChanged: matches
+                                                  ? (v) async {
+                                                      final ms =
+                                                          (totalMs * v).round();
+                                                      await viewModel
+                                                          .audioPlayer
+                                                          .pause();
+                                                      await viewModel
+                                                          .audioPlayer
+                                                          .seek(Duration(
+                                                              milliseconds:
+                                                                  ms));
+                                                    }
+                                                  : null,
+                                              onChangeEnd: matches
+                                                  ? (v) async {
+                                                      final ms =
+                                                          (totalMs * v).round();
+                                                      await viewModel
+                                                          .audioPlayer
+                                                          .seek(Duration(
+                                                              milliseconds:
+                                                                  ms));
+                                                      await viewModel
+                                                          .audioPlayer
+                                                          .play();
+                                                    }
+                                                  : null,
+                                            ),
                                           ),
                                         ),
+                                        const SizedBox(width: 9),
+                                        Text(
+                                          fmt(total),
+                                          style: GoogleFonts.manrope(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.black500,
+                                          ),
+                                        ),
+                                        // Padding(
+                                        //   padding: const EdgeInsets.symmetric(
+                                        //       horizontal: 4),
+                                        //   child: Row(
+                                        //     mainAxisAlignment:
+                                        //         MainAxisAlignment.spaceBetween,
+                                        //     children: [
+
+                                        //     ],
+                                        //   ),
+                                        // ),
                                       ],
                                     );
                                   },
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 16),
                                 ValueListenableBuilder<bool>(
                                   valueListenable: viewModel.isPlayingNotifier,
                                   builder: (context, playing, _) {
@@ -382,6 +375,8 @@ class _QuranViewState extends State<QuranView> {
                                     }
 
                                     return Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         GestureDetector(
                                           onTap: () async {
@@ -394,21 +389,34 @@ class _QuranViewState extends State<QuranView> {
                                           },
                                           child: Text(
                                             '${_speed.toStringAsFixed(1)}x',
-                                            style: const TextStyle(
-                                              fontSize: 14,
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 16,
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0xFF111827),
+                                              color: AppColors.black500,
                                             ),
                                           ),
                                         ),
-                                        const Spacer(),
-                                        smallIconButton(
+                                        IconButton(
                                           onPressed:
                                               viewModel.audioPlayer.hasPrevious
                                                   ? viewModel.audioPlayer
                                                       .seekToPrevious
                                                   : null,
-                                          icon: Icons.skip_previous_rounded,
+                                          padding: EdgeInsets.zero,
+                                          constraints:
+                                              const BoxConstraints.tightFor(
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                          icon: SvgPicture.asset(
+                                            'assets/icons/previous.svg',
+                                            width: 30,
+                                            height: 30,
+                                            colorFilter: const ColorFilter.mode(
+                                              Color(0xFF111827),
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
                                         ),
                                         Container(
                                           width: 50,
@@ -445,8 +453,8 @@ class _QuranViewState extends State<QuranView> {
                                           ),
                                           icon: SvgPicture.asset(
                                             'assets/icons/next.svg',
-                                            width: 22,
-                                            height: 22,
+                                            width: 30,
+                                            height: 30,
                                             colorFilter: const ColorFilter.mode(
                                               Color(0xFF111827),
                                               BlendMode.srcIn,
@@ -466,7 +474,6 @@ class _QuranViewState extends State<QuranView> {
                                           },
                                           icon: Icons.repeat_rounded,
                                         ),
-                                        const Spacer(),
                                       ],
                                     );
                                   },

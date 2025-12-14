@@ -85,9 +85,9 @@ class DashboardFeatureCard extends StatelessWidget {
             Text(
               title,
               style: GoogleFonts.cairo(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF111827),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black500,
               ),
             ),
             const SizedBox(height: 10),

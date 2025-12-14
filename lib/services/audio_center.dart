@@ -19,6 +19,19 @@ class AudioCenter extends ChangeNotifier {
         _surahServices = surahServices {
     _playerStateSub =
         _audioServices.audioPlayer.playerStateStream.listen((state) {
+      // When playback finishes, just_audio reports `processingState == completed`
+      // (and playing is typically false). We need to reset our shared UI state
+      // so dashboard/QuranView stop showing an active "Now Playing" session.
+      if (state.processingState == ProcessingState.completed) {
+        isPlaying = false;
+        isLoading = false;
+        currentSurahNumber = null;
+        currentSurahName = null;
+        notifyListeners();
+
+        return;
+      }
+
       final newPlaying = state.playing;
       if (newPlaying == isPlaying) return;
 
