@@ -187,6 +187,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                             _NowPlayingCard(
                               audioPlayer: _audioCenter.audioPlayer,
                               title: _audioCenter.currentSurahName!,
+                              isLoading: _audioCenter.isLoading,
                               onTap: () {
                                 final surah = Surah(
                                   number: _audioCenter.currentSurahNumber!,
@@ -511,10 +512,12 @@ class _NowPlayingCard extends StatelessWidget {
   final String title;
   final AudioPlayer audioPlayer;
   final VoidCallback onTap;
+  final bool isLoading;
 
   const _NowPlayingCard({
     required this.audioPlayer,
     required this.title,
+    required this.isLoading,
     required this.onTap,
   });
 
@@ -567,7 +570,7 @@ class _NowPlayingCard extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: audioPlayer.hasPrevious
+                          onPressed: !isLoading && audioPlayer.hasPrevious
                               ? () => audioPlayer.seekToPrevious()
                               : null,
                           icon: SvgPicture.asset(
@@ -581,26 +584,40 @@ class _NowPlayingCard extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: () async {
-                            if (playing) {
-                              await audioPlayer.pause();
-                            } else {
-                              if (processingState ==
-                                  ProcessingState.completed) {
-                                await audioPlayer.seek(Duration.zero, index: 0);
-                              }
-                              await audioPlayer.play();
-                            }
-                          },
-                          icon: Icon(
-                            playing
-                                ? CupertinoIcons.pause_circle_fill
-                                : CupertinoIcons.play_circle_fill,
-                            size: 36,
-                          ),
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  if (playing) {
+                                    await audioPlayer.pause();
+                                  } else {
+                                    if (processingState ==
+                                        ProcessingState.completed) {
+                                      await audioPlayer.seek(Duration.zero,
+                                          index: 0);
+                                    }
+                                    await audioPlayer.play();
+                                  }
+                                },
+                          icon: isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Color(0xFF111827),
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  playing
+                                      ? CupertinoIcons.pause_circle_fill
+                                      : CupertinoIcons.play_circle_fill,
+                                  size: 36,
+                                ),
                         ),
                         IconButton(
-                          onPressed: audioPlayer.hasNext
+                          onPressed: !isLoading && audioPlayer.hasNext
                               ? () => audioPlayer.seekToNext()
                               : null,
                           icon: SvgPicture.asset(

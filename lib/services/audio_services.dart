@@ -45,8 +45,8 @@ class AudioServices {
 
   Future<void> setPlaylistAudio(List<AudioSource> audioSources) async {
     try {
-      await audioPlayer.setAudioSources(audioSources);
       await stop(trackEvent: false);
+      await audioPlayer.setAudioSources(audioSources);
     } catch (e) {
       debugPrint(e.toString());
     }

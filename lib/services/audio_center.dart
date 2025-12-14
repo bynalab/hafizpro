@@ -101,15 +101,21 @@ class AudioCenter extends ChangeNotifier {
 
   void endTestSession() {
     if (_playbackOwner != PlaybackOwner.test) return;
+    unawaited(_endTestSessionAsync());
+  }
+
+  Future<void> _endTestSessionAsync() async {
+    if (_playbackOwner != PlaybackOwner.test) return;
 
     _playbackOwner = PlaybackOwner.reading;
-    unawaited(_audioServices.stop(trackEvent: false));
+
+    await _audioServices.stop(trackEvent: false);
     _resetPlaybackSession();
 
     final snapshot = _readingSnapshot;
     _readingSnapshot = null;
     if (snapshot != null) {
-      unawaited(_restoreReadingSession(snapshot));
+      await _restoreReadingSession(snapshot);
     }
   }
 
