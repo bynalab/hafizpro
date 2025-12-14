@@ -15,6 +15,8 @@ class SurahServices {
     required this.surahPicker,
   });
 
+  static const int totalSurahs = 114;
+
   int getRandomSurahNumber() {
     return surahPicker.getNextSurah();
   }

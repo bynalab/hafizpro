@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_services.dart';
@@ -11,6 +12,51 @@ class AudioCenter extends ChangeNotifier {
   final AudioServices _audioServices;
   final SurahServices _surahServices;
   StreamSubscription<PlayerState>? _playerStateSub;
+  bool _isAutoAdvancing = false;
+
+  bool _tryAutoAdvanceToNextSurah() {
+    final current = currentSurahNumber;
+    if (_isAutoAdvancing ||
+        current == null ||
+        current >= SurahServices.totalSurahs) {
+      return false;
+    }
+
+    _isAutoAdvancing = true;
+
+    final nextNumber = current + 1;
+    final nextName = surahList
+        .firstWhere(
+          (s) => s.number == nextNumber,
+          orElse: () => Surah(number: nextNumber, englishName: 'Surah'),
+        )
+        .englishName;
+
+    unawaited(
+      toggleSurah(
+        Surah(number: nextNumber, englishName: nextName),
+        startIndex: 0,
+      ).whenComplete(() {
+        _isAutoAdvancing = false;
+      }),
+    );
+
+    return true;
+  }
+
+  void _resetPlaybackSession() {
+    _isAutoAdvancing = false;
+    isPlaying = false;
+    isLoading = false;
+    currentSurahNumber = null;
+    currentSurahName = null;
+    notifyListeners();
+  }
+
+  void _handlePlaybackCompleted() {
+    if (_tryAutoAdvanceToNextSurah()) return;
+    _resetPlaybackSession();
+  }
 
   AudioCenter({
     required AudioServices audioServices,
@@ -23,12 +69,7 @@ class AudioCenter extends ChangeNotifier {
       // (and playing is typically false). We need to reset our shared UI state
       // so dashboard/QuranView stop showing an active "Now Playing" session.
       if (state.processingState == ProcessingState.completed) {
-        isPlaying = false;
-        isLoading = false;
-        currentSurahNumber = null;
-        currentSurahName = null;
-        notifyListeners();
-
+        _handlePlaybackCompleted();
         return;
       }
 
