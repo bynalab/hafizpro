@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
+import 'package:hafiz_test/model/playback_snapshot.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -16,6 +17,7 @@ class AudioCenter extends ChangeNotifier {
   StreamSubscription<PlayerState>? _playerStateSub;
   bool _isAutoAdvancing = false;
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
+  PlaybackSnapshot? _readingSnapshot;
 
   PlaybackOwner get playbackOwner => _playbackOwner;
 
@@ -65,8 +67,28 @@ class AudioCenter extends ChangeNotifier {
     _resetPlaybackSession();
   }
 
+  void _snapshotReadingSession() {
+    final audioPlayer = _audioServices.audioPlayer;
+    final current = currentSurahNumber;
+    final name = currentSurahName;
+    final idx = audioPlayer.currentIndex;
+
+    if (current != null && name != null && idx != null) {
+      _readingSnapshot = PlaybackSnapshot(
+        surahNumber: current,
+        surahName: name,
+        index: idx,
+        position: audioPlayer.position,
+      );
+    } else {
+      _readingSnapshot = null;
+    }
+  }
+
   void beginTestSession() {
     if (_playbackOwner == PlaybackOwner.test) return;
+
+    _snapshotReadingSession();
 
     _playbackOwner = PlaybackOwner.test;
 
@@ -83,6 +105,42 @@ class AudioCenter extends ChangeNotifier {
     _playbackOwner = PlaybackOwner.reading;
     unawaited(_audioServices.stop(trackEvent: false));
     _resetPlaybackSession();
+
+    final snapshot = _readingSnapshot;
+    _readingSnapshot = null;
+    if (snapshot != null) {
+      unawaited(_restoreReadingSession(snapshot));
+    }
+  }
+
+  Future<void> _restoreReadingSession(PlaybackSnapshot snapshot) async {
+    if (isLoading) return;
+    if (_playbackOwner != PlaybackOwner.reading) return;
+
+    isLoading = true;
+    currentSurahNumber = snapshot.surahNumber;
+    currentSurahName = snapshot.surahName;
+    isPlaying = false;
+    notifyListeners();
+
+    try {
+      final fullSurah = await _surahServices.getSurah(snapshot.surahNumber);
+      if (fullSurah.ayahs.isEmpty) return;
+
+      currentSurahName = fullSurah.englishName;
+      await _audioServices.setPlaylistAudio(fullSurah.audioSources);
+      await _audioServices.seek(snapshot.position, index: snapshot.index);
+      await _audioServices.pause(audioName: currentSurahName);
+      isPlaying = false;
+    } catch (_) {
+      // Keep UI state cleared if restore fails.
+      currentSurahNumber = null;
+      currentSurahName = null;
+      isPlaying = false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   AudioCenter({
