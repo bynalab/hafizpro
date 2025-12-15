@@ -200,19 +200,15 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                               title: title,
                               isLoading: _audioCenter.isLoading,
                               onTap: () {
-                                if (currentJuzNumber != null) {
-                                  final juz = juzList.firstWhere(
-                                    (j) => j.number == currentJuzNumber,
-                                    orElse: () => juzList.first,
-                                  );
-
+                                final juzNumber = currentJuzNumber;
+                                if (juzNumber != null) {
+                                  final juz = findJuzByNumber(juzNumber);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => JuzQuranView(juz: juz),
                                     ),
                                   );
-
                                   return;
                                 }
 

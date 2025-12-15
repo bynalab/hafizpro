@@ -11,6 +11,7 @@ import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/test_screen.dart';
+import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 
 class TestBySurah extends StatefulWidget {
@@ -163,15 +164,7 @@ class _TestPage extends State<TestBySurah> {
         ),
         body: Stack(
           children: [
-            if (isLoading)
-              const Center(
-                child: CircularProgressIndicator.adaptive(
-                  strokeWidth: 5,
-                  backgroundColor: Colors.blueGrey,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            else if (hasError)
+            if (hasError)
               CustomErrorWidget(
                 title: 'Failed to Load Test',
                 message:
@@ -186,8 +179,25 @@ class _TestPage extends State<TestBySurah> {
               SingleChildScrollView(
                 child: TestScreen(
                   surah: surah,
-                  currentAyah: currentAyah,
+                  currentAyah: isLoading ? Ayah() : currentAyah,
                   isLoading: isLoading,
+                  onReadFull: () async {
+                    final surahNumber = this.surahNumber;
+                    final surahName = surah.englishName;
+                    if (surahNumber <= 0) return;
+
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => QuranView(
+                          surah: Surah(
+                            number: surahNumber,
+                            englishName: surahName,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   onRefresh: () async => await init(),
                 ),
               ),

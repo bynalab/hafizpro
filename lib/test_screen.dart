@@ -12,10 +12,10 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
-import 'package:hafiz_test/surah/view_full_surah.dart';
 import 'package:hafiz_test/util/util.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/widget/quran_loader.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 
@@ -25,12 +25,16 @@ class TestScreen extends StatefulWidget {
 
   final bool isLoading;
   final Function()? onRefresh;
+  final VoidCallback? onReadFull;
+  final String readFullLabel;
 
   const TestScreen({
     super.key,
     required this.surah,
     required this.currentAyah,
     this.onRefresh,
+    this.onReadFull,
+    this.readFullLabel = 'Read Entire Surah',
     this.isLoading = false,
   });
 
@@ -42,6 +46,8 @@ class _TestPage extends State<TestScreen> {
   final audioServices = getIt<AudioServices>();
   final storageServices = getIt<IStorageService>();
   final audioCenter = getIt<AudioCenter>();
+
+  bool _isRefreshing = false;
 
   AudioPlayer get audioPlayer => audioServices.audioPlayer;
 
@@ -506,18 +512,9 @@ class _TestPage extends State<TestScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) {
-                            return SurahScreen(surah: surah);
-                          },
-                        ),
-                      );
-                    },
+                    onPressed: widget.onReadFull,
                     child: Text(
-                      'Read Full Surah',
+                      widget.readFullLabel,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -544,8 +541,20 @@ class _TestPage extends State<TestScreen> {
                         'ayah_number': widget.currentAyah.numberInSurah,
                       });
 
-                      await widget.onRefresh?.call();
-                      init();
+                      setState(() {
+                        _isRefreshing = true;
+                      });
+
+                      try {
+                        await widget.onRefresh?.call();
+                      } finally {
+                        await init();
+                        if (mounted) {
+                          setState(() {
+                            _isRefreshing = false;
+                          });
+                        }
+                      }
                     },
                     child: Text(
                       'Refresh Ayah',
@@ -565,16 +574,23 @@ class _TestPage extends State<TestScreen> {
       ],
     );
 
+    final body = QuranLoaderOverlay(
+      visible: widget.isLoading || _isRefreshing,
+      title: 'Loading Ayah',
+      subtitle: 'جارٍ التحميل',
+      child: content,
+    );
+
     if (kIsWeb) {
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child: content,
+          child: body,
         ),
       );
     }
 
-    return content;
+    return body;
   }
 }
 

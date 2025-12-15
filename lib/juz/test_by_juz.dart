@@ -5,6 +5,8 @@ import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/data/juz_list.dart';
+import 'package:hafiz_test/juz/juz_quran_view.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
@@ -155,15 +157,7 @@ class _TestPage extends State<TestByJuz> {
         ),
         body: Stack(
           children: [
-            if (isLoading)
-              const Center(
-                child: CircularProgressIndicator.adaptive(
-                  strokeWidth: 5,
-                  backgroundColor: Colors.blueGrey,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            else if (hasError)
+            if (hasError)
               CustomErrorWidget(
                 title: 'Failed to Load Juz Test',
                 message:
@@ -178,7 +172,18 @@ class _TestPage extends State<TestByJuz> {
               SingleChildScrollView(
                 child: TestScreen(
                   surah: surah,
-                  currentAyah: currentAyah,
+                  currentAyah: isLoading ? Ayah() : currentAyah,
+                  isLoading: isLoading,
+                  readFullLabel: 'Read Entire Juz',
+                  onReadFull: () async {
+                    final juz = findJuzByNumber(widget.juzNumber);
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JuzQuranView(juz: juz),
+                      ),
+                    );
+                  },
                   onRefresh: init,
                 ),
               ),

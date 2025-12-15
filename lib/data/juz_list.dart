@@ -321,3 +321,10 @@ List<JuzModel> searchJuz(String query) {
     return juz.name.toLowerCase().contains(q);
   }).toList();
 }
+
+JuzModel findJuzByNumber(int juzNumber) {
+  return juzList.firstWhere(
+    (j) => j.number == juzNumber,
+    orElse: () => juzList.first,
+  );
+}

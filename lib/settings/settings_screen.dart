@@ -12,6 +12,7 @@ import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/widget/quran_loader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -140,7 +141,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: controller.isLoading
-          ? const Center(child: CircularProgressIndicator.adaptive())
+          ? const QuranLoader(
+              title: 'Loading Settings...',
+              subtitle: 'جارٍ التحميل',
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
               child: Column(
