@@ -4,6 +4,7 @@ import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/bismillah.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class QuranAyahList extends StatelessWidget {
@@ -22,25 +23,7 @@ class QuranAyahList extends StatelessWidget {
     required this.onControlPressed,
   });
 
-  static const String _bismillahPlain = 'بسم الله الرحمن الرحيم';
-  static const String bismillahWithTashkeel =
-      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
-
   int get _offset => showBismillah ? 1 : 0;
-
-  String _trimLeadingBismillahForDisplay(String text) {
-    final trimmedLeft = text.trimLeft();
-
-    if (trimmedLeft.startsWith(_bismillahPlain)) {
-      return trimmedLeft.substring(_bismillahPlain.length).trimLeft();
-    }
-
-    if (trimmedLeft.startsWith(bismillahWithTashkeel)) {
-      return trimmedLeft.substring(bismillahWithTashkeel.length).trimLeft();
-    }
-
-    return text;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +36,7 @@ class QuranAyahList extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.fromLTRB(18, 6, 18, 12),
             child: Text(
-              '﷽',
+              Bismillah.glyph,
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: GoogleFonts.amiri(
@@ -70,7 +53,7 @@ class QuranAyahList extends StatelessWidget {
 
         final ayah = surah.ayahs[ayahIndex];
         final displayText = (showBismillah && ayahIndex == 0)
-            ? _trimLeadingBismillahForDisplay(ayah.text)
+            ? Bismillah.trimLeadingForDisplay(ayah.text)
             : ayah.text;
 
         return AyahCard(

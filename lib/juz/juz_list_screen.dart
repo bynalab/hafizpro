@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/juz/test_by_juz.dart';
+import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
-import 'package:hafiz_test/widget/star_burst_icon.dart';
 
 class JuzListScreen extends StatefulWidget {
   const JuzListScreen({super.key});
@@ -78,85 +78,6 @@ class _JuzListScreenState extends State<JuzListScreen> {
   }
 }
 
-class _JuzRow extends StatelessWidget {
-  const _JuzRow({
-    required this.numberText,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final String numberText;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
-        ),
-        child: Row(
-          children: [
-            StarburstIcon(text: numberText),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cairo(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF111827), width: 1.4),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: 20,
-                  color: Color(0xFF111827),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _JuzListBody extends StatelessWidget {
   const _JuzListBody({
     required this.title,
@@ -192,6 +113,7 @@ class _JuzListBody extends StatelessWidget {
             child: SizedBox(
               height: 170,
               child: Stack(
+                clipBehavior: Clip.none,
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
@@ -259,12 +181,12 @@ class _JuzListBody extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    right: -10,
-                    bottom: -28,
+                    right: -20,
+                    bottom: -33,
                     child: Image.asset(
                       headerImage,
-                      width: 190,
-                      height: 190,
+                      width: 150,
+                      height: 150,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -315,12 +237,10 @@ class _JuzListBody extends StatelessWidget {
                   itemBuilder: (_, index) {
                     final juz = juzNames[index];
                     final juzNumber = juz.number;
-                    final name = juz.name;
 
-                    return _JuzRow(
-                      numberText: '$juzNumber',
-                      title: name,
-                      subtitle: '${juz.ayahCount} Verses',
+                    return JuzCard(
+                      juz: juz,
+                      showPlayButton: false,
                       onTap: () {
                         AnalyticsService.trackJuzSelected(juzNumber);
                         Navigator.push(

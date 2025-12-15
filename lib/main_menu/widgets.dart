@@ -9,6 +9,7 @@ import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 
 class SearchField extends StatelessWidget {
   final TextEditingController controller;
@@ -298,6 +299,13 @@ class SurahListWidget extends StatelessWidget {
         final s = surahs[i];
         return SurahCard(
           surah: s,
+          onTap: () {
+            AnalyticsService.trackSurahSelected(s.englishName, s.number);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => QuranView(surah: s)),
+            );
+          },
           onPlay: () {
             AnalyticsService.trackSurahSelected(s.englishName, s.number);
             Navigator.push(
@@ -313,24 +321,27 @@ class SurahListWidget extends StatelessWidget {
 
 class SurahCard extends StatelessWidget {
   final Surah surah;
+  final VoidCallback onTap;
+  final bool showPlayButton;
   final VoidCallback? onPlay;
-  final VoidCallback? onTap;
   final bool isPlaying;
   final bool isLoading;
 
   const SurahCard({
     super.key,
     required this.surah,
+    required this.onTap,
+    this.showPlayButton = true,
     this.onPlay,
-    this.onTap,
     this.isPlaying = false,
     this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
@@ -366,34 +377,36 @@ class SurahCard extends StatelessWidget {
                 ],
               ),
             ),
-            GestureDetector(
-              onTap: isLoading ? null : onPlay,
-              child: Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border:
-                      Border.all(color: const Color(0xFF111827), width: 1.4),
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Color(0xFF111827)),
+            if (showPlayButton)
+              GestureDetector(
+                onTap: isLoading ? null : (onPlay ?? onTap),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border:
+                        Border.all(color: const Color(0xFF111827), width: 1.4),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFF111827),
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          color: const Color(0xFF111827),
                         ),
-                      )
-                    : Icon(
-                        isPlaying
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
-                        color: const Color(0xFF111827),
-                      ),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -415,11 +428,9 @@ class JuzListWidget extends StatelessWidget {
       itemBuilder: (context, i) {
         final juz = juzNames[i];
         final juzNumber = juz.number;
-        final name = juz.name;
 
         return JuzCard(
-          juzNumber: juzNumber,
-          name: name,
+          juz: juz,
           onTap: () {
             AnalyticsService.trackJuzSelected(juzNumber);
             Navigator.push(
@@ -434,59 +445,91 @@ class JuzListWidget extends StatelessWidget {
 }
 
 class JuzCard extends StatelessWidget {
-  final int juzNumber;
-  final String name;
+  final JuzModel juz;
   final VoidCallback onTap;
+  final bool showPlayButton;
+  final VoidCallback? onPlay;
 
   const JuzCard({
     super.key,
-    required this.juzNumber,
-    required this.name,
+    required this.juz,
     required this.onTap,
+    this.showPlayButton = true,
+    this.onPlay,
   });
+
+  String _pad2(int v) => v.toString().padLeft(2, '0');
+
+  String _surahName(int surahNumber) {
+    final s = surahList.firstWhere((x) => x.number == surahNumber);
+    return s.englishName;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Row(
-        children: [
-          StarburstIcon(text: '$juzNumber'),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              name,
-              style: GoogleFonts.cairo(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF111827),
+    final juzNumber = juz.number;
+    final rangeText =
+        '${_surahName(juz.startSurah)}(${_pad2(juz.startAyah)}) : ${_surahName(juz.endSurah)}(${_pad2(juz.endAyah)})';
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE5E7EB)),
+        ),
+        child: Row(
+          children: [
+            StarburstIcon(text: '$juzNumber'),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    juz.name,
+                    style: GoogleFonts.cairo(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    rangeText,
+                    style: GoogleFonts.cairo(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: onTap,
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFF111827),
-                  width: 1.4,
+            if (showPlayButton)
+              GestureDetector(
+                onTap: onPlay ?? onTap,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF111827),
+                      width: 1.4,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Color(0xFF111827),
+                  ),
                 ),
               ),
-              child: const Icon(
-                Icons.play_arrow_rounded,
-                color: Color(0xFF111827),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

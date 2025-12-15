@@ -10,6 +10,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/juz.model.dart';
+import 'package:hafiz_test/juz/juz_quran_view.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -17,7 +18,6 @@ import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 // import 'package:hafiz_test/surah/surah_list_screen.dart';
 // import 'package:hafiz_test/enum/surah_select_action.dart';
-import 'package:hafiz_test/juz/juz_list_screen.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 // import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
 
@@ -266,7 +266,9 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => QuranView(surah: surah),
+                          builder: (_) {
+                            return QuranView(surah: surah);
+                          },
                         ),
                       );
                     },
@@ -287,17 +289,16 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                 itemBuilder: (context, i) {
                   final JuzModel juz = displayJuz[i];
                   final juzNumber = juz.number;
-                  final name = juz.name;
 
                   return JuzCard(
-                    juzNumber: juzNumber,
-                    name: name,
+                    juz: juz,
                     onTap: () {
                       AnalyticsService.trackJuzSelected(juzNumber);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const JuzListScreen()),
+                          builder: (_) => JuzQuranView(juz: juz),
+                        ),
                       );
                     },
                   );
