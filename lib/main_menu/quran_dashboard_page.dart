@@ -301,6 +301,14 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                         ),
                       );
                     },
+                    onPlay: () async {
+                      AnalyticsService.trackJuzSelected(juzNumber);
+                      await _audioCenter.toggleJuz(juz);
+                    },
+                    isPlaying: _audioCenter.isCurrentJuz(juzNumber) &&
+                        _audioCenter.isPlaying,
+                    isLoading: _audioCenter.isCurrentJuz(juzNumber) &&
+                        _audioCenter.isLoading,
                   );
                 },
               ),

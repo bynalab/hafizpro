@@ -449,6 +449,8 @@ class JuzCard extends StatelessWidget {
   final VoidCallback onTap;
   final bool showPlayButton;
   final VoidCallback? onPlay;
+  final bool isPlaying;
+  final bool isLoading;
 
   const JuzCard({
     super.key,
@@ -456,6 +458,8 @@ class JuzCard extends StatelessWidget {
     required this.onTap,
     this.showPlayButton = true,
     this.onPlay,
+    this.isPlaying = false,
+    this.isLoading = false,
   });
 
   String _pad2(int v) => v.toString().padLeft(2, '0');
@@ -511,7 +515,7 @@ class JuzCard extends StatelessWidget {
             ),
             if (showPlayButton)
               GestureDetector(
-                onTap: onPlay ?? onTap,
+                onTap: isLoading ? null : (onPlay ?? onTap),
                 child: Container(
                   width: 34,
                   height: 34,
@@ -522,10 +526,21 @@ class JuzCard extends StatelessWidget {
                       width: 1.4,
                     ),
                   ),
-                  child: const Icon(
-                    Icons.play_arrow_rounded,
-                    color: Color(0xFF111827),
-                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFF111827),
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          isPlaying ? Icons.stop : Icons.play_arrow_rounded,
+                          color: const Color(0xFF111827),
+                        ),
                 ),
               ),
           ],

@@ -12,6 +12,10 @@ import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/bismillah.dart';
+import 'package:hafiz_test/util/app_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class JuzQuranView extends StatefulWidget {
   final JuzModel juz;
@@ -26,17 +30,21 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   final _surahServices = getIt<SurahServices>();
   final _audioCenter = getIt<AudioCenter>();
 
-  final _scrollController = ScrollController();
-  final _scrollViewKey = GlobalKey();
-
   bool _isLoading = true;
   bool _hasError = false;
   String _error = '';
 
   final _playingIndexNotifier = ValueNotifier<int?>(null);
 
-  List<_JuzSection> _sections = const [];
-  List<GlobalKey> _sectionMarkerKeys = const [];
+  double _speed = 1.5;
+
+  final ItemScrollController _itemScrollController = ItemScrollController();
+  final ItemPositionsListener _itemPositionsListener =
+      ItemPositionsListener.create();
+
+  List<_JuzEntry> _entries = const [];
+  List<int> _globalAyahIndexToEntryIndex = const [];
+
   String _currentStickySurahTitle = '';
 
   String _pad2(int n) => n.toString().padLeft(2, '0');
@@ -60,7 +68,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     });
 
     try {
-      final sections = <_JuzSection>[];
+      final entries = <_JuzEntry>[];
+      final globalAyahIndexToEntryIndex = <int>[];
+
       var globalAyahIndex = 0;
 
       for (final range in widget.juz.surahRanges()) {
@@ -80,30 +90,54 @@ class _JuzQuranViewState extends State<JuzQuranView> {
         final showBismillah =
             range.startAyah == 1 && Bismillah.shouldShow(range.surahNumber);
 
-        final ayahs = full.ayahs.sublist(clampedStart, clampedEnd + 1);
-        sections.add(
-          _JuzSection(
-            surah: full,
-            ayahs: ayahs,
-            showBismillah: showBismillah,
-            startGlobalAyahIndex: globalAyahIndex,
+        entries.add(
+          _JuzEntry.header(
+            surahTitle: full.englishName,
           ),
         );
 
-        globalAyahIndex += ayahs.length;
+        if (showBismillah) {
+          entries.add(const _JuzEntry.bismillah());
+        }
+
+        final ayahs = full.ayahs.sublist(clampedStart, clampedEnd + 1);
+        for (int localIndex = 0; localIndex < ayahs.length; localIndex++) {
+          final ayah = ayahs[localIndex];
+          final displayText = (showBismillah && localIndex == 0)
+              ? Bismillah.trimLeadingForDisplay(ayah.text)
+              : ayah.text;
+
+          globalAyahIndexToEntryIndex.add(entries.length);
+          entries.add(
+            _JuzEntry.ayah(
+              globalAyahIndex: globalAyahIndex,
+              surah: full,
+              ayah: ayah,
+              displayText: displayText,
+            ),
+          );
+          globalAyahIndex++;
+        }
       }
 
       setState(() {
-        _sections = sections;
-        _sectionMarkerKeys = List.generate(sections.length, (_) => GlobalKey());
+        _entries = entries;
+        _globalAyahIndexToEntryIndex = globalAyahIndexToEntryIndex;
         _currentStickySurahTitle =
-            sections.isEmpty ? '' : sections.first.surah.englishName;
+            entries.isEmpty ? '' : _firstHeaderTitle(entries);
         _isLoading = false;
       });
 
+      _itemPositionsListener.itemPositions.addListener(_onPositionsChanged);
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Scroll to the currently playing ayah if we're in the right juz.
         if (!mounted) return;
-        _updateStickyHeader();
+        if (!_audioCenter.isCurrentJuz(widget.juz.number)) return;
+
+        final idx = _audioCenter.juzPlayingIndexNotifier.value ??
+            _audioCenter.audioPlayer.currentIndex;
+        _setPlayingIndexAndScroll(idx, animated: false);
       });
     } catch (e) {
       setState(() {
@@ -118,106 +152,105 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   void initState() {
     super.initState();
     _load();
+
+    _audioCenter.juzPlayingIndexNotifier.addListener(_onJuzAudioIndexChanged);
   }
 
   @override
   void dispose() {
+    _itemPositionsListener.itemPositions.removeListener(_onPositionsChanged);
+    _audioCenter.juzPlayingIndexNotifier
+        .removeListener(_onJuzAudioIndexChanged);
     _playingIndexNotifier.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
-  void _updateStickyHeader() {
-    if (_sections.isEmpty) return;
+  void _onJuzAudioIndexChanged() {
+    if (!mounted) return;
+    if (!_audioCenter.isCurrentJuz(widget.juz.number)) return;
 
-    final scrollBox = _scrollViewKey.currentContext?.findRenderObject();
-    if (scrollBox is! RenderBox) return;
-    final scrollTopY = scrollBox.localToGlobal(Offset.zero).dy;
-    final thresholdY = scrollTopY + 1;
+    final idx = _audioCenter.juzPlayingIndexNotifier.value;
+    _setPlayingIndexAndScroll(idx, animated: true);
+  }
 
-    int currentIndex = 0;
+  void _setPlayingIndexAndScroll(int? idx, {required bool animated}) {
+    if (idx == null) return;
+    if (_globalAyahIndexToEntryIndex.isEmpty) return;
+    if (idx < 0 || idx >= _globalAyahIndexToEntryIndex.length) return;
 
-    for (int i = 0; i < _sectionMarkerKeys.length; i++) {
-      final key = _sectionMarkerKeys[i];
-      final box = key.currentContext?.findRenderObject();
-      if (box is! RenderBox) continue;
+    final entryIndex = _globalAyahIndexToEntryIndex[idx];
+    _playingIndexNotifier.value = idx;
 
-      final y = box.localToGlobal(Offset.zero).dy;
-      if (y <= thresholdY) {
-        currentIndex = i;
-      } else {
+    if (!_itemScrollController.isAttached) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (!_itemScrollController.isAttached) return;
+        _setPlayingIndexAndScroll(idx, animated: animated);
+      });
+      return;
+    }
+
+    if (animated) {
+      _itemScrollController.scrollTo(
+        index: entryIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        alignment: 0.25,
+      );
+    } else {
+      _itemScrollController.jumpTo(index: entryIndex, alignment: 0.25);
+    }
+  }
+
+  String _titleForGlobalIndex(int? globalIndex) {
+    if (globalIndex == null) return 'Juz ${widget.juz.number}';
+    if (globalIndex < 0 || globalIndex >= _globalAyahIndexToEntryIndex.length) {
+      return 'Juz ${widget.juz.number}';
+    }
+
+    final entryIndex = _globalAyahIndexToEntryIndex[globalIndex];
+    if (entryIndex < 0 || entryIndex >= _entries.length) {
+      return 'Juz ${widget.juz.number}';
+    }
+
+    final entry = _entries[entryIndex];
+    final surah = entry.surah;
+    final ayah = entry.ayah;
+    if (surah == null || ayah == null) return 'Juz ${widget.juz.number}';
+    return '${surah.englishName}: ${ayah.numberInSurah}';
+  }
+
+  String _firstHeaderTitle(List<_JuzEntry> entries) {
+    for (final e in entries) {
+      if (e.type == _JuzEntryType.header) return e.surahTitle ?? '';
+    }
+
+    return '';
+  }
+
+  void _onPositionsChanged() {
+    if (!mounted) return;
+    final positions = _itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return;
+
+    final visible = positions.where((p) => p.itemTrailingEdge > 0).toList()
+      ..sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
+
+    if (visible.isEmpty) return;
+    final firstIndex = visible.first.index;
+
+    String? nextTitle;
+    for (int i = firstIndex; i >= 0; i--) {
+      if (i >= _entries.length) continue;
+      final e = _entries[i];
+      if (e.type == _JuzEntryType.header) {
+        nextTitle = e.surahTitle;
         break;
       }
     }
 
-    final nextTitle = _sections[currentIndex].surah.englishName;
-    if (nextTitle == _currentStickySurahTitle) return;
-    setState(() => _currentStickySurahTitle = nextTitle);
-  }
-
-  List<Widget> _buildSectionSlivers(int index) {
-    final section = _sections[index];
-
-    return [
-      SliverToBoxAdapter(
-        child: _SurahMarker(
-          key: _sectionMarkerKeys[index],
-          title: section.surah.englishName,
-        ),
-      ),
-      if (section.showBismillah)
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
-            child: Text(
-              Bismillah.glyph,
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.rtl,
-              style: GoogleFonts.amiri(
-                fontSize: 24,
-                height: 2,
-                color: const Color(0xFF111827),
-              ),
-            ),
-          ),
-        ),
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, localIndex) {
-            final globalIndex = section.startGlobalAyahIndex + localIndex;
-            final ayah = section.ayahs[localIndex];
-            final isEven = globalIndex % 2 == 0;
-
-            final displayText = (section.showBismillah && localIndex == 0)
-                ? Bismillah.trimLeadingForDisplay(ayah.text)
-                : ayah.text;
-
-            return AyahCard(
-              index: globalIndex,
-              ayah: Ayah(
-                number: ayah.number,
-                audio: ayah.audio,
-                audioSecondary: ayah.audioSecondary,
-                text: displayText,
-                translation: ayah.translation,
-                numberInSurah: ayah.numberInSurah,
-                juz: ayah.juz,
-                manzil: ayah.manzil,
-                page: ayah.page,
-                ruku: ayah.ruku,
-                hizbQuarter: ayah.hizbQuarter,
-                surah: ayah.surah,
-              ),
-              playingIndexNotifier: _playingIndexNotifier,
-              backgroundColor:
-                  isEven ? const Color(0xFFF3F4F6) : const Color(0xFFF9FAFB),
-              onPlayPressed: _onPlayPressed,
-            );
-          },
-          childCount: section.ayahs.length,
-        ),
-      ),
-    ];
+    if (nextTitle == null || nextTitle == _currentStickySurahTitle) return;
+    setState(() => _currentStickySurahTitle = nextTitle!);
   }
 
   Future<void> _onPlayPressed(int globalIndex) async {
@@ -234,16 +267,17 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
     _playingIndexNotifier.value = globalIndex;
 
-    for (final section in _sections) {
-      final start = section.startGlobalAyahIndex;
-      final end = start + section.ayahs.length - 1;
-      if (globalIndex >= start && globalIndex <= end) {
-        final localIndex = globalIndex - start;
-        final ayah = section.ayahs[localIndex];
-        await _audioCenter.playSingleAyah(section.surah, ayah.audioSource);
-        return;
-      }
+    if (globalIndex < 0 || globalIndex >= _globalAyahIndexToEntryIndex.length) {
+      return;
     }
+
+    final entryIndex = _globalAyahIndexToEntryIndex[globalIndex];
+    if (entryIndex < 0 || entryIndex >= _entries.length) return;
+    final entry = _entries[entryIndex];
+    final surah = entry.surah;
+    final ayah = entry.ayah;
+    if (surah == null || ayah == null) return;
+    await _audioCenter.playSingleAyah(surah, ayah.audioSource);
   }
 
   @override
@@ -345,33 +379,365 @@ class _JuzQuranViewState extends State<JuzQuranView> {
             ),
           ),
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollUpdateNotification ||
-                    notification is UserScrollNotification) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    _updateStickyHeader();
-                  });
-                }
-                return false;
-              },
-              child: CustomScrollView(
-                key: _scrollViewKey,
-                controller: _scrollController,
-                slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickySurahHeaderDelegate(
-                      title: _currentStickySurahTitle,
+            child: Stack(
+              children: [
+                ScrollablePositionedList.separated(
+                  padding: const EdgeInsets.only(top: 54, bottom: 180),
+                  itemCount: _entries.length,
+                  itemScrollController: _itemScrollController,
+                  itemPositionsListener: _itemPositionsListener,
+                  itemBuilder: (context, index) {
+                    final entry = _entries[index];
+
+                    switch (entry.type) {
+                      case _JuzEntryType.header:
+                        return _SurahMarker(title: entry.surahTitle ?? '');
+                      case _JuzEntryType.bismillah:
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
+                          child: Text(
+                            Bismillah.glyph,
+                            textAlign: TextAlign.center,
+                            textDirection: TextDirection.rtl,
+                            style: GoogleFonts.amiri(
+                              fontSize: 24,
+                              height: 2,
+                              color: const Color(0xFF111827),
+                            ),
+                          ),
+                        );
+                      case _JuzEntryType.ayah:
+                        final globalIndex = entry.globalAyahIndex ?? 0;
+                        final isEven = globalIndex % 2 == 0;
+                        final ayah = entry.ayah;
+
+                        if (ayah == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return AyahCard(
+                          index: globalIndex,
+                          ayah: Ayah(
+                            number: ayah.number,
+                            audio: ayah.audio,
+                            audioSecondary: ayah.audioSecondary,
+                            text: entry.displayText ?? ayah.text,
+                            translation: ayah.translation,
+                            numberInSurah: ayah.numberInSurah,
+                            juz: ayah.juz,
+                            manzil: ayah.manzil,
+                            page: ayah.page,
+                            ruku: ayah.ruku,
+                            hizbQuarter: ayah.hizbQuarter,
+                            surah: ayah.surah,
+                          ),
+                          playingIndexNotifier: _playingIndexNotifier,
+                          backgroundColor: isEven
+                              ? const Color(0xFFF3F4F6)
+                              : const Color(0xFFF9FAFB),
+                          onPlayPressed: _onPlayPressed,
+                        );
+                    }
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(height: 2),
+                ),
+                _PinnedHeader(title: _currentStickySurahTitle),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+                    color: const Color(0xFF78B7C6),
+                    child: SafeArea(
+                      top: false,
+                      child: ValueListenableBuilder<int?>(
+                        valueListenable: _playingIndexNotifier,
+                        builder: (context, index, _) {
+                          final matches =
+                              _audioCenter.isCurrentJuz(widget.juz.number);
+                          final title = _titleForGlobalIndex(index);
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.black500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              StreamBuilder<Duration>(
+                                stream: matches
+                                    ? _audioCenter.audioPlayer.positionStream
+                                    : const Stream<Duration>.empty(),
+                                builder: (context, snap) {
+                                  final pos = matches
+                                      ? (snap.data ?? Duration.zero)
+                                      : Duration.zero;
+                                  final total = matches
+                                      ? (_audioCenter.audioPlayer.duration ??
+                                          Duration.zero)
+                                      : Duration.zero;
+                                  final totalMs = total.inMilliseconds;
+                                  final value = totalMs == 0
+                                      ? 0.0
+                                      : (pos.inMilliseconds / totalMs)
+                                          .clamp(0.0, 1.0);
+
+                                  String fmt(Duration d) {
+                                    final m = d.inMinutes
+                                        .remainder(60)
+                                        .toString()
+                                        .padLeft(2, '0');
+                                    final s = d.inSeconds
+                                        .remainder(60)
+                                        .toString()
+                                        .padLeft(2, '0');
+                                    return '$m:$s';
+                                  }
+
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        fmt(pos),
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.black500,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 9),
+                                      Expanded(
+                                        child: SliderTheme(
+                                          data:
+                                              SliderTheme.of(context).copyWith(
+                                            trackHeight: 4,
+                                            thumbShape:
+                                                const RoundSliderThumbShape(
+                                                    enabledThumbRadius: 0),
+                                            overlayShape:
+                                                SliderComponentShape.noOverlay,
+                                            activeTrackColor:
+                                                AppColors.green500,
+                                            inactiveTrackColor: AppColors
+                                                .black500
+                                                .withValues(alpha: 0.30),
+                                          ),
+                                          child: Slider(
+                                            value: value,
+                                            onChanged: matches
+                                                ? (v) async {
+                                                    final ms =
+                                                        (totalMs * v).round();
+                                                    await _audioCenter
+                                                        .audioPlayer
+                                                        .pause();
+                                                    await _audioCenter
+                                                        .audioPlayer
+                                                        .seek(Duration(
+                                                            milliseconds: ms));
+                                                  }
+                                                : null,
+                                            onChangeEnd: matches
+                                                ? (v) async {
+                                                    final ms =
+                                                        (totalMs * v).round();
+                                                    await _audioCenter
+                                                        .audioPlayer
+                                                        .seek(Duration(
+                                                            milliseconds: ms));
+                                                    await _audioCenter
+                                                        .audioPlayer
+                                                        .play();
+                                                  }
+                                                : null,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 9),
+                                      Text(
+                                        fmt(total),
+                                        style: GoogleFonts.manrope(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.black500,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              StreamBuilder<SequenceState?>(
+                                stream: _audioCenter
+                                    .audioPlayer.sequenceStateStream,
+                                builder: (context, _) {
+                                  final hasPrevious = matches &&
+                                      _audioCenter.audioPlayer.hasPrevious;
+                                  final hasNext = matches &&
+                                      _audioCenter.audioPlayer.hasNext;
+
+                                  return StreamBuilder<PlayerState>(
+                                    stream: _audioCenter
+                                        .audioPlayer.playerStateStream,
+                                    builder: (context, snap) {
+                                      final isActuallyPlaying =
+                                          snap.data?.playing ?? false;
+                                      final playing =
+                                          matches && isActuallyPlaying;
+
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              _speed = _speed == 2.0
+                                                  ? 1.0
+                                                  : _speed + 0.5;
+                                              await _audioCenter.audioPlayer
+                                                  .setSpeed(_speed);
+                                              setState(() {});
+                                            },
+                                            child: Text(
+                                              '${_speed.toStringAsFixed(1)}x',
+                                              style: GoogleFonts.cairo(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.black500,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: hasPrevious
+                                                ? _audioCenter
+                                                    .audioPlayer.seekToPrevious
+                                                : null,
+                                            padding: EdgeInsets.zero,
+                                            constraints:
+                                                const BoxConstraints.tightFor(
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/previous.svg',
+                                              width: 30,
+                                              height: 30,
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                Color(0xFF111827),
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Color(0xFF111827),
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () async {
+                                                await _audioCenter
+                                                    .toggleJuz(widget.juz);
+                                              },
+                                              padding: EdgeInsets.zero,
+                                              constraints:
+                                                  const BoxConstraints.expand(),
+                                              icon: Icon(
+                                                playing
+                                                    ? Icons.pause
+                                                    : Icons.play_arrow,
+                                                size: 28,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: hasNext
+                                                ? _audioCenter
+                                                    .audioPlayer.seekToNext
+                                                : null,
+                                            padding: EdgeInsets.zero,
+                                            constraints:
+                                                const BoxConstraints.tightFor(
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                            icon: SvgPicture.asset(
+                                              'assets/icons/next.svg',
+                                              width: 30,
+                                              height: 30,
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                Color(0xFF111827),
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                          ),
+                                          StreamBuilder<LoopMode>(
+                                            stream: _audioCenter
+                                                .audioPlayer.loopModeStream,
+                                            builder: (context, snap) {
+                                              final loopMode =
+                                                  snap.data ?? LoopMode.off;
+
+                                              return IconButton(
+                                                onPressed: () async {
+                                                  final next =
+                                                      loopMode == LoopMode.one
+                                                          ? LoopMode.off
+                                                          : LoopMode.one;
+                                                  await _audioCenter.audioPlayer
+                                                      .setLoopMode(next);
+                                                },
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints
+                                                        .tightFor(
+                                                  width: 40,
+                                                  height: 40,
+                                                ),
+                                                icon: Icon(
+                                                  Icons.repeat_rounded,
+                                                  size: 24,
+                                                  color:
+                                                      loopMode == LoopMode.one
+                                                          ? AppColors.black
+                                                          : AppColors.black600,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ),
-                  for (int i = 0; i < _sections.length; i++)
-                    ..._buildSectionSlivers(i),
-                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -380,72 +746,87 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   }
 }
 
-class _JuzSection {
-  final Surah surah;
-  final List<Ayah> ayahs;
-  final bool showBismillah;
-  final int startGlobalAyahIndex;
+enum _JuzEntryType { header, bismillah, ayah }
 
-  const _JuzSection({
-    required this.surah,
-    required this.ayahs,
-    required this.showBismillah,
-    required this.startGlobalAyahIndex,
+class _JuzEntry {
+  final _JuzEntryType type;
+  final String? surahTitle;
+  final int? globalAyahIndex;
+  final Surah? surah;
+  final Ayah? ayah;
+  final String? displayText;
+
+  const _JuzEntry._({
+    required this.type,
+    this.surahTitle,
+    this.globalAyahIndex,
+    this.surah,
+    this.ayah,
+    this.displayText,
   });
+
+  const _JuzEntry.header({required String surahTitle})
+      : this._(type: _JuzEntryType.header, surahTitle: surahTitle);
+
+  const _JuzEntry.bismillah() : this._(type: _JuzEntryType.bismillah);
+
+  const _JuzEntry.ayah({
+    required int globalAyahIndex,
+    required Surah surah,
+    required Ayah ayah,
+    required String displayText,
+  }) : this._(
+          type: _JuzEntryType.ayah,
+          globalAyahIndex: globalAyahIndex,
+          surah: surah,
+          ayah: ayah,
+          displayText: displayText,
+        );
 }
 
-class _StickySurahHeaderDelegate extends SliverPersistentHeaderDelegate {
+class _PinnedHeader extends StatelessWidget {
   final String title;
 
-  _StickySurahHeaderDelegate({required this.title});
+  const _PinnedHeader({required this.title});
 
   @override
-  double get minExtent => 44;
-
-  @override
-  double get maxExtent => 44;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return Container(
-      color: const Color(0xFFF9FAFB),
-      padding: const EdgeInsets.fromLTRB(18, 10, 18, 8),
-      child: Center(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 160),
-          switchInCurve: Curves.easeOut,
-          switchOutCurve: Curves.easeIn,
-          transitionBuilder: (child, animation) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          child: Text(
-            title,
-            key: ValueKey(title),
-            style: GoogleFonts.cairo(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF111827),
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        height: 44,
+        color: const Color(0xFFF9FAFB),
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 8),
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 160),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            transitionBuilder: (child, animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: Text(
+              title,
+              key: ValueKey(title),
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF111827),
+              ),
             ),
           ),
         ),
       ),
     );
   }
-
-  @override
-  bool shouldRebuild(covariant _StickySurahHeaderDelegate oldDelegate) {
-    return oldDelegate.title != title;
-  }
 }
 
 class _SurahMarker extends StatelessWidget {
   final String title;
 
-  const _SurahMarker({super.key, required this.title});
+  const _SurahMarker({required this.title});
 
   @override
   Widget build(BuildContext context) {

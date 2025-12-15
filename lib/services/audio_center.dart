@@ -3,21 +3,25 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
+import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/playback_snapshot.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:just_audio/just_audio.dart';
 
-enum PlaybackOwner { reading, test }
+enum PlaybackOwner { reading, test, juz }
 
 class AudioCenter extends ChangeNotifier {
   final AudioServices _audioServices;
   final SurahServices _surahServices;
   StreamSubscription<PlayerState>? _playerStateSub;
+  StreamSubscription<int?>? _indexSub;
   bool _isAutoAdvancing = false;
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
   PlaybackSnapshot? _readingSnapshot;
+
+  final ValueNotifier<int?> juzPlayingIndexNotifier = ValueNotifier<int?>(null);
 
   bool _isSurahLevelAudio(Surah surah) {
     if (surah.ayahs.isEmpty) return false;
@@ -65,6 +69,8 @@ class AudioCenter extends ChangeNotifier {
     isLoading = false;
     currentSurahNumber = null;
     currentSurahName = null;
+    currentJuzNumber = null;
+    juzPlayingIndexNotifier.value = null;
     notifyListeners();
   }
 
@@ -97,6 +103,9 @@ class AudioCenter extends ChangeNotifier {
     _snapshotReadingSession();
 
     _playbackOwner = PlaybackOwner.test;
+    _indexSub?.cancel();
+    _indexSub = null;
+    juzPlayingIndexNotifier.value = null;
 
     if (_audioServices.audioPlayer.playing) {
       unawaited(_audioServices.pause(audioName: currentSurahName));
@@ -114,6 +123,10 @@ class AudioCenter extends ChangeNotifier {
     if (_playbackOwner != PlaybackOwner.test) return;
 
     _playbackOwner = PlaybackOwner.reading;
+
+    _indexSub?.cancel();
+    _indexSub = null;
+    juzPlayingIndexNotifier.value = null;
 
     await _audioServices.stop(trackEvent: false);
     _resetPlaybackSession();
@@ -183,12 +196,15 @@ class AudioCenter extends ChangeNotifier {
 
   int? currentSurahNumber;
   String? currentSurahName;
+  int? currentJuzNumber;
   bool isPlaying = false;
   bool isLoading = false;
 
   AudioPlayer get audioPlayer => _audioServices.audioPlayer;
 
   bool isCurrentSurah(int surahNumber) => currentSurahNumber == surahNumber;
+
+  bool isCurrentJuz(int juzNumber) => currentJuzNumber == juzNumber;
 
   void setCurrentSurah(Surah surah) {
     currentSurahNumber = surah.number;
@@ -215,6 +231,14 @@ class AudioCenter extends ChangeNotifier {
   Future<void> toggleSurah(Surah surah, {int startIndex = 0}) async {
     if (isLoading) return;
 
+    if (_playbackOwner != PlaybackOwner.reading) {
+      _playbackOwner = PlaybackOwner.reading;
+      currentJuzNumber = null;
+      _indexSub?.cancel();
+      _indexSub = null;
+      juzPlayingIndexNotifier.value = null;
+    }
+
     final audioPlayer = _audioServices.audioPlayer;
 
     if (currentSurahNumber == surah.number) {
@@ -233,6 +257,7 @@ class AudioCenter extends ChangeNotifier {
     isLoading = true;
     currentSurahNumber = surah.number;
     currentSurahName = surah.englishName;
+    currentJuzNumber = null;
     notifyListeners();
 
     try {
@@ -264,9 +289,83 @@ class AudioCenter extends ChangeNotifier {
     await toggleSurah(surah, startIndex: index);
   }
 
+  Future<void> toggleJuz(JuzModel juz) async {
+    if (isLoading) return;
+
+    final audioPlayer = _audioServices.audioPlayer;
+
+    if (_playbackOwner == PlaybackOwner.juz && currentJuzNumber == juz.number) {
+      if (audioPlayer.playing) {
+        isPlaying = false;
+        notifyListeners();
+        await _audioServices.pause(audioName: currentSurahName);
+      } else {
+        isPlaying = true;
+        notifyListeners();
+        unawaited(_audioServices.play(audioName: currentSurahName));
+      }
+      return;
+    }
+
+    isLoading = true;
+    _playbackOwner = PlaybackOwner.juz;
+    currentJuzNumber = juz.number;
+    currentSurahNumber = null;
+    currentSurahName = 'Juz ${juz.number}';
+    juzPlayingIndexNotifier.value = null;
+    notifyListeners();
+
+    try {
+      final playlist = <AudioSource>[];
+
+      for (final range in juz.surahRanges()) {
+        final full = await _surahServices.getSurah(range.surahNumber);
+        if (full.ayahs.isEmpty) continue;
+
+        final endAyah = range.endAyah ?? full.numberOfAyahs;
+        final startIndex = range.startAyah - 1;
+        final endIndexInclusive = endAyah - 1;
+
+        if (startIndex < 0 || endIndexInclusive < 0) continue;
+        final clampedStart = startIndex.clamp(0, full.ayahs.length - 1);
+        final clampedEnd = endIndexInclusive.clamp(0, full.ayahs.length - 1);
+        if (clampedEnd < clampedStart) continue;
+
+        final slice = full.ayahs.sublist(clampedStart, clampedEnd + 1);
+        playlist.addAll(slice.map((a) => a.audioSource));
+      }
+
+      if (playlist.isEmpty) {
+        throw Exception('No verses available for Juz ${juz.number}');
+      }
+
+      await _audioServices.setPlaylistAudio(playlist);
+      await audioPlayer.seek(Duration.zero, index: 0);
+
+      await _indexSub?.cancel();
+      _indexSub = audioPlayer.currentIndexStream.listen((idx) {
+        if (_playbackOwner != PlaybackOwner.juz) return;
+        if (currentJuzNumber != juz.number) return;
+        juzPlayingIndexNotifier.value = idx;
+      });
+
+      unawaited(_audioServices.play(audioName: currentSurahName));
+
+      isPlaying = true;
+    } catch (_) {
+      isPlaying = audioPlayer.playing;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> stop() async {
     if (isLoading) return;
     isPlaying = false;
+    _indexSub?.cancel();
+    _indexSub = null;
+    juzPlayingIndexNotifier.value = null;
     notifyListeners();
     await _audioServices.stop(audioName: currentSurahName);
   }
@@ -274,6 +373,8 @@ class AudioCenter extends ChangeNotifier {
   @override
   void dispose() {
     _playerStateSub?.cancel();
+    _indexSub?.cancel();
+    juzPlayingIndexNotifier.dispose();
 
     super.dispose();
   }
