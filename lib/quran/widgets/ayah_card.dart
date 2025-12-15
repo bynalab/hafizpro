@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/util/app_colors.dart';
 
 class AyahCard extends StatelessWidget {
   final Ayah ayah;
@@ -60,10 +62,9 @@ class AyahCard extends StatelessWidget {
                       ),
                       child: Text(
                         '${ayah.numberInSurah}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF111827),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppColors.black500,
                         ),
                       ),
                     ),
@@ -95,11 +96,10 @@ class AyahCard extends StatelessWidget {
                     ayah.text,
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'Quran',
+                    style: GoogleFonts.amiri(
+                      fontSize: 24,
                       height: 2,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: AppColors.black500,
                     ),
                   ),
                 ),
@@ -109,23 +109,21 @@ class AyahCard extends StatelessWidget {
                   child: Text(
                     hardcodedTransliteration,
                     textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.7,
-                      color: Color(0xFF111827),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: AppColors.black500,
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     hardcodedTranslation,
                     textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.6,
-                      color: Color(0xFF111827),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: AppColors.black500,
                     ),
                   ),
                 ),

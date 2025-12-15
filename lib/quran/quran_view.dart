@@ -84,7 +84,7 @@ class _QuranViewState extends State<QuranView> {
         body: CustomErrorWidget(
           title: 'Failed to Load Surah',
           message:
-              'Please check your internet connection or try again shortly.',
+              'Please check your internet connection or try again shortly. ${viewModel.error}',
           icon: Icons.menu_book_rounded,
           color: Colors.green.shade700,
           onRetry: () async {
@@ -158,32 +158,34 @@ class _QuranViewState extends State<QuranView> {
                 children: [
                   Column(
                     children: [
-                      const SizedBox(height: 14),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Container(
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF3F4F6),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            viewModel.surah?.englishName ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
+                      // const SizedBox(height: 14),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 18),
+                      //   child: Container(
+                      //     height: 40,
+                      //     alignment: Alignment.center,
+                      //     decoration: BoxDecoration(
+                      //       color: const Color(0xFFF3F4F6),
+                      //       borderRadius: BorderRadius.circular(10),
+                      //     ),
+                      //     child: Text(
+                      //       viewModel.surah?.englishName ?? '',
+                      //       style: const TextStyle(
+                      //         fontSize: 16,
+                      //         fontWeight: FontWeight.w600,
+                      //         color: Color(0xFF111827),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                       Expanded(
                         child: viewModel.surah == null
                             ? const SizedBox.shrink()
                             : QuranAyahList(
                                 surah: viewModel.surah!,
+                                showBismillah: viewModel.shouldShowBismillah(
+                                  viewModel.surah?.number,
+                                ),
                                 playingIndexNotifier:
                                     viewModel.playingIndexNotifier,
                                 scrollController:

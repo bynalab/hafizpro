@@ -22,6 +22,7 @@ class QuranViewModel {
   Surah? surah;
   bool isLoading = true;
   bool hasError = false;
+  String error = '';
   bool isPlaylist = false;
 
   StreamSubscription<PlayerState>? _playerStateSub;
@@ -30,13 +31,24 @@ class QuranViewModel {
   final playingIndexNotifier = ValueNotifier<int?>(null);
   final isPlayingNotifier = ValueNotifier<bool>(false);
 
+  static const Set<int> _noBismillahPreSurahs = {1, 9};
+
+  bool shouldShowBismillah(int? surahNumber) {
+    if (surahNumber == null) return false;
+    return !_noBismillahPreSurahs.contains(surahNumber);
+  }
+
+  int get _bismillahListOffset => shouldShowBismillah(surah?.number) ? 1 : 0;
+
   AudioPlayer get audioPlayer => audioCenter.audioPlayer;
 
   Future<void> initialize(int surahNumber) async {
     try {
       isLoading = true;
       surah = await surahService.getSurah(surahNumber);
-      if (surah?.ayahs.isEmpty ?? true) return;
+      if (surah?.ayahs.isEmpty ?? true) {
+        throw Exception('Surah $surahNumber has no ayahs');
+      }
 
       // Only reflect existing playback state if the currently playing surah
       // matches the surah being viewed.
@@ -57,9 +69,11 @@ class QuranViewModel {
       }
 
       hasError = false;
+      error = '';
     } catch (e) {
       debugPrint('Error loading surah: $e');
       hasError = true;
+      error = e.toString();
     } finally {
       isLoading = false;
     }
@@ -166,7 +180,7 @@ class QuranViewModel {
     if (!itemScrollController.isAttached) return;
 
     itemScrollController.scrollTo(
-      index: index,
+      index: index + _bismillahListOffset,
       duration: const Duration(milliseconds: 250),
     );
   }

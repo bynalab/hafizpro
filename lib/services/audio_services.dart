@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 
 class AudioServices {
@@ -131,11 +130,21 @@ class AudioServices {
     Duration? position,
     int? index,
   }) async {
-    await stop();
+    await stop(trackEvent: false);
     await seek(position ?? Duration.zero, index: index);
-    await setAudioSource(
-      preload: false,
-      audioSource ?? AudioSource.uri(Uri(), tag: MediaItem(id: '', title: '')),
-    );
+
+    // Avoid setting an invalid/empty Uri() which can confuse platform decoders.
+    // If no source is provided, clear the player's playlist.
+    if (audioSource == null) {
+      try {
+        await setPlaylistAudio([]);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+
+      return;
+    }
+
+    await setAudioSource(audioSource, preload: false);
   }
 }

@@ -73,6 +73,14 @@ class SurahServices {
           if (code == 400 || code == 404) {
             continue;
           }
+
+          // On slow/unstable networks, try the next provider.
+          if (e.type == DioExceptionType.connectionTimeout ||
+              e.type == DioExceptionType.sendTimeout ||
+              e.type == DioExceptionType.receiveTimeout ||
+              e.type == DioExceptionType.connectionError) {
+            continue;
+          }
           rethrow;
         }
       }
@@ -81,6 +89,6 @@ class SurahServices {
       rethrow;
     }
 
-    return Surah();
+    throw Exception('Failed to load surah $surahNumber');
   }
 }

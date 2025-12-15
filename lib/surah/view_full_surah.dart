@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,9 +26,8 @@ class _SurahScreenState extends State<SurahScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     audioService.stop();
+    super.dispose();
   }
 
   Surah get surah => widget.surah;
@@ -127,6 +128,8 @@ class QuranVerseCard extends StatefulWidget {
 class QuranVersenCardState extends State<QuranVerseCard> {
   final audioServices = AudioServices();
 
+  StreamSubscription<PlayerState>? _playerStateSub;
+
   bool isLoading = false;
   bool isPlaying = false;
 
@@ -163,7 +166,8 @@ class QuranVersenCardState extends State<QuranVerseCard> {
   void initState() {
     super.initState();
 
-    audioServices.audioPlayer.playerStateStream.listen((state) {
+    _playerStateSub =
+        audioServices.audioPlayer.playerStateStream.listen((state) {
       setState(() {
         isPlaying = state.playing;
       });
@@ -199,6 +203,7 @@ class QuranVersenCardState extends State<QuranVerseCard> {
 
   @override
   void dispose() {
+    _playerStateSub?.cancel();
     audioServices.audioPlayer.stop();
 
     super.dispose();

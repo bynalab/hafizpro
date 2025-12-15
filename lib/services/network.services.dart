@@ -16,8 +16,8 @@ class NetworkServices {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        connectTimeout: const Duration(seconds: 20),
-        receiveTimeout: const Duration(seconds: 20),
+        connectTimeout: const Duration(seconds: 45),
+        receiveTimeout: const Duration(seconds: 45),
       ),
     );
   }
