@@ -538,7 +538,7 @@ class JuzCard extends StatelessWidget {
                           ),
                         )
                       : Icon(
-                          isPlaying ? Icons.stop : Icons.play_arrow_rounded,
+                          isPlaying ? Icons.pause : Icons.play_arrow_rounded,
                           color: const Color(0xFF111827),
                         ),
                 ),

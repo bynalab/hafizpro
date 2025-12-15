@@ -195,10 +195,10 @@ class _JuzQuranViewState extends State<JuzQuranView> {
         index: entryIndex,
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
-        alignment: 0.25,
+        alignment: 0.10,
       );
     } else {
-      _itemScrollController.jumpTo(index: entryIndex, alignment: 0.25);
+      _itemScrollController.jumpTo(index: entryIndex, alignment: 0.10);
     }
   }
 

@@ -177,22 +177,54 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                     ListenableBuilder(
                       listenable: _audioCenter,
                       builder: (context, _) {
-                        if (_audioCenter.currentSurahNumber == null ||
-                            _audioCenter.currentSurahName == null) {
+                        final currentSurahNumber =
+                            _audioCenter.currentSurahNumber;
+                        final currentSurahName = _audioCenter.currentSurahName;
+                        final currentJuzNumber = _audioCenter.currentJuzNumber;
+
+                        if (currentJuzNumber == null &&
+                            (currentSurahNumber == null ||
+                                currentSurahName == null)) {
                           return const SizedBox.shrink();
                         }
+
+                        final title = currentJuzNumber != null
+                            ? 'Juz $currentJuzNumber'
+                            : (currentSurahName ?? '');
 
                         return Column(
                           children: [
                             const SizedBox(height: 14),
                             _NowPlayingCard(
                               audioPlayer: _audioCenter.audioPlayer,
-                              title: _audioCenter.currentSurahName!,
+                              title: title,
                               isLoading: _audioCenter.isLoading,
                               onTap: () {
+                                if (currentJuzNumber != null) {
+                                  final juz = juzList.firstWhere(
+                                    (j) => j.number == currentJuzNumber,
+                                    orElse: () => juzList.first,
+                                  );
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => JuzQuranView(juz: juz),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                final surahNumber = currentSurahNumber;
+                                final surahName = currentSurahName;
+                                if (surahNumber == null || surahName == null) {
+                                  return;
+                                }
+
                                 final surah = Surah(
-                                  number: _audioCenter.currentSurahNumber!,
-                                  englishName: _audioCenter.currentSurahName!,
+                                  number: surahNumber,
+                                  englishName: surahName,
                                 );
 
                                 AnalyticsService.trackSurahSelected(
