@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:hafiz_test/juz/juz_list_screen.dart';
+import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -401,7 +402,7 @@ class SurahCard extends StatelessWidget {
 }
 
 class JuzListWidget extends StatelessWidget {
-  final List<String> juzNames;
+  final List<JuzModel> juzNames;
 
   const JuzListWidget({super.key, required this.juzNames});
 
@@ -412,8 +413,9 @@ class JuzListWidget extends StatelessWidget {
       itemCount: juzNames.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) {
-        final juzNumber = i + 1;
-        final name = juzNames[i];
+        final juz = juzNames[i];
+        final juzNumber = juz.number;
+        final name = juz.name;
 
         return JuzCard(
           juzNumber: juzNumber,

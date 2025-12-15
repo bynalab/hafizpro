@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/juz/test_by_juz.dart';
+import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
 
@@ -176,7 +177,7 @@ class _JuzListBody extends StatelessWidget {
   final String headerImage;
   final String searchHint;
   final TextEditingController searchController;
-  final List<String> juzNames;
+  final List<JuzModel> juzNames;
   final VoidCallback onBack;
 
   @override
@@ -312,13 +313,14 @@ class _JuzListBody extends StatelessWidget {
                   itemCount: juzNames.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 14),
                   itemBuilder: (_, index) {
-                    final juzNumber = index + 1;
-                    final name = juzNames[index];
+                    final juz = juzNames[index];
+                    final juzNumber = juz.number;
+                    final name = juz.name;
 
                     return _JuzRow(
                       numberText: '$juzNumber',
                       title: name,
-                      subtitle: '210 Verses',
+                      subtitle: '${juz.ayahCount} Verses',
                       onTap: () {
                         AnalyticsService.trackJuzSelected(juzNumber);
                         Navigator.push(

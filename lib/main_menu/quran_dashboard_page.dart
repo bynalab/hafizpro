@@ -9,6 +9,7 @@ import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -284,8 +285,9 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                 itemCount: displayJuz.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, i) {
-                  final juzNumber = i + 1;
-                  final name = displayJuz[i];
+                  final JuzModel juz = displayJuz[i];
+                  final juzNumber = juz.number;
+                  final name = juz.name;
 
                   return JuzCard(
                     juzNumber: juzNumber,

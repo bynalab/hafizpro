@@ -366,26 +366,6 @@ class _QuranViewState extends State<QuranView> {
                                 ValueListenableBuilder<bool>(
                                   valueListenable: viewModel.isPlayingNotifier,
                                   builder: (context, playing, _) {
-                                    IconButton smallIconButton({
-                                      required VoidCallback? onPressed,
-                                      required IconData icon,
-                                    }) {
-                                      return IconButton(
-                                        onPressed: onPressed,
-                                        padding: EdgeInsets.zero,
-                                        constraints:
-                                            const BoxConstraints.tightFor(
-                                          width: 40,
-                                          height: 40,
-                                        ),
-                                        icon: Icon(
-                                          icon,
-                                          size: 24,
-                                          color: const Color(0xFF111827),
-                                        ),
-                                      );
-                                    }
-
                                     return Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -473,7 +453,7 @@ class _QuranViewState extends State<QuranView> {
                                             ),
                                           ),
                                         ),
-                                        smallIconButton(
+                                        IconButton(
                                           onPressed: () async {
                                             final next = viewModel
                                                         .audioPlayer.loopMode ==
@@ -484,8 +464,22 @@ class _QuranViewState extends State<QuranView> {
                                                 .setLoopMode(next);
                                             setState(() {});
                                           },
-                                          icon: Icons.repeat_rounded,
-                                        ),
+                                          padding: EdgeInsets.zero,
+                                          constraints:
+                                              const BoxConstraints.tightFor(
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                          icon: Icon(
+                                            Icons.repeat_rounded,
+                                            size: 24,
+                                            color: viewModel
+                                                        .audioPlayer.loopMode ==
+                                                    LoopMode.one
+                                                ? AppColors.black
+                                                : AppColors.black600,
+                                          ),
+                                        )
                                       ],
                                     );
                                   },

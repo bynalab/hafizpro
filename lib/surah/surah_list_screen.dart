@@ -145,9 +145,8 @@ class _SurahListScreenState extends State<SurahListScreen> {
             AnalyticsService.trackSurahSelected(surah.englishName, surahNumber);
 
             if (isWideScreen) {
-              setState(() {
-                selectedSurah = surah;
-              });
+              setState(() => selectedSurah = surah);
+
               return;
             }
 
