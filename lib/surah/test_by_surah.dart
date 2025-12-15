@@ -27,7 +27,7 @@ class _TestPage extends State<TestBySurah> {
   final surahServices = getIt<SurahServices>();
   final audioCenter = getIt<AudioCenter>();
 
-  bool isLoading = false;
+  bool isLoading = true;
   bool hasError = false;
   String? errorMessage;
 
@@ -38,8 +38,10 @@ class _TestPage extends State<TestBySurah> {
   void initState() {
     super.initState();
 
-    audioCenter.beginTestSession();
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      audioCenter.beginTestSession();
+      init();
+    });
   }
 
   @override

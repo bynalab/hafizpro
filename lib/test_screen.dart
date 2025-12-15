@@ -72,6 +72,14 @@ class _TestPage extends State<TestScreen> {
     }
   }
 
+  @override
+  void didUpdateWidget(covariant TestScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentAyah.number == widget.currentAyah.number) return;
+    currentAyah = widget.currentAyah;
+    unawaited(handleAudioPlay());
+  }
+
   void playNextAyah() {
     if (currentAyah.numberInSurah >= ayahs.length) {
       showSnackBar(context, 'End of Surah');
@@ -170,7 +178,7 @@ class _TestPage extends State<TestScreen> {
 
   @override
   dispose() {
-    audioCenter.endTestSession();
+    unawaited(audioServices.stop(trackEvent: false));
     _playerStateSub?.cancel();
 
     super.dispose();

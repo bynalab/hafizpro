@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +5,7 @@ import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -23,7 +23,11 @@ class TestByJuz extends StatefulWidget {
 }
 
 class _TestPage extends State<TestByJuz> {
-  bool isLoading = false;
+  final surahServices = getIt<SurahServices>();
+  final ayahServices = getIt<AyahServices>();
+  final audioCenter = getIt<AudioCenter>();
+
+  bool isLoading = true;
   bool hasError = false;
   String? errorMessage;
 
@@ -32,6 +36,8 @@ class _TestPage extends State<TestByJuz> {
   Surah surah = Surah();
 
   Future<void> init() async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
       hasError = false;
@@ -41,10 +47,10 @@ class _TestPage extends State<TestByJuz> {
     try {
       // The Ayah returned from this function does not contain `audioSource`
       final ayahFromJuz =
-          await getIt<AyahServices>().getRandomAyahFromJuz(widget.juzNumber);
+          await ayahServices.getRandomAyahFromJuz(widget.juzNumber);
 
       final surahNumber = ayahFromJuz.surah?.number ?? 0;
-      surah = await getIt<SurahServices>().getSurah(surahNumber);
+      surah = await surahServices.getSurah(surahNumber);
 
       // Hence, the need to loop through surah ayahs to get audioSource for `ayahFromJuz`
       currentAyah = surah.ayahs.firstWhere(
@@ -75,7 +81,16 @@ class _TestPage extends State<TestByJuz> {
   void initState() {
     super.initState();
 
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      audioCenter.beginTestSession();
+      init();
+    });
+  }
+
+  @override
+  void dispose() {
+    audioCenter.endTestSession();
+    super.dispose();
   }
 
   @override
