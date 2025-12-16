@@ -26,15 +26,6 @@ class AyahCard extends StatelessWidget {
       builder: (context, currentPlayingIndex, _) {
         final isActive = currentPlayingIndex == index;
 
-        const hardcodedTransliteration =
-            'Wala takuloo amwalakum baynakum bialbatili\n'
-            'watudloo biha ila alhukkami litakuloo fareegan\n'
-            'min amwali annasi\n'
-            'bialithmi waantum taAAlamoona';
-
-        const hardcodedTranslation =
-            "You 'alone' we worship and You 'alone' we ask\nfor help.";
-
         return Padding(
           padding: const EdgeInsets.fromLTRB(18, 6, 18, 6),
           child: Container(
@@ -103,30 +94,34 @@ class AyahCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    hardcodedTransliteration,
-                    textAlign: TextAlign.left,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: AppColors.black500,
+                if ((ayah.transliteration ?? '').trim().isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      ayah.transliteration!.trim(),
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: AppColors.black500,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    hardcodedTranslation,
-                    textAlign: TextAlign.left,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: AppColors.black500,
+                  const SizedBox(height: 10),
+                ],
+                if ((ayah.translation ?? '').trim().isNotEmpty) ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      ayah.translation!.trim(),
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: AppColors.black500,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

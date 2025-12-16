@@ -58,20 +58,7 @@ class QuranAyahList extends StatelessWidget {
 
         return AyahCard(
           index: ayahIndex,
-          ayah: Ayah(
-            number: ayah.number,
-            audio: ayah.audio,
-            audioSecondary: ayah.audioSecondary,
-            text: displayText,
-            translation: ayah.translation,
-            numberInSurah: ayah.numberInSurah,
-            juz: ayah.juz,
-            manzil: ayah.manzil,
-            page: ayah.page,
-            ruku: ayah.ruku,
-            hizbQuarter: ayah.hizbQuarter,
-            surah: ayah.surah,
-          ),
+          ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
           backgroundColor: isEven ? AppColors.gray500 : AppColors.gray50,
           onPlayPressed: (_) => onControlPressed(ayahIndex),

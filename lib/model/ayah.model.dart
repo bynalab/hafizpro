@@ -6,6 +6,7 @@ class Ayah {
   final List<String> audioSecondary;
   final String text;
   final String? translation;
+  final String? transliteration;
   final int numberInSurah;
   final int juz;
   final int manzil;
@@ -21,6 +22,7 @@ class Ayah {
     this.audioSecondary = const [],
     this.text = '',
     this.translation,
+    this.transliteration,
     this.numberInSurah = 0,
     this.juz = 0,
     this.manzil = 0,
@@ -30,6 +32,38 @@ class Ayah {
     this.surah,
     // this.sajda = false,
   });
+
+  Ayah copyWith({
+    int? number,
+    String? audio,
+    List<String>? audioSecondary,
+    String? text,
+    String? translation,
+    String? transliteration,
+    int? numberInSurah,
+    int? juz,
+    int? manzil,
+    int? page,
+    int? ruku,
+    int? hizbQuarter,
+    Surah? surah,
+  }) {
+    return Ayah(
+      number: number ?? this.number,
+      audio: audio ?? this.audio,
+      audioSecondary: audioSecondary ?? this.audioSecondary,
+      text: text ?? this.text,
+      translation: translation ?? this.translation,
+      transliteration: transliteration ?? this.transliteration,
+      numberInSurah: numberInSurah ?? this.numberInSurah,
+      juz: juz ?? this.juz,
+      manzil: manzil ?? this.manzil,
+      page: page ?? this.page,
+      ruku: ruku ?? this.ruku,
+      hizbQuarter: hizbQuarter ?? this.hizbQuarter,
+      surah: surah ?? this.surah,
+    );
+  }
 
   factory Ayah.fromJson(Map<String, dynamic> json) {
     return Ayah(
@@ -41,6 +75,8 @@ class Ayah {
               json['textTranslation'] ??
               json['englishTranslation'])
           ?.toString(),
+      transliteration:
+          (json['transliteration'] ?? json['textTransliteration'])?.toString(),
       numberInSurah: json['numberInSurah'],
       juz: json['juz'],
       manzil: json['manzil'],
@@ -59,6 +95,7 @@ class Ayah {
       'audioSecondary': audioSecondary,
       'text': text,
       'translation': translation,
+      'transliteration': transliteration,
       'numberInSurah': numberInSurah,
       'juz': juz,
       'manzil': manzil,

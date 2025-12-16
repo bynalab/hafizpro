@@ -17,13 +17,7 @@ class TarteelAudio {
     Surah surah, {
     required String reciterId,
   }) {
-    return Surah(
-      number: surah.number,
-      name: surah.name,
-      englishName: surah.englishName,
-      englishNameTranslation: surah.englishNameTranslation,
-      revelationType: surah.revelationType,
-      numberOfAyahs: surah.numberOfAyahs,
+    return surah.copyWith(
       ayahs: withSurahAudioForAyahsByReciter(
         surah.ayahs,
         surahNumber: surah.number,
@@ -137,20 +131,9 @@ class TarteelAudio {
     // This API is base-only. If you need different filename schemes per reciter,
     // use withAudioForAyahsByReciter.
     return ayahs.map(
-      (a) {
-        return Ayah(
-          number: a.number,
-          audio: ayahUrl(base, surahNumber, a.numberInSurah),
-          audioSecondary: a.audioSecondary,
-          text: a.text,
-          translation: a.translation,
-          numberInSurah: a.numberInSurah,
-          juz: a.juz,
-          manzil: a.manzil,
-          page: a.page,
-          ruku: a.ruku,
-          hizbQuarter: a.hizbQuarter,
-          surah: a.surah,
+      (ayah) {
+        return ayah.copyWith(
+          audio: ayahUrl(base, surahNumber, ayah.numberInSurah),
         );
       },
     ).toList();
@@ -162,24 +145,7 @@ class TarteelAudio {
     required String reciterId,
   }) {
     final url = surahUrlForReciter(reciterId, surahNumber);
-    return ayahs.map(
-      (a) {
-        return Ayah(
-          number: a.number,
-          audio: url,
-          audioSecondary: a.audioSecondary,
-          text: a.text,
-          translation: a.translation,
-          numberInSurah: a.numberInSurah,
-          juz: a.juz,
-          manzil: a.manzil,
-          page: a.page,
-          ruku: a.ruku,
-          hizbQuarter: a.hizbQuarter,
-          surah: a.surah,
-        );
-      },
-    ).toList();
+    return ayahs.map((ayah) => ayah.copyWith(audio: url)).toList();
   }
 
   static List<Ayah> withAudioForAyahsByReciter(
@@ -188,33 +154,16 @@ class TarteelAudio {
     required String reciterId,
   }) {
     return ayahs.map(
-      (a) {
-        return Ayah(
-          number: a.number,
-          audio: ayahUrlForReciter(reciterId, surahNumber, a.numberInSurah),
-          audioSecondary: a.audioSecondary,
-          text: a.text,
-          translation: a.translation,
-          numberInSurah: a.numberInSurah,
-          juz: a.juz,
-          manzil: a.manzil,
-          page: a.page,
-          ruku: a.ruku,
-          hizbQuarter: a.hizbQuarter,
-          surah: a.surah,
+      (ayah) {
+        return ayah.copyWith(
+          audio: ayahUrlForReciter(reciterId, surahNumber, ayah.numberInSurah),
         );
       },
     ).toList();
   }
 
   static Surah withAudioForSurah(Surah surah, {required String base}) {
-    return Surah(
-      number: surah.number,
-      name: surah.name,
-      englishName: surah.englishName,
-      englishNameTranslation: surah.englishNameTranslation,
-      revelationType: surah.revelationType,
-      numberOfAyahs: surah.numberOfAyahs,
+    return surah.copyWith(
       ayahs: withAudioForAyahs(
         surah.ayahs,
         surahNumber: surah.number,
@@ -227,13 +176,7 @@ class TarteelAudio {
     Surah surah, {
     required String reciterId,
   }) {
-    return Surah(
-      number: surah.number,
-      name: surah.name,
-      englishName: surah.englishName,
-      englishNameTranslation: surah.englishNameTranslation,
-      revelationType: surah.revelationType,
-      numberOfAyahs: surah.numberOfAyahs,
+    return surah.copyWith(
       ayahs: withAudioForAyahsByReciter(
         surah.ayahs,
         surahNumber: surah.number,
@@ -249,34 +192,11 @@ class TarteelAudio {
   }) {
     final url = surahUrl(base, surahNumber);
 
-    return ayahs.map(
-      (a) {
-        return Ayah(
-          number: a.number,
-          audio: url,
-          audioSecondary: a.audioSecondary,
-          text: a.text,
-          translation: a.translation,
-          numberInSurah: a.numberInSurah,
-          juz: a.juz,
-          manzil: a.manzil,
-          page: a.page,
-          ruku: a.ruku,
-          hizbQuarter: a.hizbQuarter,
-          surah: a.surah,
-        );
-      },
-    ).toList();
+    return ayahs.map((ayah) => ayah.copyWith(audio: url)).toList();
   }
 
   static Surah withSurahAudioForSurah(Surah surah, {required String base}) {
-    return Surah(
-      number: surah.number,
-      name: surah.name,
-      englishName: surah.englishName,
-      englishNameTranslation: surah.englishNameTranslation,
-      revelationType: surah.revelationType,
-      numberOfAyahs: surah.numberOfAyahs,
+    return surah.copyWith(
       ayahs: withSurahAudioForAyahs(
         surah.ayahs,
         surahNumber: surah.number,

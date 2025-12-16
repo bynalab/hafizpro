@@ -5,6 +5,7 @@ import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/quran_api_providers.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/tarteel_audio_resolver.dart';
+import 'package:hafiz_test/services/translation_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
 
@@ -12,14 +13,44 @@ class SurahServices {
   final NetworkServices networkServices;
   final IStorageService storageServices;
   final SurahPicker surahPicker;
+  final TranslationService translationService;
 
   SurahServices({
     required this.networkServices,
     required this.storageServices,
     required this.surahPicker,
+    required this.translationService,
   });
 
   static const int totalSurahs = 114;
+
+  Future<Surah> _withTextData(Surah surah) async {
+    SurahTextData data = const SurahTextData();
+
+    try {
+      data = await translationService.getSurahTextData(surah.number);
+    } catch (e) {
+      // Translation/transliteration are non-critical; never block loading.
+      debugPrint('Failed to load text data for surah ${surah.number}: $e');
+    }
+
+    final updatedAyahs = surah.ayahs.map((ayah) {
+      final translation = data.translations[ayah.numberInSurah];
+      final transliteration = data.transliterations[ayah.numberInSurah];
+
+      return ayah.copyWith(
+        translation: (translation == null || translation.trim().isEmpty)
+            ? ayah.translation
+            : translation,
+        transliteration:
+            (transliteration == null || transliteration.trim().isEmpty)
+                ? ayah.transliteration
+                : transliteration,
+      );
+    }).toList(growable: false);
+
+    return surah.copyWith(ayahs: updatedAyahs);
+  }
 
   int getRandomSurahNumber() {
     return surahPicker.getNextSurah();
@@ -51,22 +82,30 @@ class SurahServices {
           if (body != null) {
             final surah = Surah.fromJson(body['data']);
 
+            final surahWithMeta = await _withTextData(surah);
+
             if (tarteel.mode == TarteelMode.surah) {
               return TarteelAudio.withSurahAudioForSurahByReciter(
-                surah,
+                surahWithMeta,
                 reciterId: reciterId,
               );
             }
 
             if (tarteel.mode == TarteelMode.verse) {
               return TarteelAudio.withAudioForSurahByReciter(
-                surah,
+                surahWithMeta,
                 reciterId: reciterId,
               );
             }
 
-            return surah;
+            return surahWithMeta;
           }
+        } on FormatException catch (e) {
+          // Some providers/proxies may occasionally return a non-JSON payload
+          // (e.g. HTML error page). Treat this as a provider failure and try
+          // the next provider.
+          debugPrint('Invalid response format from $url: $e');
+          continue;
         } on DioException catch (e) {
           final code = e.response?.statusCode;
           // If this provider doesn't support the reciter, try next.
@@ -82,6 +121,11 @@ class SurahServices {
             continue;
           }
           rethrow;
+        } catch (e) {
+          // Any other unexpected parsing/runtime error from this provider:
+          // try next provider.
+          debugPrint('Error loading surah from $url: $e');
+          continue;
         }
       }
     } catch (e) {

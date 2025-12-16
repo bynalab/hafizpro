@@ -19,6 +19,27 @@ class Surah {
     this.ayahs = const [],
   });
 
+  Surah copyWith({
+    int? number,
+    String? name,
+    String? englishName,
+    String? englishNameTranslation,
+    String? revelationType,
+    int? numberOfAyahs,
+    List<Ayah>? ayahs,
+  }) {
+    return Surah(
+      number: number ?? this.number,
+      name: name ?? this.name,
+      englishName: englishName ?? this.englishName,
+      englishNameTranslation:
+          englishNameTranslation ?? this.englishNameTranslation,
+      revelationType: revelationType ?? this.revelationType,
+      numberOfAyahs: numberOfAyahs ?? this.numberOfAyahs,
+      ayahs: ayahs ?? this.ayahs,
+    );
+  }
+
   Ayah getAyah(int? ayahNumber) {
     if (ayahNumber == null || ayahNumber == 0) {
       ayahNumber = 1;

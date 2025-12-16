@@ -417,19 +417,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
                         return AyahCard(
                           index: globalIndex,
-                          ayah: Ayah(
-                            number: ayah.number,
-                            audio: ayah.audio,
-                            audioSecondary: ayah.audioSecondary,
+                          ayah: ayah.copyWith(
                             text: entry.displayText ?? ayah.text,
-                            translation: ayah.translation,
-                            numberInSurah: ayah.numberInSurah,
-                            juz: ayah.juz,
-                            manzil: ayah.manzil,
-                            page: ayah.page,
-                            ruku: ayah.ruku,
-                            hizbQuarter: ayah.hizbQuarter,
-                            surah: ayah.surah,
                           ),
                           playingIndexNotifier: _playingIndexNotifier,
                           backgroundColor: isEven

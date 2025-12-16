@@ -43,9 +43,11 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/
     - assets/img/
     - assets/icons/
     - assets/img/onboarding/
+    - assets/surah_meta/
     - shorebird.yaml
 
   fonts:
