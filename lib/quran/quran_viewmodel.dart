@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -129,7 +128,15 @@ class QuranViewModel {
         return;
       }
 
-      if (index != null && isPlaylist) {
+      if (index == null) return;
+
+      // When this view is opened via auto-advance, `initialize()` may run
+      // before the playlist is set on the AudioPlayer. In that case `isPlaylist`
+      // would be false and we'd miss the first index emission (typically 0).
+      // Derive playlist state from the current sequence length.
+      isPlaylist = audioPlayer.sequence.length > 1;
+
+      if (isPlaylist) {
         playingIndexNotifier.value = index;
         scrollToVerse(index);
       }
@@ -185,25 +192,15 @@ class QuranViewModel {
     );
   }
 
-  void playSingleAyah(int index) {
-    final currentSurah = surah;
-    if (currentSurah == null) return;
-
-    isPlaylist = false;
-    playingIndexNotifier.value = index;
-    audioCenter.playSingleAyah(
-        currentSurah, currentSurah.ayahs[index].audioSource);
-  }
-
   void onAyahControlPressed(int index) async {
     final currentSurah = surah;
     if (currentSurah == null) return;
 
-    if (isPlaylist) {
-      await audioCenter.playFromAyahIndex(currentSurah, index);
-    } else {
-      playSingleAyah(index);
-    }
+    // Card tap should behave like "play from here" (continue to next verse),
+    // not "play one verse then stop/auto-advance".
+    isPlaylist = true;
+    playingIndexNotifier.value = index;
+    await audioCenter.playFromAyahIndex(currentSurah, index);
   }
 
   void dispose() {

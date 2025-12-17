@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/surah_list.dart';
-import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/juz.model.dart';
@@ -271,13 +270,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
       return;
     }
 
-    final entryIndex = _globalAyahIndexToEntryIndex[globalIndex];
-    if (entryIndex < 0 || entryIndex >= _entries.length) return;
-    final entry = _entries[entryIndex];
-    final surah = entry.surah;
-    final ayah = entry.ayah;
-    if (surah == null || ayah == null) return;
-    await _audioCenter.playSingleAyah(surah, ayah.audioSource);
+    // Start (or seek within) the Juz playlist from the tapped verse so playback
+    // continues to the next verses within the Juz.
+    await _audioCenter.toggleJuz(widget.juz, startIndex: globalIndex);
   }
 
   @override

@@ -700,3 +700,10 @@ List<Surah> searchSurah(String surahName) {
     return surah.englishName.toLowerCase().contains(surahName.toLowerCase());
   }).toList();
 }
+
+Surah findSurahByNumber(int? surahNumer) {
+  return surahList.firstWhere(
+    (surah) => surah.number == surahNumer,
+    orElse: () => surahList.first,
+  );
+}

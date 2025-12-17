@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
@@ -29,6 +30,7 @@ class _QuranViewState extends State<QuranView> {
   );
 
   double _speed = 1.5;
+  bool _isAutoSwitching = false;
 
   void _onPlayingIndexChanged() {
     final idx = viewModel.playingIndexNotifier.value;
@@ -53,14 +55,46 @@ class _QuranViewState extends State<QuranView> {
 
     viewModel.initiateListeners();
     viewModel.playingIndexNotifier.addListener(_onPlayingIndexChanged);
+    viewModel.audioCenter.addListener(_onAudioCenterChanged);
     viewModel.initialize(widget.surah.number).then((_) {
       setState(() {});
+      _onPlayingIndexChanged();
+    });
+  }
+
+  void _onAudioCenterChanged() {
+    if (!mounted) return;
+
+    // Only auto-switch screens when AudioCenter is in reading mode and has
+    // moved playback to a different surah (auto-advance at end of playlist).
+    if (viewModel.audioCenter.playbackOwner != PlaybackOwner.reading) return;
+
+    final currentSurahNumer = viewModel.audioCenter.currentSurahNumber;
+    if (currentSurahNumer == null || currentSurahNumer == widget.surah.number) {
+      return;
+    }
+
+    if (_isAutoSwitching) return;
+
+    _isAutoSwitching = true;
+
+    final nextSurah = findSurahByNumber(currentSurahNumer);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) {
+          return QuranView(surah: nextSurah);
+        }),
+      ).whenComplete(() => _isAutoSwitching = false);
     });
   }
 
   @override
   void dispose() {
     viewModel.playingIndexNotifier.removeListener(_onPlayingIndexChanged);
+    viewModel.audioCenter.removeListener(_onAudioCenterChanged);
     viewModel.dispose();
 
     super.dispose();

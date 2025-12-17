@@ -18,6 +18,7 @@ class AudioCenter extends ChangeNotifier {
   StreamSubscription<PlayerState>? _playerStateSub;
   StreamSubscription<int?>? _indexSub;
   bool _isAutoAdvancing = false;
+  bool _readingWasPlaylist = false;
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
   PlaybackSnapshot? _readingSnapshot;
 
@@ -33,6 +34,7 @@ class AudioCenter extends ChangeNotifier {
 
   bool _tryAutoAdvanceToNextSurah() {
     if (_playbackOwner != PlaybackOwner.reading) return false;
+    if (!_readingWasPlaylist) return false;
 
     final current = currentSurahNumber;
     if (_isAutoAdvancing ||
@@ -65,6 +67,7 @@ class AudioCenter extends ChangeNotifier {
 
   void _resetPlaybackSession() {
     _isAutoAdvancing = false;
+    _readingWasPlaylist = false;
     isPlaying = false;
     isLoading = false;
     currentSurahNumber = null;
@@ -216,6 +219,7 @@ class AudioCenter extends ChangeNotifier {
     if (isLoading) return;
 
     isLoading = true;
+    _readingWasPlaylist = false;
     setCurrentSurah(surah);
 
     try {
@@ -255,6 +259,7 @@ class AudioCenter extends ChangeNotifier {
     }
 
     isLoading = true;
+    _readingWasPlaylist = true;
     currentSurahNumber = surah.number;
     currentSurahName = surah.englishName;
     currentJuzNumber = null;
@@ -286,25 +291,49 @@ class AudioCenter extends ChangeNotifier {
   }
 
   Future<void> playFromAyahIndex(Surah surah, int index) async {
+    if (isLoading) return;
+
+    // Force reading mode for surah playback.
+    if (_playbackOwner != PlaybackOwner.reading) {
+      _playbackOwner = PlaybackOwner.reading;
+      currentJuzNumber = null;
+      _indexSub?.cancel();
+      _indexSub = null;
+      juzPlayingIndexNotifier.value = null;
+    }
+
+    final audioPlayer = _audioServices.audioPlayer;
+
+    // If the surah is already loaded, just seek to the requested ayah index and
+    // continue the playlist instead of re-toggling (which would pause/resume).
+    if (currentSurahNumber == surah.number && audioPlayer.sequence.isNotEmpty) {
+      final clamped = index.clamp(0, audioPlayer.sequence.length - 1);
+      await audioPlayer.seek(Duration.zero, index: clamped);
+      isPlaying = true;
+      notifyListeners();
+      unawaited(_audioServices.play(audioName: currentSurahName));
+      return;
+    }
+
     await toggleSurah(surah, startIndex: index);
   }
 
-  Future<void> toggleJuz(JuzModel juz) async {
+  Future<void> toggleJuz(JuzModel juz, {int startIndex = 0}) async {
     if (isLoading) return;
 
     final audioPlayer = _audioServices.audioPlayer;
 
     if (_playbackOwner == PlaybackOwner.juz && currentJuzNumber == juz.number) {
-      if (audioPlayer.playing) {
-        isPlaying = false;
-        notifyListeners();
-        await _audioServices.pause(audioName: currentSurahName);
+      if (audioPlayer.sequence.isEmpty) {
+        // Fall through to rebuild playlist.
       } else {
+        final clamped = startIndex.clamp(0, audioPlayer.sequence.length - 1);
+        await audioPlayer.seek(Duration.zero, index: clamped);
         isPlaying = true;
         notifyListeners();
         unawaited(_audioServices.play(audioName: currentSurahName));
+        return;
       }
-      return;
     }
 
     isLoading = true;
@@ -340,7 +369,8 @@ class AudioCenter extends ChangeNotifier {
       }
 
       await _audioServices.setPlaylistAudio(playlist);
-      await audioPlayer.seek(Duration.zero, index: 0);
+      final clamped = startIndex.clamp(0, playlist.length - 1);
+      await audioPlayer.seek(Duration.zero, index: clamped);
 
       await _indexSub?.cancel();
       _indexSub = audioPlayer.currentIndexStream.listen((idx) {
