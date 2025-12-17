@@ -5,15 +5,13 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
-import 'package:hafiz_test/quran/widgets/ayah_card.dart';
-import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
+import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
+import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/bismillah.dart';
-import 'package:hafiz_test/util/app_colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class JuzQuranView extends StatefulWidget {
@@ -428,297 +426,27 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                 _PinnedHeader(title: _currentStickySurahTitle),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
-                    color: const Color(0xFF78B7C6),
-                    child: SafeArea(
-                      top: false,
-                      child: ValueListenableBuilder<int?>(
-                        valueListenable: _playingIndexNotifier,
-                        builder: (context, index, _) {
-                          final matches =
-                              _audioCenter.isCurrentJuz(widget.juz.number);
-                          final title = _titleForGlobalIndex(index);
-
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.cairo(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.black500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              StreamBuilder<Duration>(
-                                stream: matches
-                                    ? _audioCenter.audioPlayer.positionStream
-                                    : const Stream<Duration>.empty(),
-                                builder: (context, snap) {
-                                  final pos = matches
-                                      ? (snap.data ?? Duration.zero)
-                                      : Duration.zero;
-                                  final total = matches
-                                      ? (_audioCenter.audioPlayer.duration ??
-                                          Duration.zero)
-                                      : Duration.zero;
-                                  final totalMs = total.inMilliseconds;
-                                  final value = totalMs == 0
-                                      ? 0.0
-                                      : (pos.inMilliseconds / totalMs)
-                                          .clamp(0.0, 1.0);
-
-                                  String fmt(Duration d) {
-                                    final m = d.inMinutes
-                                        .remainder(60)
-                                        .toString()
-                                        .padLeft(2, '0');
-                                    final s = d.inSeconds
-                                        .remainder(60)
-                                        .toString()
-                                        .padLeft(2, '0');
-                                    return '$m:$s';
-                                  }
-
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        fmt(pos),
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.black500,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 9),
-                                      Expanded(
-                                        child: SliderTheme(
-                                          data:
-                                              SliderTheme.of(context).copyWith(
-                                            trackHeight: 4,
-                                            thumbShape:
-                                                const RoundSliderThumbShape(
-                                                    enabledThumbRadius: 0),
-                                            overlayShape:
-                                                SliderComponentShape.noOverlay,
-                                            activeTrackColor:
-                                                AppColors.green500,
-                                            inactiveTrackColor: AppColors
-                                                .black500
-                                                .withValues(alpha: 0.30),
-                                          ),
-                                          child: Slider(
-                                            value: value,
-                                            onChanged: matches
-                                                ? (v) async {
-                                                    final ms =
-                                                        (totalMs * v).round();
-                                                    await _audioCenter
-                                                        .audioPlayer
-                                                        .pause();
-                                                    await _audioCenter
-                                                        .audioPlayer
-                                                        .seek(Duration(
-                                                            milliseconds: ms));
-                                                  }
-                                                : null,
-                                            onChangeEnd: matches
-                                                ? (v) async {
-                                                    final ms =
-                                                        (totalMs * v).round();
-                                                    await _audioCenter
-                                                        .audioPlayer
-                                                        .seek(Duration(
-                                                            milliseconds: ms));
-                                                    await _audioCenter
-                                                        .audioPlayer
-                                                        .play();
-                                                  }
-                                                : null,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 9),
-                                      Text(
-                                        fmt(total),
-                                        style: GoogleFonts.manrope(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.black500,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              StreamBuilder<SequenceState?>(
-                                stream: _audioCenter
-                                    .audioPlayer.sequenceStateStream,
-                                builder: (context, _) {
-                                  final hasPrevious = matches &&
-                                      _audioCenter.audioPlayer.hasPrevious;
-                                  final hasNext = matches &&
-                                      _audioCenter.audioPlayer.hasNext;
-
-                                  return StreamBuilder<PlayerState>(
-                                    stream: _audioCenter
-                                        .audioPlayer.playerStateStream,
-                                    builder: (context, snap) {
-                                      final isActuallyPlaying =
-                                          snap.data?.playing ?? false;
-                                      final playing =
-                                          matches && isActuallyPlaying;
-
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () async {
-                                              _speed = _speed == 2.0
-                                                  ? 1.0
-                                                  : _speed + 0.5;
-                                              await _audioCenter.audioPlayer
-                                                  .setSpeed(_speed);
-                                              setState(() {});
-                                            },
-                                            child: Text(
-                                              '${_speed.toStringAsFixed(1)}x',
-                                              style: GoogleFonts.cairo(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: AppColors.black500,
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: hasPrevious
-                                                ? _audioCenter
-                                                    .audioPlayer.seekToPrevious
-                                                : null,
-                                            padding: EdgeInsets.zero,
-                                            constraints:
-                                                const BoxConstraints.tightFor(
-                                              width: 40,
-                                              height: 40,
-                                            ),
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/previous.svg',
-                                              width: 30,
-                                              height: 30,
-                                              colorFilter:
-                                                  const ColorFilter.mode(
-                                                Color(0xFF111827),
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xFF111827),
-                                            ),
-                                            child: IconButton(
-                                              onPressed: () async {
-                                                await _audioCenter
-                                                    .toggleJuz(widget.juz);
-                                              },
-                                              padding: EdgeInsets.zero,
-                                              constraints:
-                                                  const BoxConstraints.expand(),
-                                              icon: Icon(
-                                                playing
-                                                    ? Icons.pause
-                                                    : Icons.play_arrow,
-                                                size: 28,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: hasNext
-                                                ? _audioCenter
-                                                    .audioPlayer.seekToNext
-                                                : null,
-                                            padding: EdgeInsets.zero,
-                                            constraints:
-                                                const BoxConstraints.tightFor(
-                                              width: 40,
-                                              height: 40,
-                                            ),
-                                            icon: SvgPicture.asset(
-                                              'assets/icons/next.svg',
-                                              width: 30,
-                                              height: 30,
-                                              colorFilter:
-                                                  const ColorFilter.mode(
-                                                Color(0xFF111827),
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                          ),
-                                          StreamBuilder<LoopMode>(
-                                            stream: _audioCenter
-                                                .audioPlayer.loopModeStream,
-                                            builder: (context, snap) {
-                                              final loopMode =
-                                                  snap.data ?? LoopMode.off;
-
-                                              return IconButton(
-                                                onPressed: () async {
-                                                  final next =
-                                                      loopMode == LoopMode.one
-                                                          ? LoopMode.off
-                                                          : LoopMode.one;
-                                                  await _audioCenter.audioPlayer
-                                                      .setLoopMode(next);
-                                                },
-                                                padding: EdgeInsets.zero,
-                                                constraints:
-                                                    const BoxConstraints
-                                                        .tightFor(
-                                                  width: 40,
-                                                  height: 40,
-                                                ),
-                                                icon: Icon(
-                                                  Icons.repeat_rounded,
-                                                  size: 24,
-                                                  color:
-                                                      loopMode == LoopMode.one
-                                                          ? AppColors.black
-                                                          : AppColors.black600,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          );
+                  child: ListenableBuilder(
+                    listenable: _audioCenter,
+                    builder: (context, _) {
+                      return BottomAudioControls(
+                        playingIndexListenable: _playingIndexNotifier,
+                        titleBuilder: _titleForGlobalIndex,
+                        audioCenter: _audioCenter,
+                        audioPlayer: _audioCenter.audioPlayer,
+                        isContextActive:
+                            _audioCenter.isCurrentJuz(widget.juz.number),
+                        speed: _speed,
+                        onSpeedChanged: (nextSpeed) async {
+                          _speed = nextSpeed;
+                          await _audioCenter.audioPlayer.setSpeed(_speed);
+                          setState(() {});
                         },
-                      ),
-                    ),
+                        onTogglePlayPause: () async {
+                          await _audioCenter.toggleJuz(widget.juz);
+                        },
+                      );
+                    },
                   ),
                 ),
               ],
