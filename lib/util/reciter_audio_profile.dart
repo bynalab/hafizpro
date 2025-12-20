@@ -14,6 +14,10 @@ class ReciterAudioProfile {
 
 class ReciterAudioProfiles {
   static const Map<String, ReciterAudioProfile> byReciterId = {
+    'ar.saoodshuraym': ReciterAudioProfile(
+      ayahBase: 'https://audio-cdn.tarteel.ai/quran/saudAlShuraim',
+      ayahTemplate: '{surah:000}{ayah:000}.mp3',
+    ),
     'ar.abdurrahmaansudais': ReciterAudioProfile(
       ayahBase: 'https://audio.qurancdn.com/Sudais/mp3',
       ayahTemplate: '{surah:000}{ayah:000}.mp3',

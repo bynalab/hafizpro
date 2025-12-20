@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/model/juz.model.dart';
@@ -19,6 +20,8 @@ class AudioCenter extends ChangeNotifier {
   StreamSubscription<int?>? _indexSub;
   bool _isAutoAdvancing = false;
   bool _readingWasPlaylist = false;
+  int _readingPlaylistIndexOffset = 0;
+  AudioSource? _bismillahAudioSource;
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
   PlaybackSnapshot? _readingSnapshot;
 
@@ -68,6 +71,7 @@ class AudioCenter extends ChangeNotifier {
   void _resetPlaybackSession() {
     _isAutoAdvancing = false;
     _readingWasPlaylist = false;
+    _readingPlaylistIndexOffset = 0;
     isPlaying = false;
     isLoading = false;
     currentSurahNumber = null;
@@ -156,7 +160,31 @@ class AudioCenter extends ChangeNotifier {
       if (fullSurah.ayahs.isEmpty) return;
 
       currentSurahName = fullSurah.englishName;
-      await _audioServices.setPlaylistAudio(fullSurah.audioSources);
+
+      if (_isSurahLevelAudio(fullSurah)) {
+        _readingPlaylistIndexOffset = 0;
+        await _audioServices
+            .setPlaylistAudio([fullSurah.ayahs.first.audioSource]);
+      } else {
+        // Keep playlist shape consistent with normal surah playback: if this
+        // surah would normally have a prepended Bismillah track (Surah 1:1),
+        // include it here too so snapshot indices remain valid.
+        _readingPlaylistIndexOffset = 0;
+        final canPrepend = fullSurah.number != 1 && fullSurah.number != 9;
+
+        final playlist = <AudioSource>[];
+        if (canPrepend) {
+          final bismillah = await _getBismillahSource();
+          if (bismillah != null) {
+            playlist.add(bismillah);
+            _readingPlaylistIndexOffset = 1;
+          }
+        }
+
+        playlist.addAll(fullSurah.audioSources);
+        await _audioServices.setPlaylistAudio(playlist);
+      }
+
       await _audioServices.seek(snapshot.position, index: snapshot.index);
       await _audioServices.pause(audioName: currentSurahName);
       isPlaying = false;
@@ -205,6 +233,62 @@ class AudioCenter extends ChangeNotifier {
 
   AudioPlayer get audioPlayer => _audioServices.audioPlayer;
 
+  int get readingPlaylistIndexOffset => _readingPlaylistIndexOffset;
+
+  Future<void> onReciterChanged() async {
+    // Reciter change affects all verse URLs (including our cached Bismillah).
+    _bismillahAudioSource = null;
+
+    final audioPlayer = _audioServices.audioPlayer;
+    final wasPlaying = audioPlayer.playing;
+
+    if (isLoading) return;
+
+    if (_playbackOwner == PlaybackOwner.reading && currentSurahNumber != null) {
+      final n = currentSurahNumber!;
+      final idx = audioPlayer.currentIndex ?? 0;
+      final mapped = (idx - _readingPlaylistIndexOffset);
+      final startIndex = mapped < 0 ? 0 : mapped;
+
+      final fallbackName = surahList
+          .firstWhere(
+            (s) => s.number == n,
+            orElse: () => Surah(number: n, englishName: 'Surah'),
+          )
+          .englishName;
+
+      await toggleSurah(
+        Surah(number: n, englishName: currentSurahName ?? fallbackName),
+        startIndex: startIndex,
+        forceReload: true,
+      );
+
+      if (!wasPlaying) {
+        await audioPlayer.pause();
+        isPlaying = false;
+        notifyListeners();
+      }
+
+      return;
+    }
+
+    if (_playbackOwner == PlaybackOwner.juz && currentJuzNumber != null) {
+      final j = currentJuzNumber!;
+      final startIndex = (audioPlayer.currentIndex ?? 0);
+      await toggleJuz(
+        findJuzByNumber(j),
+        startIndex: startIndex,
+        forceReload: true,
+      );
+
+      if (!wasPlaying) {
+        await audioPlayer.pause();
+        isPlaying = false;
+        notifyListeners();
+      }
+    }
+  }
+
   bool isCurrentSurah(int surahNumber) => currentSurahNumber == surahNumber;
 
   bool isCurrentJuz(int juzNumber) => currentJuzNumber == juzNumber;
@@ -213,6 +297,36 @@ class AudioCenter extends ChangeNotifier {
     currentSurahNumber = surah.number;
     currentSurahName = surah.englishName;
     notifyListeners();
+  }
+
+  bool _shouldPrependBismillah({
+    required int surahNumber,
+    required int startIndex,
+    required Surah fullSurah,
+  }) {
+    if (startIndex != 0) return false;
+    if (surahNumber == 1 || surahNumber == 9) return false;
+    if (fullSurah.ayahs.isEmpty) return false;
+    if (_isSurahLevelAudio(fullSurah)) return false;
+
+    return true;
+  }
+
+  Future<AudioSource?> _getBismillahSource() async {
+    final cached = _bismillahAudioSource;
+    if (cached != null) return cached;
+
+    try {
+      final surah1 = await _surahServices.getSurah(1);
+      if (surah1.ayahs.isEmpty) return null;
+      if (_isSurahLevelAudio(surah1)) return null;
+
+      final src = surah1.ayahs.first.audioSource;
+      _bismillahAudioSource = src;
+      return src;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> playSingleAyah(Surah surah, AudioSource source) async {
@@ -232,7 +346,11 @@ class AudioCenter extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleSurah(Surah surah, {int startIndex = 0}) async {
+  Future<void> toggleSurah(
+    Surah surah, {
+    int startIndex = 0,
+    bool forceReload = false,
+  }) async {
     if (isLoading) return;
 
     if (_playbackOwner != PlaybackOwner.reading) {
@@ -245,7 +363,7 @@ class AudioCenter extends ChangeNotifier {
 
     final audioPlayer = _audioServices.audioPlayer;
 
-    if (currentSurahNumber == surah.number) {
+    if (!forceReload && currentSurahNumber == surah.number) {
       if (audioPlayer.playing) {
         isPlaying = false;
         notifyListeners();
@@ -260,6 +378,7 @@ class AudioCenter extends ChangeNotifier {
 
     isLoading = true;
     _readingWasPlaylist = true;
+    _readingPlaylistIndexOffset = 0;
     currentSurahNumber = surah.number;
     currentSurahName = surah.englishName;
     currentJuzNumber = null;
@@ -276,8 +395,24 @@ class AudioCenter extends ChangeNotifier {
             .setPlaylistAudio([fullSurah.ayahs.first.audioSource]);
         await audioPlayer.seek(Duration.zero, index: 0);
       } else {
-        await _audioServices.setPlaylistAudio(fullSurah.audioSources);
-        await audioPlayer.seek(Duration.zero, index: startIndex);
+        final bismillah = _shouldPrependBismillah(
+          surahNumber: fullSurah.number,
+          startIndex: startIndex,
+          fullSurah: fullSurah,
+        )
+            ? await _getBismillahSource()
+            : null;
+
+        _readingPlaylistIndexOffset = bismillah == null ? 0 : 1;
+
+        final playlist = fullSurah.audioSources.prependBismillah(bismillah);
+
+        await _audioServices.setPlaylistAudio(playlist);
+        // If we prepended a Bismillah track, it must play first.
+        // Since we only prepend when startIndex == 0, we always seek to 0.
+        final initialIndex =
+            (_readingPlaylistIndexOffset == 1) ? 0 : startIndex;
+        await audioPlayer.seek(Duration.zero, index: initialIndex);
       }
       unawaited(_audioServices.play(audioName: fullSurah.englishName));
 
@@ -307,7 +442,8 @@ class AudioCenter extends ChangeNotifier {
     // If the surah is already loaded, just seek to the requested ayah index and
     // continue the playlist instead of re-toggling (which would pause/resume).
     if (currentSurahNumber == surah.number && audioPlayer.sequence.isNotEmpty) {
-      final clamped = index.clamp(0, audioPlayer.sequence.length - 1);
+      final target = index + _readingPlaylistIndexOffset;
+      final clamped = target.clamp(0, audioPlayer.sequence.length - 1);
       await audioPlayer.seek(Duration.zero, index: clamped);
       isPlaying = true;
       notifyListeners();
@@ -318,17 +454,34 @@ class AudioCenter extends ChangeNotifier {
     await toggleSurah(surah, startIndex: index);
   }
 
-  Future<void> toggleJuz(JuzModel juz, {int startIndex = 0}) async {
+  Future<void> toggleJuz(
+    JuzModel juz, {
+    int startIndex = 0,
+    bool forceReload = false,
+  }) async {
     if (isLoading) return;
 
     final audioPlayer = _audioServices.audioPlayer;
 
-    if (_playbackOwner == PlaybackOwner.juz && currentJuzNumber == juz.number) {
+    if (!forceReload &&
+        _playbackOwner == PlaybackOwner.juz &&
+        currentJuzNumber == juz.number) {
       if (audioPlayer.sequence.isEmpty) {
         // Fall through to rebuild playlist.
       } else {
-        final clamped = startIndex.clamp(0, audioPlayer.sequence.length - 1);
-        await audioPlayer.seek(Duration.zero, index: clamped);
+        if (audioPlayer.playing) {
+          isPlaying = false;
+          notifyListeners();
+          await _audioServices.pause(audioName: currentSurahName);
+          return;
+        }
+
+        // Resume playback without rewinding. Only seek when a non-zero index
+        // is explicitly requested (e.g. user taps a specific verse).
+        if (startIndex != 0) {
+          final clamped = startIndex.clamp(0, audioPlayer.sequence.length - 1);
+          await audioPlayer.seek(Duration.zero, index: clamped);
+        }
         isPlaying = true;
         notifyListeners();
         unawaited(_audioServices.play(audioName: currentSurahName));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 
@@ -65,6 +66,7 @@ class SettingsController extends ChangeNotifier {
 
     AnalyticsService.trackSettingsChanged('reciter', oldValue, identifier);
     await _storage.setReciterId(identifier);
+    await getIt<AudioCenter>().onReciterChanged();
   }
 
   Future<void> setNotifications({

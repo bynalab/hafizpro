@@ -15,6 +15,13 @@ extension SurahAudioExtension on Surah {
   }
 }
 
+extension AudioSourcePlaylistExtension on List<AudioSource> {
+  List<AudioSource> prependBismillah(AudioSource? bismillah) {
+    if (bismillah == null) return this;
+    return [bismillah, ...this];
+  }
+}
+
 extension AyahAudioExtension on Ayah {
   AudioSource get audioSource {
     final title = (surah?.englishName != null)

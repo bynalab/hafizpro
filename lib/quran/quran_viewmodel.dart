@@ -59,7 +59,14 @@ class QuranViewModel {
 
         if (isPlaylist) {
           final idx = audioPlayer.currentIndex;
-          if (idx != null) playingIndexNotifier.value = idx;
+          if (idx != null) {
+            final mapped = idx - audioCenter.readingPlaylistIndexOffset;
+            if (mapped >= 0) {
+              playingIndexNotifier.value = mapped;
+            } else {
+              playingIndexNotifier.value = 0;
+            }
+          }
         }
       } else {
         isPlaylist = false;
@@ -137,8 +144,10 @@ class QuranViewModel {
       isPlaylist = audioPlayer.sequence.length > 1;
 
       if (isPlaylist) {
-        playingIndexNotifier.value = index;
-        scrollToVerse(index);
+        final mapped = index - audioCenter.readingPlaylistIndexOffset;
+        if (mapped < 0) return;
+        playingIndexNotifier.value = mapped;
+        scrollToVerse(mapped);
       }
     });
   }
