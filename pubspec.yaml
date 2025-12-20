@@ -33,6 +33,9 @@ dependencies:
   mixpanel_flutter: ^2.4.4
   uuid: ^4.5.1
   url_launcher: ^6.3.1
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+  flutter_timezone: ^1.0.8
 
 dev_dependencies:
   flutter_test:

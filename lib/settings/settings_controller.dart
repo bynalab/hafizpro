@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/audio_center.dart';
+import 'package:hafiz_test/services/notification_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 
 class SettingsController extends ChangeNotifier {
   final IStorageService _storage;
   final ThemeController _theme;
+  final NotificationService _notifications;
 
   SettingsController({
     IStorageService? storage,
     ThemeController? theme,
+    NotificationService? notifications,
   })  : _storage = storage ?? getIt<IStorageService>(),
-        _theme = theme ?? getIt<ThemeController>();
+        _theme = theme ?? getIt<ThemeController>(),
+        _notifications = notifications ?? getIt<NotificationService>();
 
   bool isLoading = true;
 
@@ -82,5 +86,15 @@ class SettingsController extends ChangeNotifier {
       'notification_time',
       '${time.hour}:${time.minute}',
     );
+
+    try {
+      if (enabled) {
+        await _notifications.scheduleDailyMotivation(time);
+      } else {
+        await _notifications.cancelDailyMotivation();
+      }
+    } catch (_) {
+      // Keep settings saved even if scheduling fails.
+    }
   }
 }
