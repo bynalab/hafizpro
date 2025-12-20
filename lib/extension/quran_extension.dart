@@ -13,6 +13,12 @@ extension SurahAudioExtension on Surah {
   List<AudioSource> get audioSources {
     return ayahs.map((e) => e.audioSource).toList();
   }
+
+  bool get isSurahLevelAudio {
+    if (ayahs.isEmpty) return false;
+    final urls = ayahs.map((a) => a.audio).where((u) => u.isNotEmpty).toSet();
+    return urls.length == 1;
+  }
 }
 
 extension AudioSourcePlaylistExtension on List<AudioSource> {

@@ -10,6 +10,8 @@ import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/test_screen.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
@@ -27,6 +29,7 @@ class TestBySurah extends StatefulWidget {
 class _TestPage extends State<TestBySurah> {
   final surahServices = getIt<SurahServices>();
   final audioCenter = getIt<AudioCenter>();
+  final storageServices = getIt<IStorageService>();
 
   bool isLoading = true;
   bool hasError = false;
@@ -53,6 +56,21 @@ class _TestPage extends State<TestBySurah> {
 
   Surah surah = Surah();
 
+  bool get _isReciterModeError {
+    return (errorMessage ?? '').toLowerCase().contains('surah-by-surah');
+  }
+
+  Future<void> _changeReciterAndRetry() async {
+    final selected = await ReciterPickerSheet(
+      selected: storageServices.getReciterId(),
+    ).openBottomSheet(context);
+    if (selected == null) return;
+
+    await storageServices.setReciterId(selected.identifier);
+    // await getIt<AudioCenter>().onReciterChanged();
+    await init();
+  }
+
   Future<void> init() async {
     if (!mounted) return;
 
@@ -69,9 +87,15 @@ class _TestPage extends State<TestBySurah> {
         surahNumber = widget.surahNumber!;
       }
 
-      if (surah.ayahs.isEmpty) {
+      if (surah.ayahs.isEmpty || surah.isSurahLevelAudio) {
         // Avoid refetching surah if it's ayahs are already loaded
         surah = await surahServices.getSurah(surahNumber);
+      }
+
+      if (surah.isSurahLevelAudio) {
+        throw StateError(
+          'Selected reciter audio is surah-by-surah, which cannot be used for Test. Please choose a verse-by-verse reciter.',
+        );
       }
 
       currentAyah = _getAyahForSurah();
@@ -167,13 +191,17 @@ class _TestPage extends State<TestBySurah> {
             if (hasError)
               CustomErrorWidget(
                 title: 'Failed to Load Test',
-                message:
+                message: errorMessage ??
                     'Unable to load the surah for testing. Please check your connection and try again.',
                 icon: Icons.quiz_outlined,
                 color: Colors.orange.shade700,
                 onRetry: () async {
                   await init();
                 },
+                secondaryActionLabel:
+                    _isReciterModeError ? 'Change Reciter' : null,
+                onSecondaryAction:
+                    _isReciterModeError ? _changeReciterAndRetry : null,
               )
             else
               SingleChildScrollView(

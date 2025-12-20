@@ -48,7 +48,33 @@ class NetworkServices {
       return true;
     } on DioException catch (e) {
       final code = e.response?.statusCode;
-      if (code == 400 || code == 404) return false;
+
+      // Many CDNs don't support HEAD (or respond inconsistently). Fall back to a
+      // minimal GET.
+      if (code == 403 || code == 405 || code == 404) {
+        try {
+          final isAbsolute =
+              url.startsWith('http://') || url.startsWith('https://');
+          final normalizedUrl =
+              isAbsolute ? url : (url.startsWith('/') ? url : '/$url');
+
+          final res = await _dio.get(
+            normalizedUrl,
+            options: Options(
+              headers: const {'Range': 'bytes=0-0'},
+              responseType: ResponseType.bytes,
+              followRedirects: true,
+              validateStatus: (status) => status != null,
+            ),
+          );
+
+          return res.statusCode == 200 || res.statusCode == 206;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      if (code == 400) return false;
       return false;
     } catch (_) {
       return false;

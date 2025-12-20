@@ -95,7 +95,7 @@ class SurahServices {
       final ayahs = rows.map(
         (r) {
           return Ayah(
-            number: 0,
+            number: r.ayahId,
             text: r.textAr,
             translation: r.translation,
             transliteration: r.transliteration,
@@ -121,10 +121,21 @@ class SurahServices {
       );
 
       final reciterId = storageServices.getReciterId();
-
-      // When we load from DB, we can still attach audio URLs (online) without
-      // any network check by using our known reciter templates.
       final reciterType = TarteelAudio.reciterType(reciterId);
+
+      // Best-effort: select the first reachable audio source (e.g. fallback from
+      // Tarteel CDN to islamic.network) even when the surah comes from the local
+      // DB cache.
+      try {
+        await TarteelAudioResolver.resolve(
+          networkServices: networkServices,
+          reciterId: reciterId,
+          surahNumber: surahNumber,
+        );
+      } catch (_) {
+        // Ignore resolver errors for cached DB reads.
+      }
+
       if (reciterType == RecitationType.surahbysurah) {
         return TarteelAudio.withSurahAudioForSurahByReciter(
           surahWithMeta,

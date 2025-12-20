@@ -27,12 +27,6 @@ class AudioCenter extends ChangeNotifier {
 
   final ValueNotifier<int?> juzPlayingIndexNotifier = ValueNotifier<int?>(null);
 
-  bool _isSurahLevelAudio(Surah surah) {
-    if (surah.ayahs.isEmpty) return false;
-    final urls = surah.ayahs.map((a) => a.audio).toSet();
-    return urls.length == 1;
-  }
-
   PlaybackOwner get playbackOwner => _playbackOwner;
 
   bool _tryAutoAdvanceToNextSurah() {
@@ -161,7 +155,7 @@ class AudioCenter extends ChangeNotifier {
 
       currentSurahName = fullSurah.englishName;
 
-      if (_isSurahLevelAudio(fullSurah)) {
+      if (fullSurah.isSurahLevelAudio) {
         _readingPlaylistIndexOffset = 0;
         await _audioServices
             .setPlaylistAudio([fullSurah.ayahs.first.audioSource]);
@@ -307,7 +301,7 @@ class AudioCenter extends ChangeNotifier {
     if (startIndex != 0) return false;
     if (surahNumber == 1 || surahNumber == 9) return false;
     if (fullSurah.ayahs.isEmpty) return false;
-    if (_isSurahLevelAudio(fullSurah)) return false;
+    if (fullSurah.isSurahLevelAudio) return false;
 
     return true;
   }
@@ -319,7 +313,7 @@ class AudioCenter extends ChangeNotifier {
     try {
       final surah1 = await _surahServices.getSurah(1);
       if (surah1.ayahs.isEmpty) return null;
-      if (_isSurahLevelAudio(surah1)) return null;
+      if (surah1.isSurahLevelAudio) return null;
 
       final src = surah1.ayahs.first.audioSource;
       _bismillahAudioSource = src;
@@ -390,7 +384,8 @@ class AudioCenter extends ChangeNotifier {
 
       currentSurahName = fullSurah.englishName;
 
-      if (_isSurahLevelAudio(fullSurah)) {
+      if (fullSurah.isSurahLevelAudio) {
+        _readingPlaylistIndexOffset = 0;
         await _audioServices
             .setPlaylistAudio([fullSurah.ayahs.first.audioSource]);
         await audioPlayer.seek(Duration.zero, index: 0);

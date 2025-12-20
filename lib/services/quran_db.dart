@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class QuranDbAyahRow {
+  final int ayahId;
   final int surah;
   final int ayah;
   final String textAr;
@@ -18,6 +19,7 @@ class QuranDbAyahRow {
   final int? manzil;
 
   const QuranDbAyahRow({
+    required this.ayahId,
     required this.surah,
     required this.ayah,
     required this.textAr,
@@ -32,6 +34,7 @@ class QuranDbAyahRow {
 
   factory QuranDbAyahRow.fromMap(Map<String, Object?> row) {
     return QuranDbAyahRow(
+      ayahId: (row['id'] as int?) ?? 0,
       surah: (row['surah_number'] as int?) ?? 0,
       ayah: (row['ayah_number'] as int?) ?? 0,
       textAr: (row['text'] as String?) ?? '',
@@ -104,6 +107,7 @@ class QuranDb {
     final rows = await db.rawQuery(
       '''
 SELECT
+  v.id AS id,
   v.surah_number AS surah_number,
   v.ayah_number AS ayah_number,
   v.text AS text,
@@ -127,6 +131,7 @@ ORDER BY v.ayah_number ASC;
     return rows
         .map(
           (r) => QuranDbAyahRow(
+            ayahId: (r['id'] as int?) ?? 0,
             surah: (r['surah_number'] as int?) ?? 0,
             ayah: (r['ayah_number'] as int?) ?? 0,
             textAr: (r['text'] as String?) ?? '',
