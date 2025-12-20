@@ -9,10 +9,11 @@ class ReciterPickerSheet extends StatefulWidget {
   const ReciterPickerSheet({super.key, required this.selected});
 
   Future<Reciter?> openBottomSheet(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return showModalBottomSheet<Reciter>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF0E0E0E) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -62,6 +63,7 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final height = MediaQuery.of(context).size.height;
     final query = _query.trim().toLowerCase();
     final filtered = searchReciters(query);
@@ -89,13 +91,16 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF111827),
+                        color: isDark ? Colors.white : const Color(0xFF111827),
                       ),
                     ),
                     const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
+                      icon: Icon(
+                        Icons.close,
+                        color: isDark ? Colors.white : null,
+                      ),
                     ),
                   ],
                 ),
@@ -105,26 +110,45 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
                     hintText: 'Search reciters...',
-                    prefixIcon: const Icon(Icons.search),
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? const Color(0xFF9CA3AF)
+                          : const Color(0xFF6B7280),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: isDark ? const Color(0xFF9CA3AF) : null,
+                    ),
                     suffixIcon: _query.trim().isEmpty
                         ? null
                         : IconButton(
                             onPressed: () => _searchController.clear(),
-                            icon: const Icon(Icons.close),
+                            icon: Icon(
+                              Icons.close,
+                              color: isDark ? const Color(0xFF9CA3AF) : null,
+                            ),
                           ),
                     filled: true,
-                    fillColor: const Color(0xFFF2F2F2),
+                    fillColor: isDark
+                        ? const Color(0xFF1A1A1A)
+                        : const Color(0xFFF2F2F2),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
+                  ),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: ListView.separated(
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, __) => Divider(
+                      height: 1,
+                      color: isDark ? const Color(0xFF2A2A2A) : null,
+                    ),
                     itemBuilder: (context, index) {
                       final reciter = filtered[index];
                       final isSelected = reciter.identifier == widget.selected;
@@ -139,9 +163,13 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                           height: 28,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFF2F2F2),
+                            color: isDark
+                                ? const Color(0xFF1A1A1A)
+                                : const Color(0xFFF2F2F2),
                             border: Border.all(
-                              color: const Color(0xFFE5E7EB),
+                              color: isDark
+                                  ? const Color(0xFF2A2A2A)
+                                  : const Color(0xFFE5E7EB),
                             ),
                           ),
                           child: Center(
@@ -150,7 +178,9 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF111827),
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111827),
                               ),
                             ),
                           ),
@@ -160,7 +190,8 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
                         subtitle: arabicName.isEmpty
@@ -170,17 +201,23 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  color: const Color(0xFF58667B),
+                                  color: isDark
+                                      ? const Color(0xFF9CA3AF)
+                                      : const Color(0xFF58667B),
                                 ),
                               ),
                         trailing: isSelected
-                            ? const Icon(
+                            ? Icon(
                                 Icons.check,
-                                color: Color(0xFF205B5F),
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF205B5F),
                               )
-                            : const Icon(
+                            : Icon(
                                 Icons.chevron_right_rounded,
-                                color: Color(0xFF9CA3AF),
+                                color: isDark
+                                    ? const Color(0xFF9CA3AF)
+                                    : const Color(0xFF9CA3AF),
                               ),
                         onTap: () => Navigator.pop(context, reciter),
                       );

@@ -11,6 +11,52 @@ import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 
+class _DashboardPalette {
+  static bool _isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  static Color segmentedActiveBorder(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF2A6B6F) : Colors.transparent;
+  }
+
+  static Color searchBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF111111) : Colors.white;
+  }
+
+  static Color searchBorder(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF242424) : const Color(0xFFE5E7EB);
+  }
+
+  static Color primaryText(BuildContext context) {
+    return _isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+  }
+
+  static Color secondaryText(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+  }
+
+  static Color segmentedBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF141414) : const Color(0xFFF3F4F6);
+  }
+
+  static Color segmentedActiveBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF1E1E1E) : Colors.white;
+  }
+
+  static Color listTileBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF101010) : Colors.white;
+  }
+
+  static Color listTileBorder(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF2A2A2A) : const Color(0xFFE5E7EB);
+  }
+
+  static Color pillBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF2A6B6F) : const Color(0xFFBFE7EA);
+  }
+}
+
 class SearchField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -27,23 +73,24 @@ class SearchField extends StatelessWidget {
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _DashboardPalette.searchBg(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: _DashboardPalette.searchBorder(context)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Color(0xFF9CA3AF)),
+          Icon(Icons.search, color: _DashboardPalette.secondaryText(context)),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
+              style: TextStyle(color: _DashboardPalette.primaryText(context)),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF9CA3AF),
+                  color: _DashboardPalette.secondaryText(context),
                 ),
                 border: InputBorder.none,
               ),
@@ -89,7 +136,7 @@ class DashboardFeatureCard extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.black500,
+                color: _DashboardPalette.primaryText(context),
               ),
             ),
             const SizedBox(height: 10),
@@ -99,7 +146,7 @@ class DashboardFeatureCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _DashboardPalette.listTileBg(context),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: child,
@@ -123,12 +170,15 @@ class ChallengeContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFFBFE7EA),
+          color: isDark ? scheme.surfaceContainerHigh : const Color(0xFFBFE7EA),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -139,7 +189,7 @@ class ChallengeContainer extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF111827),
+                color: scheme.onSurface,
               ),
             ),
             const SizedBox(height: 10),
@@ -149,7 +199,7 @@ class ChallengeContainer extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: scheme.surface,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
@@ -158,8 +208,8 @@ class ChallengeContainer extends StatelessWidget {
                           'assets/img/brain.svg',
                           width: 22,
                           height: 22,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFF111827),
+                          colorFilter: ColorFilter.mode(
+                            scheme.onSurface,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -170,14 +220,14 @@ class ChallengeContainer extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF111827),
+                              color: scheme.onSurface,
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(
+                        Icon(
                           Icons.arrow_forward,
-                          color: Color(0xFF111827),
+                          color: scheme.onSurface,
                         ),
                       ],
                     ),
@@ -218,7 +268,7 @@ class SegmentedSwitch extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
+        color: _DashboardPalette.segmentedBg(context),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -255,17 +305,28 @@ class _SegmentedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = _DashboardPalette._isDark(context);
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       height: 40,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active ? Colors.white : Colors.transparent,
+        color: active
+            ? _DashboardPalette.segmentedActiveBg(context)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
+        border: active && isDark
+            ? Border.all(
+                color: _DashboardPalette.segmentedActiveBorder(context)
+                    .withValues(alpha: 0.55),
+                width: 1,
+              )
+            : null,
         boxShadow: active
             ? [
-                const BoxShadow(
-                  color: Color(0x14000000),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 10,
                   offset: Offset(0, 3),
                 )
@@ -277,7 +338,9 @@ class _SegmentedItem extends StatelessWidget {
         style: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: active ? const Color(0xFF115E59) : const Color(0xFF6B7280),
+          color: active
+              ? AppColors.green500
+              : _DashboardPalette.secondaryText(context),
         ),
       ),
     );
@@ -345,9 +408,9 @@ class SurahCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: _DashboardPalette.listTileBorder(context)),
         ),
         child: Row(
           children: [
@@ -362,7 +425,7 @@ class SurahCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
+                      color: _DashboardPalette.primaryText(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -371,7 +434,7 @@ class SurahCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9CA3AF),
+                      color: _DashboardPalette.secondaryText(context),
                     ),
                   ),
                 ],
@@ -385,17 +448,19 @@ class SurahCard extends StatelessWidget {
                   height: 34,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border:
-                        Border.all(color: const Color(0xFF111827), width: 1.4),
+                    border: Border.all(
+                      color: _DashboardPalette.primaryText(context),
+                      width: 1.4,
+                    ),
                   ),
                   child: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF111827),
+                              _DashboardPalette.primaryText(context),
                             ),
                           ),
                         )
@@ -403,7 +468,7 @@ class SurahCard extends StatelessWidget {
                           isPlaying
                               ? Icons.pause_rounded
                               : Icons.play_arrow_rounded,
-                          color: const Color(0xFF111827),
+                          color: _DashboardPalette.primaryText(context),
                         ),
                 ),
               ),
@@ -481,9 +546,9 @@ class JuzCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: _DashboardPalette.listTileBorder(context)),
         ),
         child: Row(
           children: [
@@ -498,7 +563,7 @@ class JuzCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF111827),
+                      color: _DashboardPalette.primaryText(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -507,7 +572,7 @@ class JuzCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF6B7280),
+                      color: _DashboardPalette.secondaryText(context),
                     ),
                   ),
                 ],
@@ -522,24 +587,24 @@ class JuzCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF111827),
+                      color: _DashboardPalette.primaryText(context),
                       width: 1.4,
                     ),
                   ),
                   child: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF111827),
+                              _DashboardPalette.primaryText(context),
                             ),
                           ),
                         )
                       : Icon(
                           isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                          color: const Color(0xFF111827),
+                          color: _DashboardPalette.primaryText(context),
                         ),
                 ),
               ),
@@ -568,6 +633,8 @@ class TestOptionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -582,7 +649,7 @@ class TestOptionContainer extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -593,7 +660,7 @@ class TestOptionContainer extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF111827),
+                        color: scheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -602,7 +669,7 @@ class TestOptionContainer extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF6B7280),
+                        color: scheme.onSurfaceVariant,
                         height: 1.25,
                       ),
                     ),
@@ -660,11 +727,13 @@ class BottomPillNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = _DashboardPalette._isDark(context);
+
     return Container(
       width: 240,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFBFE7EA),
+        color: _DashboardPalette.pillBg(context),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -678,7 +747,9 @@ class BottomPillNav extends StatelessWidget {
                 width: 18,
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  index == 0 ? Colors.white : const Color(0xFF115E59),
+                  index == 0
+                      ? Colors.white
+                      : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
                   BlendMode.srcIn,
                 ),
               ),
@@ -695,7 +766,9 @@ class BottomPillNav extends StatelessWidget {
                 width: 18,
                 height: 18,
                 colorFilter: ColorFilter.mode(
-                  index == 1 ? Colors.white : const Color(0xFF115E59),
+                  index == 1
+                      ? Colors.white
+                      : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
                   BlendMode.srcIn,
                 ),
               ),

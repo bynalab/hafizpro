@@ -44,6 +44,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isWideScreen = MediaQuery.of(context).size.width >= 600;
 
     final displaySurahs =
@@ -91,14 +92,17 @@ class _SurahListScreenState extends State<SurahListScreen> {
 
     if (isWideScreen) {
       return Scaffold(
-        backgroundColor: const Color(0xFFF9FAFB),
+        backgroundColor: isDark
+            ? Theme.of(context).colorScheme.surface
+            : const Color(0xFFF9FAFB),
         body: Row(
           children: [
             // Left: List
             Expanded(
               flex: 2,
               child: _SelectListScaffold(
-                headerBackground: const Color(0xFFFADDE5),
+                headerBackground:
+                    isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
                 title: 'Surah List',
                 descriptionTitle: 'Select a Surah',
                 descriptionBody:
@@ -114,9 +118,20 @@ class _SurahListScreenState extends State<SurahListScreen> {
             Expanded(
               flex: 3,
               child: Container(
-                color: Colors.white,
+                color: isDark
+                    ? Theme.of(context).colorScheme.surface
+                    : Colors.white,
                 child: selectedSurah == null
-                    ? const Center(child: Text("Select a Surah"))
+                    ? Center(
+                        child: Text(
+                          'Select a Surah',
+                          style: TextStyle(
+                            color: isDark
+                                ? Theme.of(context).colorScheme.onSurface
+                                : null,
+                          ),
+                        ),
+                      )
                     : widget.actionType == SurahSelectionAction.read
                         ? QuranView(
                             key: ValueKey(selectedSurah?.number),
@@ -133,9 +148,12 @@ class _SurahListScreenState extends State<SurahListScreen> {
       );
     } else {
       return Scaffold(
-        backgroundColor: const Color(0xFFF9FAFB),
+        backgroundColor: isDark
+            ? Theme.of(context).colorScheme.surface
+            : const Color(0xFFF9FAFB),
         body: _SelectListScaffold(
-          headerBackground: const Color(0xFFFADDE5),
+          headerBackground:
+              isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
           title: 'Surah List',
           descriptionTitle: 'Select a Surah',
           descriptionBody:
@@ -176,6 +194,12 @@ class _SelectListScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor =
+        isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF111827);
+
     return Column(
       children: [
         Container(
@@ -195,15 +219,17 @@ class _SelectListScaffold extends StatelessWidget {
                       child: Container(
                         width: 44,
                         height: 44,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color:
+                              isDark ? const Color(0xFF1A1A1A) : Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             Icons.arrow_back_ios_new_rounded,
                             size: 18,
-                            color: Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -218,7 +244,7 @@ class _SelectListScaffold extends StatelessWidget {
                         style: GoogleFonts.cairo(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF111827),
+                          color: titleColor,
                         ),
                       ),
                     ),
@@ -236,7 +262,7 @@ class _SelectListScaffold extends StatelessWidget {
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF111827),
+                              color: titleColor,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -245,7 +271,7 @@ class _SelectListScaffold extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF111827),
+                              color: subtitleColor,
                               height: 1.3,
                             ),
                           ),
@@ -276,9 +302,13 @@ class _SelectListScaffold extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF111111) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF242424)
+                          : const Color(0xFFE5E7EB),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -287,6 +317,11 @@ class _SelectListScaffold extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: searchController,
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFFF3F4F6)
+                                : const Color(0xFF111827),
+                          ),
                           decoration: InputDecoration(
                             hintText: searchHint,
                             hintStyle: GoogleFonts.inter(

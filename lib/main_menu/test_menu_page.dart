@@ -22,6 +22,11 @@ class TestMenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconBg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
+    final titleColor =
+        isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+    final subtitleColor = const Color(0xFF9CA3AF);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     const pillOuterBottomPadding = 18.0;
     const pillHeight = 44.0;
@@ -55,21 +60,21 @@ class TestMenuPage extends StatelessWidget {
               ),
               const Spacer(),
               CircleIconButton(
-                background: const Color(0xFFF2F2F2),
+                background: iconBg,
                 icon: Icon(
                   Theme.of(context).brightness == Brightness.dark
                       ? Icons.light_mode
                       : Icons.dark_mode,
-                  color: const Color(0xFF111827),
+                  color: titleColor,
                 ),
                 onTap: onToggleTheme,
               ),
               const SizedBox(width: 10),
               CircleIconButton(
-                background: const Color(0xFFF2F2F2),
+                background: iconBg,
                 icon: const Icon(
                   Icons.settings,
-                  color: Color(0xFF111827),
+                  color: null,
                 ),
                 onTap: onOpenSettings,
               ),
@@ -81,7 +86,7 @@ class TestMenuPage extends StatelessWidget {
             style: GoogleFonts.cairo(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF111827),
+              color: titleColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -90,12 +95,13 @@ class TestMenuPage extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF58667B),
+              color: subtitleColor,
             ),
           ),
           const SizedBox(height: 18),
           TestOptionContainer(
-            background: const Color(0xFFFADDE5),
+            background:
+                isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
             title: 'By Surah',
             subtitle: 'Test your knowledge based\non different surahs',
             icon:
@@ -113,7 +119,8 @@ class TestMenuPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           TestOptionContainer(
-            background: const Color(0xFF7CB7C6),
+            background:
+                isDark ? const Color(0xFF243F46) : const Color(0xFF7CB7C6),
             title: 'By Juz',
             subtitle: 'Test how well you know each\nJuz.',
             icon: const Icon(Icons.mosque_rounded, color: Color(0xFF0A3A45)),
@@ -126,7 +133,8 @@ class TestMenuPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           TestOptionContainer(
-            background: const Color(0xFFF7CFC7),
+            background:
+                isDark ? const Color(0xFF3A2F27) : const Color(0xFFF7CFC7),
             title: 'Random Verses',
             subtitle: 'Get verses from anywhere in\nthe Qur’an.',
             icon: const Icon(Icons.brightness_3_rounded,

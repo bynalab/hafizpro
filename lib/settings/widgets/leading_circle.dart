@@ -16,12 +16,13 @@ class LeadingCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
       ),
       child: Center(
         child: assetPath != null
@@ -33,7 +34,8 @@ class LeadingCircle extends StatelessWidget {
               )
             : Icon(
                 icon,
-                color: iconColor ?? const Color(0xFF111827),
+                color: iconColor ??
+                    (isDark ? Colors.white : const Color(0xFF111827)),
               ),
       ),
     );

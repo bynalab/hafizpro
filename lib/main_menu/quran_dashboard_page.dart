@@ -23,6 +23,36 @@ import 'package:hafiz_test/util/app_colors.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
 
+class _DashboardPalette {
+  static bool _isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  static Color iconButtonBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
+  }
+
+  static Color primaryText(BuildContext context) {
+    return _isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+  }
+
+  static Color secondaryText(BuildContext context) {
+    return const Color(0xFF9CA3AF);
+  }
+
+  static Color pinnedHeaderBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF0B0B0B) : Colors.white;
+  }
+
+  static Color cardTeal(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF1B5E63) : const Color(0xFFBFE7EA);
+  }
+
+  static Color cardPurple(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF3B2448) : const Color(0xFFE6BDEB);
+  }
+}
+
 class QuranDashboardPage extends StatefulWidget {
   const QuranDashboardPage({
     super.key,
@@ -92,21 +122,21 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       ),
                       const Spacer(),
                       CircleIconButton(
-                        background: const Color(0xFFF2F2F2),
+                        background: _DashboardPalette.iconButtonBg(context),
                         icon: Icon(
                           Theme.of(context).brightness == Brightness.dark
                               ? Icons.light_mode
                               : Icons.dark_mode,
-                          color: const Color(0xFF111827),
+                          color: _DashboardPalette.primaryText(context),
                         ),
                         onTap: widget.onToggleTheme,
                       ),
                       const SizedBox(width: 10),
                       CircleIconButton(
-                        background: const Color(0xFFF2F2F2),
+                        background: _DashboardPalette.iconButtonBg(context),
                         icon: const Icon(
                           Icons.settings,
-                          color: Color(0xFF111827),
+                          color: null,
                         ),
                         onTap: widget.onOpenSettings,
                       ),
@@ -123,7 +153,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   if (!_isSearching) ...[
                     if (lastRead == null)
                       DashboardFeatureCard(
-                        background: const Color(0xFFBFE7EA),
+                        background: _DashboardPalette.cardTeal(context),
                         title: 'Challenge yourself',
                         onTap: () {
                           AnalyticsService.trackButtonClick(
@@ -148,8 +178,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                               'assets/img/brain.svg',
                               width: 22,
                               height: 22,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFF111827),
+                              colorFilter: ColorFilter.mode(
+                                _DashboardPalette.primaryText(context),
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -160,14 +190,14 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF111827),
+                                  color: _DashboardPalette.primaryText(context),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward,
-                              color: Color(0xFF111827),
+                              color: _DashboardPalette.primaryText(context),
                             ),
                           ],
                         ),
@@ -248,7 +278,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF111827),
+                        color: _DashboardPalette.primaryText(context),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -263,7 +293,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   minExtent: 58,
                   maxExtent: 58,
                   child: Container(
-                    color: Colors.white,
+                    color: _DashboardPalette.pinnedHeaderBg(context),
                     padding: const EdgeInsets.only(bottom: 12),
                     child: SegmentedSwitch(
                       leftLabel: 'Surah',
@@ -393,7 +423,7 @@ class _ContinueLastTestCard extends StatelessWidget {
     final ayah = lastRead.$2;
 
     return DashboardFeatureCard(
-      background: const Color(0xFFBFE7EA),
+      background: _DashboardPalette.cardTeal(context),
       title: 'Continue your last test',
       onTap: () {
         Navigator.push(
@@ -418,8 +448,8 @@ class _ContinueLastTestCard extends StatelessWidget {
             'assets/img/brain.svg',
             width: 22,
             height: 22,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF111827),
+            colorFilter: ColorFilter.mode(
+              _DashboardPalette.primaryText(context),
               BlendMode.srcIn,
             ),
           ),
@@ -433,7 +463,7 @@ class _ContinueLastTestCard extends StatelessWidget {
                   style: GoogleFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
+                    color: _DashboardPalette.primaryText(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -442,14 +472,17 @@ class _ContinueLastTestCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF9CA3AF),
+                    color: _DashboardPalette.secondaryText(context),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward, color: Color(0xFF111827)),
+          Icon(
+            Icons.arrow_forward,
+            color: _DashboardPalette.primaryText(context),
+          ),
         ],
       ),
     );
@@ -564,7 +597,7 @@ class _NowPlayingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DashboardFeatureCard(
       onTap: onTap,
-      background: const Color(0xFFE6BDEB),
+      background: _DashboardPalette.cardPurple(context),
       title: 'Now Playing',
       right: Image.asset(
         'assets/img/headset_icon.png',
@@ -583,7 +616,10 @@ class _NowPlayingCard extends StatelessWidget {
 
           return Row(
             children: [
-              const Icon(CupertinoIcons.waveform, color: Color(0xFF111827)),
+              Icon(
+                CupertinoIcons.waveform,
+                color: _DashboardPalette.primaryText(context),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -594,7 +630,7 @@ class _NowPlayingCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.black500,
+                        color: _DashboardPalette.primaryText(context),
                       ),
                     ),
                     // const SizedBox(height: 10),
@@ -616,8 +652,8 @@ class _NowPlayingCard extends StatelessWidget {
                             'assets/icons/previous.svg',
                             width: 22,
                             height: 22,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF111827),
+                            colorFilter: ColorFilter.mode(
+                              _DashboardPalette.primaryText(context),
                               BlendMode.srcIn,
                             ),
                           ),
@@ -638,13 +674,13 @@ class _NowPlayingCard extends StatelessWidget {
                                   }
                                 },
                           icon: isLoading
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF111827),
+                                      _DashboardPalette.primaryText(context),
                                     ),
                                   ),
                                 )
@@ -663,8 +699,8 @@ class _NowPlayingCard extends StatelessWidget {
                             'assets/icons/next.svg',
                             width: 22,
                             height: 22,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF111827),
+                            colorFilter: ColorFilter.mode(
+                              _DashboardPalette.primaryText(context),
                               BlendMode.srcIn,
                             ),
                           ),

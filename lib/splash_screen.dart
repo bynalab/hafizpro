@@ -70,6 +70,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: SafeArea(
         top: false,
@@ -140,6 +141,7 @@ class _SplashScreenState extends State<SplashScreen>
                           title: _verseTitle,
                           arabic: _verseArabic,
                           translation: _verseTranslation,
+                          isDark: isDark,
                         ),
                       ),
                     ),
@@ -159,11 +161,13 @@ class _VerseCard extends StatelessWidget {
     required this.title,
     required this.arabic,
     required this.translation,
+    required this.isDark,
   });
 
   final String title;
   final String arabic;
   final String translation;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
@@ -171,17 +175,21 @@ class _VerseCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       decoration: BoxDecoration(
-        color: AppColors.green100,
+        color: isDark
+            ? const Color(0xFF0D3B3F).withValues(alpha: 0.92)
+            : AppColors.green100,
         border: Border.all(
-          color: AppColors.black100,
+          color: isDark ? const Color(0xFF262626) : AppColors.black100,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x3DE4E5E7),
+            color: isDark
+                ? const Color(0xFFE4E5E7).withValues(alpha: 0.24)
+                : const Color(0x3DE4E5E7),
             blurRadius: 2,
-            offset: Offset(0, 1),
+            offset: const Offset(0, 1),
             spreadRadius: 0,
           ),
         ],
@@ -196,7 +204,7 @@ class _VerseCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 16,
-                color: AppColors.black500,
+                color: isDark ? Colors.white : AppColors.black500,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -206,7 +214,7 @@ class _VerseCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.amiri(
                 fontSize: 24,
-                color: AppColors.black500,
+                color: isDark ? Colors.white : AppColors.black500,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -216,7 +224,7 @@ class _VerseCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: AppColors.black500,
+                color: isDark ? const Color(0xFFCBD5E1) : AppColors.black500,
                 fontWeight: FontWeight.w400,
               ),
             ),

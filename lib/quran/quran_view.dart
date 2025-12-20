@@ -106,6 +106,8 @@ class _QuranViewState extends State<QuranView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (viewModel.isLoading) {
       return Scaffold(body: SurahLoader());
     }
@@ -135,11 +137,13 @@ class _QuranViewState extends State<QuranView> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF9FAFB),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor
+            : const Color(0xFFF9FAFB),
         body: Column(
           children: [
             Container(
-              color: const Color(0xFF78B7C6),
+              color: isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6),
               padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
               child: SafeArea(
                 bottom: false,
@@ -154,15 +158,19 @@ class _QuranViewState extends State<QuranView> {
                           child: Container(
                             width: 44,
                             height: 44,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF1A1A1A)
+                                  : Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Icon(
                                 Icons.arrow_back_ios_new_rounded,
                                 size: 18,
-                                color: Color(0xFF111827),
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111827),
                               ),
                             ),
                           ),
@@ -172,10 +180,11 @@ class _QuranViewState extends State<QuranView> {
                         alignment: Alignment.center,
                         child: Text(
                           viewModel.surah?.englishName ?? '',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
                       ),

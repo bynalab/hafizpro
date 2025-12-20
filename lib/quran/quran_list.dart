@@ -26,6 +26,7 @@ class QuranAyahList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ScrollablePositionedList.separated(
       padding: const EdgeInsets.symmetric(vertical: 30),
       itemCount: surah.ayahs.length + _offset,
@@ -41,7 +42,7 @@ class QuranAyahList extends StatelessWidget {
               style: GoogleFonts.amiri(
                 fontSize: 24,
                 height: 2,
-                color: AppColors.black500,
+                color: isDark ? Colors.white : AppColors.black500,
               ),
             ),
           );
@@ -59,7 +60,9 @@ class QuranAyahList extends StatelessWidget {
           index: ayahIndex,
           ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
-          backgroundColor: isEven ? AppColors.gray500 : AppColors.gray50,
+          backgroundColor: isDark
+              ? (isEven ? const Color(0xFF101010) : const Color(0xFF0E0E0E))
+              : (isEven ? AppColors.gray500 : AppColors.gray50),
           onPlayPressed: (_) => onControlPressed(ayahIndex),
         );
       },

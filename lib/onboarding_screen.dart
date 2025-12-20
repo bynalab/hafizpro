@@ -75,78 +75,98 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.gray500,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          child: Column(
-            children: [
-              _ProgressIndicator(current: _index, total: _pages.length),
-              const SizedBox(height: 12),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _pages.length,
-                  onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (context, i) {
-                    final p = _pages[i];
+      backgroundColor: isDark ? const Color(0xFF0E0E0E) : AppColors.gray500,
+      body: Container(
+        decoration: isDark
+            ? const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(-0.85, -0.85),
+                  radius: 1.4,
+                  colors: [
+                    Color(0x33205B5F),
+                    Color(0xFF0E0E0E),
+                  ],
+                ),
+              )
+            : null,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: Column(
+              children: [
+                _ProgressIndicator(current: _index, total: _pages.length),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _pages.length,
+                    onPageChanged: (i) => setState(() => _index = i),
+                    itemBuilder: (context, i) {
+                      final p = _pages[i];
 
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(p.imageAsset),
-                        const SizedBox(height: 13),
-                        _MarkedUnderlineText(
-                          text: p.title,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF020617),
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(p.imageAsset),
+                          const SizedBox(height: 13),
+                          _MarkedUnderlineText(
+                            text: p.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF020617),
+                            ),
+                            underlineColor: const Color(0xFFF59E0B),
                           ),
-                          underlineColor: const Color(0xFFF59E0B),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          p.subtitle,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF58667B),
+                          const SizedBox(height: 10),
+                          Text(
+                            p.subtitle,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? const Color(0xFF9CA3AF)
+                                  : const Color(0xFF58667B),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 18),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _nextOrFinish,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.green500,
-                    foregroundColor: AppColors.gray500,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    _pages[_index].cta,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                          const SizedBox(height: 18),
+                        ],
+                      );
+                    },
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _nextOrFinish,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.green500,
+                      foregroundColor:
+                          isDark ? Colors.white : AppColors.gray500,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      _pages[_index].cta,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -176,6 +196,7 @@ class _ProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(total, (i) {
@@ -186,7 +207,9 @@ class _ProgressIndicator extends StatelessWidget {
           height: 4,
           width: 64,
           decoration: BoxDecoration(
-            color: active ? AppColors.green500 : AppColors.black100,
+            color: active
+                ? AppColors.green500
+                : (isDark ? const Color(0xFF2A2A2A) : AppColors.black100),
             borderRadius: BorderRadius.circular(99),
           ),
         );

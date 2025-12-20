@@ -40,17 +40,22 @@ class _JuzListScreenState extends State<JuzListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final displayJuz = _query.trim().isEmpty ? juzList : searchJuz(_query);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: isDark
+          ? Theme.of(context).colorScheme.surface
+          : const Color(0xFFF9FAFB),
       body: kIsWeb
           ? Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: _JuzListBody(
                   title: 'Juz List',
-                  headerBackground: const Color(0xFF7CB7C6),
+                  headerBackground: isDark
+                      ? const Color(0xFF243F46)
+                      : const Color(0xFF7CB7C6),
                   headerDescriptionTitle: 'Select a Juz',
                   headerDescriptionBody:
                       'Listen to a verse from a Juz and\nguess the next verse.',
@@ -64,7 +69,8 @@ class _JuzListScreenState extends State<JuzListScreen> {
             )
           : _JuzListBody(
               title: 'Juz List',
-              headerBackground: const Color(0xFF7CB7C6),
+              headerBackground:
+                  isDark ? const Color(0xFF243F46) : const Color(0xFF7CB7C6),
               headerDescriptionTitle: 'Select a Juz',
               headerDescriptionBody:
                   'Listen to a verse from a Juz and\nguess the next verse.',
@@ -103,6 +109,12 @@ class _JuzListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor =
+        isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF111827);
+
     return Column(
       children: [
         Container(
@@ -122,15 +134,17 @@ class _JuzListBody extends StatelessWidget {
                       child: Container(
                         width: 44,
                         height: 44,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color:
+                              isDark ? const Color(0xFF1A1A1A) : Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             Icons.arrow_back_ios_new_rounded,
                             size: 18,
-                            color: Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -145,7 +159,7 @@ class _JuzListBody extends StatelessWidget {
                         style: GoogleFonts.cairo(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF111827),
+                          color: titleColor,
                         ),
                       ),
                     ),
@@ -163,7 +177,7 @@ class _JuzListBody extends StatelessWidget {
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF111827),
+                              color: titleColor,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -172,7 +186,7 @@ class _JuzListBody extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF111827),
+                              color: subtitleColor,
                               height: 1.3,
                             ),
                           ),
@@ -203,9 +217,13 @@ class _JuzListBody extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF111111) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF242424)
+                          : const Color(0xFFE5E7EB),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -214,6 +232,11 @@ class _JuzListBody extends StatelessWidget {
                       Expanded(
                         child: TextField(
                           controller: searchController,
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFFF3F4F6)
+                                : const Color(0xFF111827),
+                          ),
                           decoration: InputDecoration(
                             hintText: searchHint,
                             hintStyle: GoogleFonts.inter(

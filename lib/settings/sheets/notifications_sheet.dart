@@ -21,10 +21,11 @@ class NotificationsSheet extends StatelessWidget {
   });
 
   Future<NotificationSheetResult?> openBottomSheet(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return showModalBottomSheet<NotificationSheetResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF0E0E0E) : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -42,6 +43,7 @@ class NotificationsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     var localEnabled = initialEnabled;
     var localTime = initialTime;
     var showSaved = false;
@@ -76,7 +78,9 @@ class NotificationsSheet extends StatelessWidget {
                     height: 5,
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5E7EB),
+                      color: isDark
+                          ? const Color(0xFF2A2A2A)
+                          : const Color(0xFFE5E7EB),
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -85,7 +89,9 @@ class NotificationsSheet extends StatelessWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: AppColors.green100,
+                      color: isDark
+                          ? AppColors.green500.withValues(alpha: 0.18)
+                          : AppColors.green100,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -100,7 +106,7 @@ class NotificationsSheet extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -156,7 +162,9 @@ class NotificationsSheet extends StatelessWidget {
                     height: 5,
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5E7EB),
+                      color: isDark
+                          ? const Color(0xFF2A2A2A)
+                          : const Color(0xFFE5E7EB),
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -167,7 +175,7 @@ class NotificationsSheet extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),
                 ),
@@ -178,7 +186,7 @@ class NotificationsSheet extends StatelessWidget {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.black50,
+                    color: isDark ? const Color(0xFF1A1A1A) : AppColors.black50,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -196,7 +204,7 @@ class NotificationsSheet extends StatelessWidget {
                               style: GoogleFonts.cairo(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.black,
+                                color: isDark ? Colors.white : AppColors.black,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -205,7 +213,9 @@ class NotificationsSheet extends StatelessWidget {
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.black,
+                                color: isDark
+                                    ? const Color(0xFF9CA3AF)
+                                    : AppColors.black,
                               ),
                             ),
                           ],
@@ -231,10 +241,12 @@ class NotificationsSheet extends StatelessWidget {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF121212) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFFE5E7EB),
+                          color: isDark
+                              ? const Color(0xFF2A2A2A)
+                              : const Color(0xFFE5E7EB),
                         ),
                       ),
                       child: Row(
@@ -254,7 +266,9 @@ class NotificationsSheet extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.black500,
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.black500,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -263,15 +277,18 @@ class NotificationsSheet extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.black400,
+                                    color: isDark
+                                        ? const Color(0xFF9CA3AF)
+                                        : AppColors.black400,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.chevron_right_rounded,
-                            color: Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ],
                       ),
@@ -286,7 +303,9 @@ class NotificationsSheet extends StatelessWidget {
                     style: FilledButton.styleFrom(
                       backgroundColor: localEnabled
                           ? AppColors.green500
-                          : const Color(0xFFE5E7EB),
+                          : (isDark
+                              ? const Color(0xFF2A2A2A)
+                              : const Color(0xFFE5E7EB)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

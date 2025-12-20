@@ -275,6 +275,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (_isLoading) {
       return const Scaffold(body: SurahLoader());
     }
@@ -293,11 +295,13 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: isDark
+          ? Theme.of(context).scaffoldBackgroundColor
+          : const Color(0xFFF9FAFB),
       body: Column(
         children: [
           Container(
-            color: const Color(0xFF78B7C6),
+            color: isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6),
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
             child: SafeArea(
               bottom: false,
@@ -312,15 +316,18 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                         child: Container(
                           width: 44,
                           height: 44,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color:
+                                isDark ? const Color(0xFF1A1A1A) : Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.arrow_back_ios_new_rounded,
                               size: 18,
-                              color: Color(0xFF111827),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
                             ),
                           ),
                         ),
@@ -335,7 +342,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                           style: GoogleFonts.cairo(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF111827),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -351,7 +359,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF111827),
+                              color: isDark
+                                  ? const Color(0xFFE5E7EB)
+                                  : const Color(0xFF111827),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -360,7 +370,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF111827),
+                              color: isDark
+                                  ? const Color(0xFF9CA3AF)
+                                  : const Color(0xFF111827),
                             ),
                           ),
                         ],
@@ -395,7 +407,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             style: GoogleFonts.amiri(
                               fontSize: 24,
                               height: 2,
-                              color: const Color(0xFF111827),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
                             ),
                           ),
                         );
@@ -414,9 +428,13 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             text: entry.displayText ?? ayah.text,
                           ),
                           playingIndexNotifier: _playingIndexNotifier,
-                          backgroundColor: isEven
-                              ? const Color(0xFFF3F4F6)
-                              : const Color(0xFFF9FAFB),
+                          backgroundColor: isDark
+                              ? (isEven
+                                  ? const Color(0xFF101010)
+                                  : const Color(0xFF0E0E0E))
+                              : (isEven
+                                  ? const Color(0xFFFCFCFC)
+                                  : const Color(0xFFF2F2F2)),
                           onPlayPressed: _onPlayPressed,
                         );
                     }
@@ -503,13 +521,17 @@ class _PinnedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Positioned(
       top: 0,
       left: 0,
       right: 0,
       child: Container(
         height: 44,
-        color: const Color(0xFFF9FAFB),
+        color: isDark
+            ? Theme.of(context).scaffoldBackgroundColor
+            : const Color(0xFFF9FAFB),
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 8),
         child: Center(
           child: AnimatedSwitcher(
@@ -525,7 +547,8 @@ class _PinnedHeader extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF111827),
+                color:
+                    isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827),
               ),
             ),
           ),
@@ -542,6 +565,8 @@ class _SurahMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         const SizedBox(height: 15),
@@ -551,15 +576,16 @@ class _SurahMarker extends StatelessWidget {
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF111827),
+                color:
+                    isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827),
               ),
             ),
           ),

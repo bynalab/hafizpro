@@ -10,18 +10,21 @@ class StarburstIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = isDark ? Colors.white : const Color(0xFF111827);
+
     return SizedBox(
       width: 44,
       height: 44,
       child: CustomPaint(
-        painter: _StarburstPainter(color: const Color(0xFF111827)),
+        painter: _StarburstPainter(color: color),
         child: Center(
           child: Text(
             text,
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF111827),
+              color: color,
             ),
           ),
         ),

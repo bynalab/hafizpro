@@ -44,8 +44,6 @@ class TarteelAudioResolver {
 
       final ok = await networkServices.urlExists(url);
       if (ok) return i;
-
-      print('url $url not reachable');
     }
 
     return null;

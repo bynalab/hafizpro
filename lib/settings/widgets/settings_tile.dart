@@ -22,6 +22,7 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Opacity(
       opacity: enabled ? 1 : 0.5,
       child: InkWell(
@@ -30,7 +31,7 @@ class SettingsTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: AppColors.black50,
+            color: isDark ? AppColors.black900 : AppColors.black50,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -46,7 +47,7 @@ class SettingsTile extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.black,
+                        color: isDark ? Colors.white : AppColors.black,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -55,7 +56,8 @@ class SettingsTile extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.black,
+                        color:
+                            isDark ? const Color(0xFF9CA3AF) : AppColors.black,
                       ),
                     ),
                   ],

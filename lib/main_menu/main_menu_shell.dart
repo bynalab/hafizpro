@@ -91,7 +91,9 @@ class _MainMenuShellState extends State<MainMenuShell> {
           );
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF0B0B0B)
+            : Colors.white,
         body: SafeArea(
           child: Stack(
             children: [

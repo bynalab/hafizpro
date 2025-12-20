@@ -98,14 +98,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final reciterName = reciters
         .firstWhereOrNull((r) => r.identifier == controller.reciter)
         ?.englishName;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF2F2F2),
+        backgroundColor:
+            isDark ? const Color(0xFF121212) : const Color(0xFFF2F2F2),
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -113,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: GoogleFonts.cairo(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF111827),
+            color: isDark ? Colors.white : const Color(0xFF111827),
           ),
         ),
         leadingWidth: 62,
@@ -125,15 +128,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE5E7EB),
+              decoration: BoxDecoration(
+                color:
+                    isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE5E7EB),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
+              child: Center(
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 18,
-                  color: Color(0xFF111827),
+                  color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
             ),
@@ -169,9 +173,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Select Reciter',
                     subtitle: reciterName ?? 'Select your favorite reciter',
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () async {
                       final selected = await ReciterPickerSheet(
@@ -188,9 +192,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Notifications',
                     subtitle: notificationSubtitle,
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () async {
                       final result = await NotificationsSheet(
@@ -211,9 +215,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Report Bug or Request Feature',
                     subtitle: 'Talk to us',
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () {},
                   ),
@@ -224,9 +228,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Official Website',
                     subtitle: 'Check Out our website',
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.open_in_new,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () {
                       _launchInBrowser(
@@ -242,9 +246,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Join our community',
                     subtitle: 'Join discussions and get help',
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.open_in_new,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () {
                       _launchInBrowser(
@@ -258,9 +262,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle(Icons.star_rate_rounded),
                     title: 'Rate Us',
                     subtitle: 'Leave a 5 star review on your app store',
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.open_in_new,
-                      color: Color(0xFF111827),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: _showInAppRating,
                   ),
@@ -270,9 +274,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: const LeadingCircle(Icons.construction),
                       title: 'Debug Rating System',
                       subtitle: 'Development tools',
-                      trailing: const Icon(
+                      trailing: Icon(
                         Icons.chevron_right_rounded,
-                        color: Color(0xFF111827),
+                        color: isDark ? Colors.white : const Color(0xFF111827),
                       ),
                       onTap: () {
                         Navigator.push(

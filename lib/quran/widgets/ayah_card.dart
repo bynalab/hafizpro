@@ -10,6 +10,14 @@ class AyahCard extends StatelessWidget {
   final void Function(int)? onPlayPressed;
   final Color backgroundColor;
 
+  // We derive contrast from the actual card background color (not Theme.brightness)
+  // because some screens may intentionally render light cards in dark mode (or vice
+  // versa). Using luminance keeps text/icon/border colors readable regardless.
+  bool _isDarkColor(Color c) {
+    final luminance = c.computeLuminance();
+    return luminance < 0.45;
+  }
+
   static final RegExp _arabicIndicDigits =
       RegExp(r'[\u0660-\u0669\u06F0-\u06F9]');
   static final RegExp _quranMarkers = RegExp(
@@ -45,6 +53,17 @@ class AyahCard extends StatelessWidget {
       builder: (context, currentPlayingIndex, _) {
         final isActive = currentPlayingIndex == index;
 
+        final isDarkCard = _isDarkColor(backgroundColor);
+        final textColor = isDarkCard ? Colors.white : AppColors.black500;
+        final borderColor = isActive
+            ? const Color(0xFF78B7C6)
+            : (isDarkCard
+                ? Colors.white.withValues(alpha: 0.16)
+                : const Color(0xFFE5E7EB));
+        final chipBorderColor = isDarkCard
+            ? Colors.white.withValues(alpha: 0.75)
+            : const Color(0xFF111827);
+
         return Padding(
           padding: const EdgeInsets.fromLTRB(18, 6, 18, 6),
           child: Container(
@@ -53,9 +72,7 @@ class AyahCard extends StatelessWidget {
               color: backgroundColor,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isActive
-                    ? const Color(0xFF78B7C6)
-                    : const Color(0xFFE5E7EB),
+                color: borderColor,
               ),
             ),
             child: Column(
@@ -68,13 +85,13 @@ class AyahCard extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF111827)),
+                        border: Border.all(color: chipBorderColor),
                       ),
                       child: Text(
                         '${ayah.numberInSurah}',
                         style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: AppColors.black500,
+                          color: textColor,
                         ),
                       ),
                     ),
@@ -86,13 +103,13 @@ class AyahCard extends StatelessWidget {
                         height: 34,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF111827)),
+                          border: Border.all(color: chipBorderColor),
                         ),
                         child: Center(
                           child: Icon(
                             isActive ? Icons.stop : Icons.play_arrow_rounded,
                             size: 20,
-                            color: const Color(0xFF111827),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -109,7 +126,7 @@ class AyahCard extends StatelessWidget {
                     style: GoogleFonts.amiri(
                       fontSize: 24,
                       height: 2,
-                      color: AppColors.black500,
+                      color: textColor,
                     ),
                   ),
                 ),
@@ -122,7 +139,7 @@ class AyahCard extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: AppColors.black500,
+                        color: textColor,
                       ),
                     ),
                   ),
@@ -136,7 +153,7 @@ class AyahCard extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: AppColors.black500,
+                        color: textColor,
                       ),
                     ),
                   ),

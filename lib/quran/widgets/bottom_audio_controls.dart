@@ -38,12 +38,18 @@ class BottomAudioControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final barBg = isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6);
+    final onBar = isDark ? Colors.white : AppColors.black500;
+    final mutedOnBar =
+        isDark ? Colors.white.withValues(alpha: 0.70) : AppColors.black600;
+
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
-        color: const Color(0xFF78B7C6),
+        color: barBg,
         child: SafeArea(
           top: false,
           child: ValueListenableBuilder<int?>(
@@ -65,7 +71,7 @@ class BottomAudioControls extends StatelessWidget {
                           style: GoogleFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.black500,
+                            color: onBar,
                           ),
                         ),
                       ),
@@ -108,7 +114,7 @@ class BottomAudioControls extends StatelessWidget {
                             style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.black500,
+                              color: onBar,
                             ),
                           ),
                           const SizedBox(width: 9),
@@ -120,9 +126,12 @@ class BottomAudioControls extends StatelessWidget {
                                   enabledThumbRadius: 0,
                                 ),
                                 overlayShape: SliderComponentShape.noOverlay,
-                                activeTrackColor: AppColors.green500,
-                                inactiveTrackColor:
-                                    AppColors.black500.withValues(alpha: 0.30),
+                                activeTrackColor:
+                                    isDark ? Colors.white : AppColors.green500,
+                                inactiveTrackColor: isDark
+                                    ? Colors.white.withValues(alpha: 0.30)
+                                    : AppColors.black500
+                                        .withValues(alpha: 0.30),
                               ),
                               child: Slider(
                                 value: value,
@@ -153,7 +162,7 @@ class BottomAudioControls extends StatelessWidget {
                             style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.black500,
+                              color: onBar,
                             ),
                           ),
                         ],
@@ -188,7 +197,7 @@ class BottomAudioControls extends StatelessWidget {
                                   style: GoogleFonts.cairo(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.black500,
+                                    color: onBar,
                                   ),
                                 ),
                               ),
@@ -205,8 +214,10 @@ class BottomAudioControls extends StatelessWidget {
                                   'assets/icons/previous.svg',
                                   width: 30,
                                   height: 30,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFF111827),
+                                  colorFilter: ColorFilter.mode(
+                                    isDark
+                                        ? Colors.white
+                                        : const Color(0xFF111827),
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -214,9 +225,11 @@ class BottomAudioControls extends StatelessWidget {
                               Container(
                                 width: 50,
                                 height: 50,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Color(0xFF111827),
+                                  color: isDark
+                                      ? const Color(0xFF0E0E0E)
+                                      : const Color(0xFF111827),
                                 ),
                                 child: AnimatedBuilder(
                                   animation: audioCenter,
@@ -265,8 +278,10 @@ class BottomAudioControls extends StatelessWidget {
                                   'assets/icons/next.svg',
                                   width: 30,
                                   height: 30,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFF111827),
+                                  colorFilter: ColorFilter.mode(
+                                    isDark
+                                        ? Colors.white
+                                        : const Color(0xFF111827),
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -292,8 +307,8 @@ class BottomAudioControls extends StatelessWidget {
                                       Icons.repeat_rounded,
                                       size: 24,
                                       color: loopMode == LoopMode.one
-                                          ? AppColors.black
-                                          : AppColors.black600,
+                                          ? onBar
+                                          : mutedOnBar,
                                     ),
                                   );
                                 },

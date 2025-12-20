@@ -208,10 +208,22 @@ class _TestPage extends State<TestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     const bgGrey = Color(0xFFF3F4F6);
     const cardTeal = Color(0xFF78B7C6);
     const brandGreen = Color(0xFF004B40);
     const textDark = Color(0xFF0F172A);
+
+    final sectionBg = isDark ? const Color(0xFF1A1A1A) : bgGrey;
+    final cardBg = isDark ? const Color(0xFF243F46) : cardTeal;
+    final primary = isDark ? const Color(0xFF2A6B6F) : brandGreen;
+    final onPrimary = Colors.white;
+    final onSurface = isDark ? const Color(0xFFF3F4F6) : textDark;
+    final onSurfaceMuted = isDark ? const Color(0xFF9CA3AF) : textDark;
+    final waveformInactive = isDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.14);
 
     String fmt(Duration d) {
       final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -227,7 +239,7 @@ class _TestPage extends State<TestScreen> {
           child: Container(
             height: 40,
             decoration: BoxDecoration(
-              color: bgGrey,
+              color: sectionBg,
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
@@ -239,7 +251,7 @@ class _TestPage extends State<TestScreen> {
                 style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: textDark,
+                  color: onSurface,
                 ),
               ),
             ),
@@ -253,7 +265,7 @@ class _TestPage extends State<TestScreen> {
             height: 280,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: cardTeal,
+              color: cardBg,
             ),
             child: Stack(
               children: [
@@ -320,7 +332,7 @@ class _TestPage extends State<TestScreen> {
                                 fontFamily: 'Kitab',
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -339,7 +351,7 @@ class _TestPage extends State<TestScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: bgGrey,
+              color: sectionBg,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Column(
@@ -364,8 +376,8 @@ class _TestPage extends State<TestScreen> {
                         _WaveformSeekBar(
                           progress: clampedProgress,
                           total: total,
-                          activeColor: cardTeal,
-                          inactiveColor: Colors.black.withValues(alpha: 0.14),
+                          activeColor: primary,
+                          inactiveColor: waveformInactive,
                           onSeekStart: () async {
                             await audioServices.pause();
                           },
@@ -386,7 +398,7 @@ class _TestPage extends State<TestScreen> {
                               style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: textDark,
+                                color: onSurface,
                               ),
                             ),
                             Text(
@@ -394,7 +406,7 @@ class _TestPage extends State<TestScreen> {
                               style: GoogleFonts.montserrat(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: textDark,
+                                color: onSurface,
                               ),
                             ),
                           ],
@@ -420,7 +432,7 @@ class _TestPage extends State<TestScreen> {
                           style: GoogleFonts.montserrat(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: textDark,
+                            color: onSurface,
                           ),
                         ),
                       ),
@@ -431,14 +443,18 @@ class _TestPage extends State<TestScreen> {
                         'assets/icons/previous.svg',
                         width: 30,
                         height: 30,
+                        colorFilter: ColorFilter.mode(
+                          isDark ? onPrimary : textDark,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     Container(
                       width: 62,
                       height: 62,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: cardTeal,
+                        color: primary,
                       ),
                       child: IconButton(
                         icon: Icon(
@@ -446,7 +462,7 @@ class _TestPage extends State<TestScreen> {
                               ? Icons.pause_rounded
                               : Icons.play_arrow_rounded,
                           size: 30,
-                          color: Colors.white,
+                          color: onPrimary,
                         ),
                         onPressed: () async {
                           if (isPlaying) {
@@ -467,6 +483,10 @@ class _TestPage extends State<TestScreen> {
                         'assets/icons/next.svg',
                         width: 30,
                         height: 30,
+                        colorFilter: ColorFilter.mode(
+                          isDark ? onPrimary : textDark,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     IconButton(
@@ -485,8 +505,8 @@ class _TestPage extends State<TestScreen> {
                         Icons.repeat_rounded,
                         size: 30,
                         color: loop
-                            ? brandGreen
-                            : textDark.withValues(alpha: 0.45),
+                            ? primary
+                            : onSurfaceMuted.withValues(alpha: 0.65),
                       ),
                     ),
                   ],
@@ -505,8 +525,8 @@ class _TestPage extends State<TestScreen> {
                   height: 48,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: brandGreen,
+                      side: BorderSide(
+                        color: isDark ? const Color(0xFF3A3A3A) : brandGreen,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -518,7 +538,7 @@ class _TestPage extends State<TestScreen> {
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: brandGreen,
+                        color: isDark ? onSurface : brandGreen,
                       ),
                     ),
                   ),
@@ -530,7 +550,7 @@ class _TestPage extends State<TestScreen> {
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: brandGreen,
+                      backgroundColor: primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -561,7 +581,7 @@ class _TestPage extends State<TestScreen> {
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: onPrimary,
                       ),
                     ),
                   ),
