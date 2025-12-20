@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
-import 'package:hafiz_test/services/translation_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 
@@ -14,26 +13,21 @@ class MockIStorageService extends Mock implements IStorageService {}
 
 class MockSurahPicker extends Mock implements SurahPicker {}
 
-class MockTranslationService extends Mock implements TranslationService {}
-
 void main() {
   group('SurahServices', () {
     late SurahServices surahServices;
     late MockNetworkServices mockNetworkServices;
     late MockIStorageService mockStorageServices;
     late MockSurahPicker mockSurahPicker;
-    late MockTranslationService mockTranslationService;
 
     setUp(() {
       mockNetworkServices = MockNetworkServices();
       mockStorageServices = MockIStorageService();
       mockSurahPicker = MockSurahPicker();
-      mockTranslationService = MockTranslationService();
       surahServices = SurahServices(
         networkServices: mockNetworkServices,
         storageServices: mockStorageServices,
         surahPicker: mockSurahPicker,
-        translationService: mockTranslationService,
       );
     });
 
@@ -77,9 +71,6 @@ void main() {
         when(() => mockNetworkServices.get(any()))
             .thenAnswer((_) async => mockResponse);
 
-        when(() => mockTranslationService.getSurahTranslations(any()))
-            .thenAnswer((_) async => {});
-
         // Act
         final result = await surahServices.getSurah(surahNumber);
 
@@ -89,11 +80,9 @@ void main() {
         expect(result.name, equals('Al-Fatihah'));
         verify(() => mockStorageServices.getReciterId()).called(1);
         verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
-        verify(() => mockTranslationService.getSurahTranslations(surahNumber))
-            .called(1);
       });
 
-      test('should return empty Surah on null response data', () async {
+      test('should throw Exception on null response data', () async {
         // Arrange
         const surahNumber = 1;
         const reciterId = 'ar.alafasy';
@@ -110,11 +99,14 @@ void main() {
             .thenAnswer((_) async => mockResponse);
 
         // Act
-        expect(() async => await surahServices.getSurah(surahNumber),
-            throwsA(isA<Exception>()));
+        await expectLater(
+          () async => await surahServices.getSurah(surahNumber),
+          throwsA(isA<Exception>()),
+        );
 
         // Assert
         verify(() => mockStorageServices.getReciterId()).called(1);
+        verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
       });
 
       test('should rethrow network errors', () async {

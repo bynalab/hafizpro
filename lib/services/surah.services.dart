@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hafiz_test/data/surah_list.dart';
+import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/quran_api_providers.dart';
+import 'package:hafiz_test/services/quran_db.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/tarteel_audio_resolver.dart';
-import 'package:hafiz_test/services/translation_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
 
@@ -13,50 +15,143 @@ class SurahServices {
   final NetworkServices networkServices;
   final IStorageService storageServices;
   final SurahPicker surahPicker;
-  final TranslationService translationService;
+  final QuranDb? quranDb;
 
   SurahServices({
     required this.networkServices,
     required this.storageServices,
     required this.surahPicker,
-    required this.translationService,
+    this.quranDb,
   });
 
   static const int totalSurahs = 114;
 
+  static const String translationIdKey = 'translation_id';
+  static const String transliterationIdKey = 'transliteration_id';
+
+  String _selectedTranslationId() {
+    return storageServices.getString(translationIdKey) ??
+        QuranDb.defaultTranslationId;
+  }
+
+  String _selectedTransliterationId() {
+    return storageServices.getString(transliterationIdKey) ??
+        QuranDb.defaultTransliterationId;
+  }
+
   Future<Surah> _withTextData(Surah surah) async {
-    SurahTextData data = const SurahTextData();
+    final db = quranDb;
+    if (db == null) return surah;
 
     try {
-      data = await translationService.getSurahTextData(surah.number);
+      final rows = await db.getAyahsForSurah(
+        surah.number,
+        translationId: _selectedTranslationId(),
+        transliterationId: _selectedTransliterationId(),
+      );
+
+      if (rows.isEmpty) return surah;
+
+      final byAyah = <int, QuranDbAyahRow>{
+        for (final r in rows) r.ayah: r,
+      };
+
+      final updatedAyahs = surah.ayahs.map((ayah) {
+        final row = byAyah[ayah.numberInSurah];
+        if (row == null) return ayah;
+        return ayah.copyWith(
+          translation: row.translation,
+          transliteration: row.transliteration,
+        );
+      }).toList(growable: false);
+
+      return surah.copyWith(ayahs: updatedAyahs);
     } catch (e) {
       // Translation/transliteration are non-critical; never block loading.
-      debugPrint('Failed to load text data for surah ${surah.number}: $e');
+      debugPrint('Failed to load DB text data for surah ${surah.number}: $e');
+      return surah;
     }
-
-    final updatedAyahs = surah.ayahs.map((ayah) {
-      final translation = data.translations[ayah.numberInSurah];
-      final transliteration = data.transliterations[ayah.numberInSurah];
-
-      return ayah.copyWith(
-        translation: (translation == null || translation.trim().isEmpty)
-            ? ayah.translation
-            : translation,
-        transliteration:
-            (transliteration == null || transliteration.trim().isEmpty)
-                ? ayah.transliteration
-                : transliteration,
-      );
-    }).toList(growable: false);
-
-    return surah.copyWith(ayahs: updatedAyahs);
   }
 
   int getRandomSurahNumber() {
     return surahPicker.getNextSurah();
   }
 
+  Future<Surah?> _getSurahFromDb(int surahNumber) async {
+    final db = quranDb;
+    if (db == null) return null;
+
+    try {
+      final rows = await db.getAyahsForSurah(
+        surahNumber,
+        translationId: _selectedTranslationId(),
+        transliterationId: _selectedTransliterationId(),
+      );
+
+      if (rows.isEmpty) return null;
+
+      final surah = findSurahByNumber(surahNumber);
+
+      final ayahs = rows.map(
+        (r) {
+          return Ayah(
+            number: 0,
+            text: r.textAr,
+            translation: r.translation,
+            transliteration: r.transliteration,
+            numberInSurah: r.ayah,
+            juz: r.juz ?? 0,
+            manzil: r.manzil ?? 0,
+            page: r.page ?? 0,
+            ruku: r.ruku ?? 0,
+            hizbQuarter: r.hizbQuarter ?? 0,
+            surah: surah,
+          );
+        },
+      ).toList(growable: false);
+
+      final surahWithMeta = Surah(
+        number: surah.number,
+        name: surah.name,
+        englishName: surah.englishName,
+        englishNameTranslation: surah.englishNameTranslation,
+        revelationType: surah.revelationType,
+        numberOfAyahs: surah.numberOfAyahs,
+        ayahs: ayahs,
+      );
+
+      final reciterId = storageServices.getReciterId();
+
+      // When we load from DB, we can still attach audio URLs (online) without
+      // any network check by using our known reciter templates.
+      final reciterType = TarteelAudio.reciterType(reciterId);
+      if (reciterType == RecitationType.surahbysurah) {
+        return TarteelAudio.withSurahAudioForSurahByReciter(
+          surahWithMeta,
+          reciterId: reciterId,
+        );
+      }
+
+      if (reciterType == RecitationType.versebyverse) {
+        return TarteelAudio.withAudioForSurahByReciter(
+          surahWithMeta,
+          reciterId: reciterId,
+        );
+      }
+
+      return surahWithMeta;
+    } catch (e) {
+      debugPrint('Failed to load surah $surahNumber from DB: $e');
+      return null;
+    }
+  }
+
   Future<Surah> getSurah(int surahNumber) async {
+    final cached = await _getSurahFromDb(surahNumber);
+    if (cached != null && cached.ayahs.isNotEmpty) {
+      return cached;
+    }
+
     try {
       final reciterId = storageServices.getReciterId();
       final tarteel = await TarteelAudioResolver.resolve(
