@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/reciters.dart';
@@ -6,7 +5,6 @@ import 'package:hafiz_test/extension/collection.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
-import 'package:hafiz_test/util/rating_debug.dart';
 import 'package:hafiz_test/settings/settings_controller.dart';
 import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
@@ -275,26 +273,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onTap: _showInAppRating,
                   ),
-                  if (kDebugMode) ...[
-                    const SizedBox(height: 10),
-                    SettingsTile(
-                      leading: const LeadingCircle(Icons.construction),
-                      title: 'Debug Rating System',
-                      subtitle: 'Development tools',
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        color: isDark ? Colors.white : const Color(0xFF111827),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RatingDebugDialog(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
                 ],
               ),
             ),
