@@ -33,10 +33,15 @@ Future<void> _restoreNotificationScheduleIfEnabled() async {
   }
 
   try {
-    await getIt<NotificationService>()
+    final notifications = getIt<NotificationService>();
+    final osEnabled = await notifications.areNotificationsEnabled();
+    if (!osEnabled) return;
+
+    await notifications
         .scheduleDailyMotivation(TimeOfDay(hour: hour, minute: minute));
-  } catch (_) {
-    // Ignore on startup; user can re-enable from settings.
+  } catch (e) {
+    debugPrint(
+        '[NotificationService] Failed to restore schedule on startup: $e');
   }
 }
 

@@ -202,10 +202,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         initialTime: controller.notificationTime,
                       ).openBottomSheet(context);
                       if (result == null) return;
-                      await controller.setNotifications(
-                        enabled: result.enabled,
-                        time: result.time,
-                      );
+                      try {
+                        await controller.setNotifications(
+                          enabled: result.enabled,
+                          time: result.time,
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(SnackBar(content: Text('$e')));
+                      }
                     },
                   ),
                   const SizedBox(height: 10),

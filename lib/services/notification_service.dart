@@ -210,7 +210,7 @@ class NotificationService {
       channelDescription: _channelDescription,
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/notification_logo',
     );
 
     const iosDetails = DarwinNotificationDetails(
