@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/reciters.dart';
 import 'package:hafiz_test/extension/collection.dart';
+import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/rating_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/settings/settings_controller.dart';
 import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
@@ -22,6 +24,11 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsController controller = SettingsController();
+
+  static const String _whatsAppFeedbackGroupUrl =
+      'https://chat.whatsapp.com/EuF6FS3qL9TElJSNQBHEdp';
+  static const String _whatsAppReciterPromptShownKey =
+      'whatsapp_reciter_prompt_shown';
 
   void _onControllerChanged() {
     if (!mounted) return;
@@ -73,6 +80,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Theme.of(context).colorScheme.error,
       ),
     );
+  }
+
+  Future<void> _maybeShowReciterWhatsAppPrompt({
+    required String? previousReciterId,
+    required String selectedReciterId,
+  }) async {
+    final storage = getIt<IStorageService>();
+    final alreadyShown =
+        (storage.getString(_whatsAppReciterPromptShownKey) ?? 'false') ==
+            'true';
+    if (alreadyShown) return;
+
+    if (selectedReciterId == 'ar.alafasy') return;
+    if (previousReciterId != null && previousReciterId != 'ar.alafasy') {
+      return;
+    }
+
+    if (!mounted) return;
+
+    AnalyticsService.trackEvent('Reciter WhatsApp Prompt Shown', properties: {
+      'previous_reciter_id': previousReciterId,
+      'selected_reciter_id': selectedReciterId,
+    });
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Want more reciters?'),
+          content: const Text(
+            'If your favorite reciter isn\'t available yet, you can request it anytime by joining our WhatsApp Feedback Group.\n\nWe use it to collect reciter requests, bug reports, and feature ideas.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                AnalyticsService.trackEvent(
+                  'Reciter WhatsApp Prompt Dismissed',
+                );
+                Navigator.of(context).pop();
+              },
+              child: const Text('Not now'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                AnalyticsService.trackEvent(
+                  'Reciter WhatsApp Prompt Join Clicked',
+                );
+                Navigator.of(context).pop();
+                _launchInBrowser(
+                  _whatsAppFeedbackGroupUrl,
+                  'WhatsApp Feedback Group',
+                );
+              },
+              child: const Text('Join group'),
+            ),
+          ],
+        );
+      },
+    );
+
+    await storage.setString(_whatsAppReciterPromptShownKey, 'true');
   }
 
   Future<void> _showInAppRating() async {
@@ -176,11 +245,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: () async {
+                      final previous = controller.reciter;
                       final selected = await ReciterPickerSheet(
                         selected: controller.reciter,
                       ).openBottomSheet(context);
                       if (selected == null) return;
                       await controller.setReciter(selected.identifier);
+
+                      await _maybeShowReciterWhatsAppPrompt(
+                        previousReciterId: previous,
+                        selectedReciterId: selected.identifier,
+                      );
                     },
                   ),
                   const SizedBox(height: 10),
@@ -224,7 +299,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      _launchInBrowser(
+                        _whatsAppFeedbackGroupUrl,
+                        'WhatsApp Feedback Group',
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(

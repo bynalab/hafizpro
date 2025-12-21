@@ -1,4 +1,10 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -115,10 +121,20 @@ class RatingService {
   static Future<void> openAppStore() async {
     final InAppReview inAppReview = InAppReview.instance;
 
+    if (!kIsWeb && Platform.isAndroid) {
+      try {
+        if (await inAppReview.isAvailable()) {
+          await inAppReview.requestReview();
+        }
+      } catch (_) {}
+
+      await inAppReview.openStoreListing();
+      return;
+    }
+
     if (await inAppReview.isAvailable()) {
       await inAppReview.requestReview();
     } else {
-      // Fallback to opening app store
       await inAppReview.openStoreListing();
     }
   }
@@ -146,6 +162,13 @@ class RatingDialog extends StatefulWidget {
 class _RatingDialogState extends State<RatingDialog> {
   int selectedRating = 0;
   bool isSubmitting = false;
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,6 +237,21 @@ class _RatingDialogState extends State<RatingDialog> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
+            TextField(
+              controller: _commentController,
+              minLines: 2,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
+              decoration: InputDecoration(
+                hintText: selectedRating >= 4
+                    ? 'Optional: tell us what you like'
+                    : 'Tell us what we can improve',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
           ],
         ],
       ),
@@ -278,6 +316,20 @@ class _RatingDialogState extends State<RatingDialog> {
     setState(() => isSubmitting = true);
 
     try {
+      final comment = _commentController.text.trim();
+      final IStorageService storage = getIt<IStorageService>();
+      final userId = storage.getString('user_id');
+
+      AnalyticsService.trackEvent(
+        'Rating Feedback Submitted',
+        properties: {
+          'stars': selectedRating,
+          'comment': comment,
+          'user_id': userId,
+          'platform': kIsWeb ? 'web' : Platform.operatingSystem,
+        },
+      );
+
       if (selectedRating >= 4) {
         // High rating - open app store
         await RatingService.markAsRated();
@@ -285,7 +337,6 @@ class _RatingDialogState extends State<RatingDialog> {
       } else {
         // Low rating - mark as rated to avoid repeated requests
         await RatingService.markAsRated();
-        // Could show feedback form here in the future
       }
     } catch (e) {
       debugPrint('Error handling rating: $e');
