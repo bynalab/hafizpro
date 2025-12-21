@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/util/reciter_audio_profile.dart';
 import 'abstract_storage_service.dart';
 
 class SharedPrefsStorageService implements IStorageService {
@@ -38,14 +39,27 @@ class SharedPrefsStorageService implements IStorageService {
   @override
   String getReciterId() {
     final existing = prefs.getString('reciter_id');
-    if (existing != null && existing.isNotEmpty) return existing;
+    if (existing != null && existing.isNotEmpty) {
+      // Check if the reciter exists in the reciters list
+      final profile = ReciterAudioProfiles.forReciter(existing);
+      if (profile != null) return existing;
+
+      unawaited(setReciterId('ar.alafasy'));
+      return 'ar.alafasy';
+    }
 
     // Backward compatibility: migrate from legacy `reciter` (provider-specific)
     // to stable `reciter_id`. For now we use the legacy identifier as the id;
     // the resolver layer can map it to provider-specific identifiers.
     final legacy = getReciter();
-    unawaited(setReciterId(legacy));
-    return legacy;
+    final legacyProfile = ReciterAudioProfiles.forReciter(legacy);
+    if (legacyProfile != null) {
+      unawaited(setReciterId(legacy));
+      return legacy;
+    }
+
+    unawaited(setReciterId('ar.alafasy'));
+    return 'ar.alafasy';
   }
 
   @override

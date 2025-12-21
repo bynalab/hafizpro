@@ -34,10 +34,12 @@ class ReciterAudioProfiles {
   static const String _tarteelQuranBase = 'https://audio-cdn.tarteel.ai/quran';
   static const String _tarteelAyahTemplate = '{surah:000}{ayah:000}.mp3';
 
-  static const String _islamicNetwork192Base =
-      'https://cdn.islamic.network/quran/audio/192';
-  static const String _islamicNetwork128Base =
-      'https://cdn.islamic.network/quran/audio/128';
+  static const String _islamicNetworkBase =
+      'https://cdn.islamic.network/quran/audio';
+
+  static String _islamicNetworkBitrateBase(int bitrate) {
+    return '$_islamicNetworkBase/$bitrate';
+  }
 
   static final Map<String, ReciterAudioProfile> byReciterId = {
     ..._tarteelVerseByVerseProfiles(
@@ -53,7 +55,16 @@ class ReciterAudioProfiles {
         if (reciterId == 'ar.alafasy') {
           return [
             ReciterAudioSource(
-              ayahBase: '$_islamicNetwork128Base/ar.alafasy',
+              ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.alafasy',
+              ayahTemplate: '{ayahGlobal}.mp3',
+            ),
+          ];
+        }
+
+        if (reciterId == 'ar.saoodshuraym') {
+          return [
+            ReciterAudioSource(
+              ayahBase: '${_islamicNetworkBitrateBase(64)}/ar.saoodshuraym',
               ayahTemplate: '{ayahGlobal}.mp3',
             ),
           ];
@@ -65,7 +76,7 @@ class ReciterAudioProfiles {
     'ar.abdullahbasfar': ReciterAudioProfile(
       sources: [
         ReciterAudioSource(
-          ayahBase: '$_islamicNetwork192Base/ar.abdullahbasfar',
+          ayahBase: '${_islamicNetworkBitrateBase(192)}/ar.abdullahbasfar',
           ayahTemplate: '{ayahGlobal}.mp3',
         ),
       ],
@@ -92,6 +103,140 @@ class ReciterAudioProfiles {
         ReciterAudioSource(
           surahBase: 'https://download.quranicaudio.com/quran/noreen_siddiq/',
           surahTemplate: '{surah:000}.mp3',
+        ),
+      ],
+    ),
+
+    // islamic.network verse-by-verse profiles (global ayah id filenames)
+    'ar.hudhaify': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.hudhaify',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(64)}/ar.hudhaify',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(32)}/ar.hudhaify',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.ibrahimakhbar': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(32)}/ar.ibrahimakhbar',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.mahermuaiqly': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.mahermuaiqly',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(64)}/ar.mahermuaiqly',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.minshawi': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.minshawi',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.minshawimujawwad': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(64)}/ar.minshawimujawwad',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.muhammadayyoub': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.muhammadayyoub',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.muhammadjibreel': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ar.muhammadjibreel',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.parhizgar': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(48)}/ar.parhizgar',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ar.aymanswoaid': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(64)}/ar.aymanswoaid',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ur.khan': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(64)}/ur.khan',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'zh.chinese': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/zh.chinese',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'fr.leclerc': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/fr.leclerc',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'fa.hedayatfarfooladvand': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(40)}/fa.hedayatfarfooladvand',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ru.kuliev-audio': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(128)}/ru.kuliev-audio',
+          ayahTemplate: '{ayahGlobal}.mp3',
+        ),
+      ],
+    ),
+    'ru.kuliev-audio-2': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          ayahBase: '${_islamicNetworkBitrateBase(320)}/ru.kuliev-audio-2',
+          ayahTemplate: '{ayahGlobal}.mp3',
         ),
       ],
     ),

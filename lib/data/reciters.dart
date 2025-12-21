@@ -1,6 +1,10 @@
 import 'package:hafiz_test/model/reciter.model.dart';
+import 'package:hafiz_test/util/reciter_audio_profile.dart';
 
-List<Reciter> reciters = _reciters;
+// Filter reciters to only include those with audio profiles
+List<Reciter> reciters = _reciters
+    .where((r) => ReciterAudioProfiles.forReciter(r.identifier) != null)
+    .toList();
 
 final _reciters = [
   Reciter(
@@ -59,14 +63,6 @@ final _reciters = [
     format: "audio",
     type: "surahbysurah",
   ),
-  // Reciter(
-  //   identifier: "ar.abdulsamad",
-  //   language: "ar",
-  //   name: "عبدالباسط عبدالصمد",
-  //   englishName: "Abdul Samad",
-  //   format: "audio",
-  //   type: "versebyverse",
-  // ),
   Reciter(
     identifier: "ar.shaatree",
     language: "ar",
@@ -75,14 +71,6 @@ final _reciters = [
     format: "audio",
     type: "versebyverse",
   ),
-  // Reciter(
-  //   identifier: "ar.ahmedajamy",
-  //   language: "ar",
-  //   name: "أحمد بن علي العجمي",
-  //   englishName: "Ahmed ibn Ali al-Ajamy",
-  //   format: "audio",
-  //   type: "versebyverse",
-  // ),
   Reciter(
     identifier: "ar.alafasy",
     language: "ar",
@@ -145,7 +133,7 @@ final _reciters = [
     name: "محمد صديق المنشاوي",
     englishName: "Minshawi",
     format: "audio",
-    type: "translation",
+    type: "versebyverse",
   ),
   Reciter(
     identifier: "ar.minshawimujawwad",
@@ -153,7 +141,7 @@ final _reciters = [
     name: "محمد صديق المنشاوي (المجود)",
     englishName: "Minshawy (Mujawwad)",
     format: "audio",
-    type: "translation",
+    type: "versebyverse",
   ),
   Reciter(
     identifier: "ar.muhammadayyoub",
@@ -176,14 +164,6 @@ final _reciters = [
     language: "ar",
     name: "سعود الشريم",
     englishName: "Saood bin Ibraaheem Ash-Shuraym",
-    format: "audio",
-    type: "versebyverse",
-  ),
-  Reciter(
-    identifier: "en.walk",
-    language: "en",
-    name: "Ibrahim Walk",
-    englishName: "Ibrahim Walk",
     format: "audio",
     type: "versebyverse",
   ),
@@ -255,10 +235,10 @@ final _reciters = [
 
 List<Reciter> searchReciter(String receiterName) {
   if (receiterName.trim().isEmpty) {
-    return _reciters;
+    return reciters;
   }
 
-  return _reciters.where((reciter) {
+  return reciters.where((reciter) {
     return reciter.englishName
         .toLowerCase()
         .contains(receiterName.toLowerCase());
