@@ -5,6 +5,7 @@ import 'package:hafiz_test/settings/settings_screen.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 import 'package:hafiz_test/main_menu/quran_dashboard_page.dart';
 import 'package:hafiz_test/main_menu/test_menu_page.dart';
@@ -80,9 +81,9 @@ class _MainMenuShellState extends State<MainMenuShell> {
               ),
               content: Semantics(
                 liveRegion: true,
-                label: 'Press back again within two seconds to exit the app',
+                label: context.l10n.mainMenuExitHint,
                 child: Text(
-                  'Press back again to exit',
+                  context.l10n.mainMenuExitSnack,
                   style: const TextStyle(color: Colors.white),
                 ),
               ),

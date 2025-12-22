@@ -11,6 +11,8 @@ import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
+import 'package:hafiz_test/util/locale_notifier.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
 import 'package:hafiz_test/widget/quran_loader.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,7 +70,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('Error launching URL: $url. Error: $e');
+        _showErrorSnackBar(
+          context.l10n.errorLaunchingUrl(url, e.toString()),
+        );
       }
     }
   }
@@ -150,17 +154,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await RatingService.showRatingDialog(context);
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('Error opening rating dialog: $e');
+        _showErrorSnackBar(context.l10n.errorOpeningRatingDialog(e.toString()));
       }
     }
   }
 
   String get notificationSubtitle {
     if (controller.notificationsEnabled) {
-      return 'Notification time: ${controller.notificationTime.format(context)}';
+      return context.l10n.notificationSubtitleEnabled(
+          controller.notificationTime.format(context));
     }
 
-    return 'Set your Notification preference';
+    return context.l10n.notificationSubtitleDisabled;
+  }
+
+  Future<void> _pickLanguage() async {
+    final storage = getIt<IStorageService>();
+    final current = Localizations.localeOf(context).languageCode;
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
+                child: Text(
+                  context.l10n.languageSelectTitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Text(context.l10n.languageEnglish),
+                trailing: current == 'en' ? const Icon(Icons.check) : null,
+                onTap: () => Navigator.of(context).pop('en'),
+              ),
+              ListTile(
+                title: Text(context.l10n.languageArabic),
+                trailing: current == 'ar' ? const Icon(Icons.check) : null,
+                onTap: () => Navigator.of(context).pop('ar'),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected == null) return;
+
+    await storage.setString('language', selected);
+    appLocale.value = Locale(selected);
   }
 
   @override
@@ -179,7 +232,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Settings',
+          context.l10n.settings,
           style: GoogleFonts.cairo(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -189,22 +242,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leadingWidth: 62,
         leading: Padding(
           padding: const EdgeInsets.only(left: 18),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(999),
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color:
-                    isDark ? const Color(0xFF1A1A1A) : const Color(0xFFE5E7EB),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
-                  color: isDark ? Colors.white : const Color(0xFF111827),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF1A1A1A)
+                      : const Color(0xFFE5E7EB),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 18,
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
                 ),
               ),
             ),
@@ -224,8 +281,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle.asset(
                       'assets/icons/autoplay.png',
                     ),
-                    title: 'Auto Play Verse',
-                    subtitle: 'Autoplay the verses as your test begins',
+                    title: context.l10n.settingsAutoPlayTitle,
+                    subtitle: context.l10n.settingsAutoPlaySubtitle,
                     trailing: AppSwitch(
                       value: controller.autoPlay,
                       onChanged: controller.setAutoPlay,
@@ -236,8 +293,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle.asset(
                       'assets/icons/hand_megaphone.png',
                     ),
-                    title: 'Select Reciter',
-                    subtitle: reciterName ?? 'Select your favorite reciter',
+                    title: context.l10n.settingsSelectReciterTitle,
+                    subtitle: reciterName ?? context.l10n.selectFavoriteReciter,
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -258,10 +315,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(
+                    leading: const LeadingCircle(Icons.language_rounded),
+                    title: context.l10n.language,
+                    subtitle:
+                        Localizations.localeOf(context).languageCode == 'ar'
+                            ? context.l10n.languageArabic
+                            : context.l10n.languageEnglish,
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
+                    onTap: _pickLanguage,
+                  ),
+                  const SizedBox(height: 10),
+                  SettingsTile(
                     leading: const LeadingCircle.asset(
                       'assets/icons/notification_bell.png',
                     ),
-                    title: 'Notifications',
+                    title: context.l10n.notifications,
                     subtitle: notificationSubtitle,
                     trailing: Icon(
                       Icons.chevron_right_rounded,
@@ -291,8 +362,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle.asset(
                       'assets/icons/bug_report.png',
                     ),
-                    title: 'Report Bug or Request Feature',
-                    subtitle: 'Talk to us',
+                    title: context.l10n.settingsReportBugTitle,
+                    subtitle: context.l10n.settingsReportBugSubtitle,
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -309,8 +380,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle.asset(
                       'assets/icons/web_icon.png',
                     ),
-                    title: 'Official Website',
-                    subtitle: 'Check Out our website',
+                    title: context.l10n.settingsOfficialWebsiteTitle,
+                    subtitle: context.l10n.settingsOfficialWebsiteSubtitle,
                     trailing: Icon(
                       Icons.open_in_new,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -327,8 +398,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: const LeadingCircle.asset(
                       'assets/icons/community_icon.png',
                     ),
-                    title: 'Join our community',
-                    subtitle: 'Join discussions and get help',
+                    title: context.l10n.settingsJoinCommunityTitle,
+                    subtitle: context.l10n.settingsJoinCommunitySubtitle,
                     trailing: Icon(
                       Icons.open_in_new,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -343,8 +414,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   SettingsTile(
                     leading: const LeadingCircle(Icons.star_rate_rounded),
-                    title: 'Rate Us',
-                    subtitle: 'Leave a 5 star review on your app store',
+                    title: context.l10n.settingsRateUsTitle,
+                    subtitle: context.l10n.settingsRateUsSubtitle,
                     trailing: Icon(
                       Icons.open_in_new,
                       color: isDark ? Colors.white : const Color(0xFF111827),

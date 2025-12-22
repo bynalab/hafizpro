@@ -1,15 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/splash_screen.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/util/app_theme.dart';
 import 'package:hafiz_test/util/app_messenger.dart';
+import 'package:hafiz_test/util/locale_notifier.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/user_identification_service.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+
+final quranHafizKey = GlobalKey<_QuranHafizState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +46,7 @@ void main() async {
     }
   }
 
-  runApp(const QuranHafiz());
+  runApp(QuranHafiz(key: quranHafizKey));
 }
 
 class QuranHafiz extends StatefulWidget {
@@ -67,6 +73,20 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
     _themeController = getIt<ThemeController>();
     _themeController.addListener(_onThemeChanged);
     WidgetsBinding.instance.addObserver(this);
+
+    _restoreLocale();
+  }
+
+  Future<void> _restoreLocale() async {
+    try {
+      final storage = getIt<IStorageService>();
+      final raw = storage.getString('language');
+      if (raw == null) return;
+      if (raw != 'en' && raw != 'ar') return;
+      appLocale.value = Locale(raw);
+    } catch (_) {
+      // Ignore locale restore errors.
+    }
   }
 
   void _onThemeChanged() {
@@ -125,14 +145,34 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: appScaffoldMessengerKey,
-      debugShowCheckedModeBanner: false,
-      title: 'Quran Hafiz',
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: _themeMode,
-      home: kIsWeb ? const MainMenu() : const SplashScreen(),
+    return ValueListenableBuilder<Locale>(
+      valueListenable: appLocale,
+      builder: (context, locale, _) {
+        return MaterialApp(
+          scaffoldMessengerKey: appScaffoldMessengerKey,
+          debugShowCheckedModeBanner: false,
+          title: 'Quran Hafiz',
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: _themeMode,
+          locale: locale,
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ar'),
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: kIsWeb ? const MainMenu() : const SplashScreen(),
+        );
+      },
     );
+  }
+
+  void setLocale(Locale locale) {
+    appLocale.value = locale;
   }
 }

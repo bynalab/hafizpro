@@ -4,6 +4,7 @@ import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class ReadingPreferencesButton extends StatelessWidget {
   final IStorageService storage;
@@ -74,7 +75,7 @@ class ReadingPreferencesButton extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Reading Preferences',
+                            context.l10n.readingPreferencesTitle,
                             style: GoogleFonts.cairo(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -83,8 +84,8 @@ class ReadingPreferencesButton extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           _PreferenceTile(
-                            title: 'Translation',
-                            subtitle: 'Show meaning under each ayah',
+                            title: context.l10n.translationLabel,
+                            subtitle: context.l10n.translationSubtitle,
                             icon: Icons.translate_rounded,
                             value: showTranslation,
                             isDark: isDark,
@@ -99,8 +100,8 @@ class ReadingPreferencesButton extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           _PreferenceTile(
-                            title: 'Transliteration',
-                            subtitle: 'Show pronunciation in Latin letters',
+                            title: context.l10n.transliterationLabel,
+                            subtitle: context.l10n.transliterationSubtitle,
                             icon: Icons.text_fields_rounded,
                             value: showTransliteration,
                             isDark: isDark,

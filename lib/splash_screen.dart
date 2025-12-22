@@ -7,6 +7,7 @@ import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -116,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Master The Quran, One ayah at a time',
+                            context.l10n.splashTagline,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.inter(
                               fontSize: 14,

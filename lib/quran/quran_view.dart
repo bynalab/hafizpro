@@ -12,6 +12,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
@@ -113,15 +114,19 @@ class _QuranViewState extends State<QuranView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (viewModel.isLoading) {
-      return Scaffold(body: SurahLoader());
+      return Scaffold(
+        body: SurahLoader(
+          title: context.l10n.surahLoadingTitle,
+          subtitle: context.l10n.surahLoadingSubtitle,
+        ),
+      );
     }
 
     if (viewModel.hasError) {
       return Scaffold(
         body: CustomErrorWidget(
-          title: 'Failed to Load Surah',
-          message:
-              'Please check your internet connection or try again shortly. ${viewModel.error}',
+          title: context.l10n.quranViewErrorTitle,
+          message: '${context.l10n.quranViewErrorMessage} ${viewModel.error}',
           icon: Icons.menu_book_rounded,
           color: Colors.green.shade700,
           onRetry: () async {
@@ -157,24 +162,27 @@ class _QuranViewState extends State<QuranView> {
                     children: [
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF1A1A1A)
-                                  : Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 18,
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF111827),
+                                    ? const Color(0xFF1A1A1A)
+                                    : Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 18,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF111827),
+                                ),
                               ),
                             ),
                           ),

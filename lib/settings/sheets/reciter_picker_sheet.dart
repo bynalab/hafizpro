@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/data/reciters.dart';
 import 'package:hafiz_test/model/reciter.model.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class ReciterPickerSheet extends StatefulWidget {
   final String? selected;
@@ -87,7 +88,7 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                 Row(
                   children: [
                     Text(
-                      'Select Reciter',
+                      context.l10n.selectFavoriteReciter,
                       style: GoogleFonts.montserrat(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -109,7 +110,7 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                   controller: _searchController,
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: 'Search reciters...',
+                    hintText: context.l10n.searchReciters,
                     hintStyle: TextStyle(
                       color: isDark
                           ? const Color(0xFF9CA3AF)

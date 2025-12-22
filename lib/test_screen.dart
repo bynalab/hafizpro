@@ -13,6 +13,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/widget/quran_loader.dart';
@@ -34,7 +35,7 @@ class TestScreen extends StatefulWidget {
     required this.currentAyah,
     this.onRefresh,
     this.onReadFull,
-    this.readFullLabel = 'Read Entire Surah',
+    this.readFullLabel = '',
     this.isLoading = false,
   });
 
@@ -88,7 +89,7 @@ class _TestPage extends State<TestScreen> {
 
   void playNextAyah() {
     if (currentAyah.numberInSurah >= ayahs.length) {
-      showSnackBar(context, 'End of Surah');
+      showSnackBar(context, context.l10n.testEndOfSurah);
 
       return;
     }
@@ -110,7 +111,7 @@ class _TestPage extends State<TestScreen> {
 
   void playPreviousAyah() {
     if (currentAyah.numberInSurah == 1) {
-      showSnackBar(context, 'Beginning of Surah');
+      showSnackBar(context, context.l10n.testBeginningOfSurah);
 
       return;
     }
@@ -210,6 +211,10 @@ class _TestPage extends State<TestScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final readFullLabel = widget.readFullLabel.isEmpty
+        ? context.l10n.testReadEntireSurah
+        : widget.readFullLabel;
+
     const bgGrey = Color(0xFFF3F4F6);
     const cardTeal = Color(0xFF78B7C6);
     const brandGreen = Color(0xFF004B40);
@@ -245,7 +250,8 @@ class _TestPage extends State<TestScreen> {
             alignment: Alignment.center,
             child: ClipRect(
               child: Marquee(
-                text: 'Guess the next Ayah      Guess the next Ayah',
+                text:
+                    '${context.l10n.testGuessNextAyah}      ${context.l10n.testGuessNextAyah}',
                 blankSpace: 32,
                 velocity: 30,
                 style: GoogleFonts.montserrat(
@@ -303,7 +309,7 @@ class _TestPage extends State<TestScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            '${surah.numberOfAyahs} Verses',
+                            context.l10n.testVersesCount(surah.numberOfAyahs),
                             style: GoogleFonts.montserrat(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -314,7 +320,8 @@ class _TestPage extends State<TestScreen> {
                       ),
                       const SizedBox(height: 26),
                       Text(
-                        'Verse ${currentAyah.numberInSurah}',
+                        context.l10n
+                            .verseNumberLabel(currentAyah.numberInSurah),
                         style: GoogleFonts.montserrat(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -416,100 +423,103 @@ class _TestPage extends State<TestScreen> {
                   },
                 ),
                 const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: updatePlaybackRate,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 6,
-                        ),
-                        child: Text(
-                          '${speed}x',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: onSurface,
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: updatePlaybackRate,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 6,
+                          ),
+                          child: Text(
+                            '${speed}x',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: onSurface,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: playPreviousAyah,
-                      icon: SvgPicture.asset(
-                        'assets/icons/previous.svg',
-                        width: 30,
-                        height: 30,
-                        colorFilter: ColorFilter.mode(
-                          isDark ? onPrimary : textDark,
-                          BlendMode.srcIn,
+                      IconButton(
+                        onPressed: playPreviousAyah,
+                        icon: SvgPicture.asset(
+                          'assets/icons/previous.svg',
+                          width: 30,
+                          height: 30,
+                          colorFilter: ColorFilter.mode(
+                            isDark ? onPrimary : textDark,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      width: 62,
-                      height: 62,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: primary,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          size: 30,
-                          color: onPrimary,
+                      Container(
+                        width: 62,
+                        height: 62,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: primary,
                         ),
-                        onPressed: () async {
-                          if (isPlaying) {
-                            await audioServices.pause(
-                              audioName: currentAudioName,
-                            );
-                          } else {
-                            await audioServices.play(
-                              audioName: currentAudioName,
-                            );
-                          }
+                        child: IconButton(
+                          icon: Icon(
+                            isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            size: 30,
+                            color: onPrimary,
+                          ),
+                          onPressed: () async {
+                            if (isPlaying) {
+                              await audioServices.pause(
+                                audioName: currentAudioName,
+                              );
+                            } else {
+                              await audioServices.play(
+                                audioName: currentAudioName,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: playNextAyah,
+                        icon: SvgPicture.asset(
+                          'assets/icons/next.svg',
+                          width: 30,
+                          height: 30,
+                          colorFilter: ColorFilter.mode(
+                            isDark ? onPrimary : textDark,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          loop = !loop;
+
+                          loopMode = loop ? LoopMode.one : LoopMode.off;
+                          audioServices.setLoopMode(loopMode);
+
+                          AnalyticsService.trackRepeatSwitch(loop,
+                              audioName: currentAudioName);
+
+                          setState(() {});
                         },
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: playNextAyah,
-                      icon: SvgPicture.asset(
-                        'assets/icons/next.svg',
-                        width: 30,
-                        height: 30,
-                        colorFilter: ColorFilter.mode(
-                          isDark ? onPrimary : textDark,
-                          BlendMode.srcIn,
+                        icon: Icon(
+                          Icons.repeat_rounded,
+                          size: 30,
+                          color: loop
+                              ? primary
+                              : onSurfaceMuted.withValues(alpha: 0.65),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        loop = !loop;
-
-                        loopMode = loop ? LoopMode.one : LoopMode.off;
-                        audioServices.setLoopMode(loopMode);
-
-                        AnalyticsService.trackRepeatSwitch(loop,
-                            audioName: currentAudioName);
-
-                        setState(() {});
-                      },
-                      icon: Icon(
-                        Icons.repeat_rounded,
-                        size: 30,
-                        color: loop
-                            ? primary
-                            : onSurfaceMuted.withValues(alpha: 0.65),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -534,7 +544,7 @@ class _TestPage extends State<TestScreen> {
                     ),
                     onPressed: widget.onReadFull,
                     child: Text(
-                      widget.readFullLabel,
+                      readFullLabel,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -577,7 +587,7 @@ class _TestPage extends State<TestScreen> {
                       }
                     },
                     child: Text(
-                      'Refresh Ayah',
+                      context.l10n.testRefreshAyah,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -596,8 +606,8 @@ class _TestPage extends State<TestScreen> {
 
     final body = QuranLoaderOverlay(
       visible: widget.isLoading || _isRefreshing,
-      title: 'Loading Ayah',
-      subtitle: 'جارٍ التحميل',
+      title: context.l10n.testLoadingAyahTitle,
+      subtitle: context.l10n.commonLoadingSubtitle,
       child: content,
     );
 

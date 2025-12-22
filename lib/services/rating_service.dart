@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -183,7 +184,7 @@ class _RatingDialogState extends State<RatingDialog> {
           ),
           const SizedBox(width: 8),
           Text(
-            'Rate Our App',
+            context.l10n.ratingDialogTitle,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -196,7 +197,7 @@ class _RatingDialogState extends State<RatingDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'How would you rate your experience with Hafiz Pro?',
+            context.l10n.ratingDialogPrompt,
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context)
@@ -244,8 +245,8 @@ class _RatingDialogState extends State<RatingDialog> {
               textInputAction: TextInputAction.newline,
               decoration: InputDecoration(
                 hintText: selectedRating >= 4
-                    ? 'Optional: tell us what you like'
-                    : 'Tell us what we can improve',
+                    ? context.l10n.ratingDialogHintPositive
+                    : context.l10n.ratingDialogHintNegative,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -261,7 +262,7 @@ class _RatingDialogState extends State<RatingDialog> {
             Navigator.of(context).pop();
           },
           child: Text(
-            'Maybe Later',
+            context.l10n.ratingDialogMaybeLater,
             style: TextStyle(
               color: Theme.of(context)
                   .colorScheme
@@ -289,7 +290,7 @@ class _RatingDialogState extends State<RatingDialog> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Text('Submit'),
+                : Text(context.l10n.ratingDialogSubmit),
           ),
       ],
     );
@@ -298,15 +299,15 @@ class _RatingDialogState extends State<RatingDialog> {
   String _getRatingMessage(int rating) {
     switch (rating) {
       case 1:
-        return 'We\'re sorry to hear that. Please let us know how we can improve.';
+        return context.l10n.ratingMessage1;
       case 2:
-        return 'We appreciate your feedback. We\'re working to make it better.';
+        return context.l10n.ratingMessage2;
       case 3:
-        return 'Thank you for your feedback. We\'ll keep improving.';
+        return context.l10n.ratingMessage3;
       case 4:
-        return 'Great! We\'re glad you\'re enjoying the app.';
+        return context.l10n.ratingMessage4;
       case 5:
-        return 'Excellent! Thank you for the amazing rating.';
+        return context.l10n.ratingMessage5;
       default:
         return '';
     }

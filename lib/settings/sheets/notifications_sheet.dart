@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
 
 class NotificationSheetResult {
@@ -103,7 +104,7 @@ class NotificationsSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Changes Saved!',
+                    context.l10n.changesSaved,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -129,7 +130,7 @@ class NotificationsSheet extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'OK',
+                        context.l10n.ok,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -172,7 +173,7 @@ class NotificationsSheet extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    'Notifications',
+                    context.l10n.notifications,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -201,7 +202,7 @@ class NotificationsSheet extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Enable Notifications',
+                              context.l10n.enableNotifications,
                               style: GoogleFonts.cairo(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -210,7 +211,7 @@ class NotificationsSheet extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Receive daily motivational messages',
+                              context.l10n.notificationsDailyMotivationSubtitle,
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,
@@ -261,7 +262,7 @@ class NotificationsSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Notification Time',
+                                  context.l10n.notificationTime,
                                   style: GoogleFonts.inter(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
@@ -314,7 +315,7 @@ class NotificationsSheet extends StatelessWidget {
                       setSheetState(() => showSaved = true);
                     },
                     child: Text(
-                      localEnabled ? 'Save' : 'Disable',
+                      localEnabled ? context.l10n.save : context.l10n.disable,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'package:hafiz_test/juz/test_by_juz.dart';
 import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class JuzListScreen extends StatefulWidget {
   const JuzListScreen({super.key});
@@ -52,15 +53,14 @@ class _JuzListScreenState extends State<JuzListScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: _JuzListBody(
-                  title: 'Juz List',
+                  title: context.l10n.juzListTitle,
                   headerBackground: isDark
                       ? const Color(0xFF243F46)
                       : const Color(0xFF7CB7C6),
-                  headerDescriptionTitle: 'Select a Juz',
-                  headerDescriptionBody:
-                      'Listen to a verse from a Juz and\nguess the next verse.',
+                  headerDescriptionTitle: context.l10n.juzListSelectTitle,
+                  headerDescriptionBody: context.l10n.juzListTestDescription,
                   headerImage: 'assets/img/juz_image.png',
-                  searchHint: 'Type Juz number',
+                  searchHint: context.l10n.juzListTypeNumberHint,
                   searchController: _searchController,
                   juzNames: displayJuz,
                   onBack: () => Navigator.pop(context),
@@ -68,14 +68,13 @@ class _JuzListScreenState extends State<JuzListScreen> {
               ),
             )
           : _JuzListBody(
-              title: 'Juz List',
+              title: context.l10n.juzListTitle,
               headerBackground:
                   isDark ? const Color(0xFF243F46) : const Color(0xFF7CB7C6),
-              headerDescriptionTitle: 'Select a Juz',
-              headerDescriptionBody:
-                  'Listen to a verse from a Juz and\nguess the next verse.',
+              headerDescriptionTitle: context.l10n.juzListSelectTitle,
+              headerDescriptionBody: context.l10n.juzListTestDescription,
               headerImage: 'assets/img/juz_image.png',
-              searchHint: 'Type Juz number',
+              searchHint: context.l10n.juzListTypeNumberHint,
               searchController: _searchController,
               juzNames: displayJuz,
               onBack: () => Navigator.pop(context),
@@ -129,22 +128,26 @@ class _JuzListBody extends StatelessWidget {
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
-                    child: GestureDetector(
-                      onTap: onBack,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color:
-                              isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            size: 18,
+                    child: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: GestureDetector(
+                        onTap: onBack,
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
                             color:
-                                isDark ? Colors.white : const Color(0xFF111827),
+                                isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 18,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
+                            ),
                           ),
                         ),
                       ),

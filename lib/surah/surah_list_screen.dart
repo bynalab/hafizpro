@@ -7,6 +7,7 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class SurahListScreen extends StatefulWidget {
   final SurahSelectionAction actionType;
@@ -103,12 +104,11 @@ class _SurahListScreenState extends State<SurahListScreen> {
               child: _SelectListScaffold(
                 headerBackground:
                     isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
-                title: 'Surah List',
-                descriptionTitle: 'Select a Surah',
-                descriptionBody:
-                    'Listen to a verse from a surah and\nguess the next verse.',
+                title: context.l10n.surahListTitle,
+                descriptionTitle: context.l10n.surahListDesktopPlaceholder,
+                descriptionBody: context.l10n.surahListTestDescription,
                 headerImageAsset: 'assets/img/star_crecent.png',
-                searchHint: 'Search by Surah',
+                searchHint: context.l10n.searchBySurahHint,
                 searchController: _searchController,
                 list: list,
                 onBack: () => Navigator.pop(context),
@@ -124,7 +124,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
                 child: selectedSurah == null
                     ? Center(
                         child: Text(
-                          'Select a Surah',
+                          context.l10n.surahListDesktopPlaceholder,
                           style: TextStyle(
                             color: isDark
                                 ? Theme.of(context).colorScheme.onSurface
@@ -154,12 +154,11 @@ class _SurahListScreenState extends State<SurahListScreen> {
         body: _SelectListScaffold(
           headerBackground:
               isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
-          title: 'Surah List',
-          descriptionTitle: 'Select a Surah',
-          descriptionBody:
-              'Listen to a verse from a surah and\nguess the next verse.',
+          title: context.l10n.surahListTitle,
+          descriptionTitle: context.l10n.surahListDesktopPlaceholder,
+          descriptionBody: context.l10n.surahListTestDescription,
           headerImageAsset: 'assets/img/star_crecent.png',
-          searchHint: 'Search by Surah',
+          searchHint: context.l10n.searchBySurahHint,
           searchController: _searchController,
           list: list,
           onBack: () => Navigator.pop(context),
@@ -214,22 +213,26 @@ class _SelectListScaffold extends StatelessWidget {
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
-                    child: GestureDetector(
-                      onTap: onBack,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color:
-                              isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            size: 18,
+                    child: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: GestureDetector(
+                        onTap: onBack,
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
                             color:
-                                isDark ? Colors.white : const Color(0xFF111827),
+                                isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 18,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
+                            ),
                           ),
                         ),
                       ),

@@ -183,137 +183,142 @@ class BottomAudioControls extends StatelessWidget {
                           final isActuallyPlaying = snap.data?.playing ?? false;
                           final playing = isContextActive && isActuallyPlaying;
 
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  final nextSpeed =
-                                      speed == 2.0 ? 1.0 : speed + 0.5;
-                                  await onSpeedChanged(nextSpeed);
-                                },
-                                child: Text(
-                                  '${speed.toStringAsFixed(1)}x',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: onBar,
+                          return Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    final nextSpeed =
+                                        speed == 2.0 ? 1.0 : speed + 0.5;
+                                    await onSpeedChanged(nextSpeed);
+                                  },
+                                  child: Text(
+                                    '${speed.toStringAsFixed(1)}x',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: onBar,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: hasPrevious
-                                    ? audioPlayer.seekToPrevious
-                                    : null,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(
-                                  width: 40,
-                                  height: 40,
+                                IconButton(
+                                  onPressed: hasPrevious
+                                      ? audioPlayer.seekToPrevious
+                                      : null,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints.tightFor(
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  icon: SvgPicture.asset(
+                                    'assets/icons/previous.svg',
+                                    width: 30,
+                                    height: 30,
+                                    colorFilter: ColorFilter.mode(
+                                      isDark
+                                          ? Colors.white
+                                          : const Color(0xFF111827),
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
                                 ),
-                                icon: SvgPicture.asset(
-                                  'assets/icons/previous.svg',
-                                  width: 30,
-                                  height: 30,
-                                  colorFilter: ColorFilter.mode(
-                                    isDark
-                                        ? Colors.white
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isDark
+                                        ? const Color(0xFF0E0E0E)
                                         : const Color(0xFF111827),
-                                    BlendMode.srcIn,
                                   ),
-                                ),
-                              ),
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isDark
-                                      ? const Color(0xFF0E0E0E)
-                                      : const Color(0xFF111827),
-                                ),
-                                child: AnimatedBuilder(
-                                  animation: audioCenter,
-                                  builder: (context, _) {
-                                    final isLoading = isContextActive &&
-                                        audioCenter.isLoading;
+                                  child: AnimatedBuilder(
+                                    animation: audioCenter,
+                                    builder: (context, _) {
+                                      final isLoading = isContextActive &&
+                                          audioCenter.isLoading;
 
-                                    return IconButton(
-                                      onPressed: isLoading
-                                          ? null
-                                          : () async {
-                                              await onTogglePlayPause();
-                                            },
-                                      padding: EdgeInsets.zero,
-                                      constraints:
-                                          const BoxConstraints.expand(),
-                                      icon: isLoading
-                                          ? const SizedBox(
-                                              width: 22,
-                                              height: 22,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2.5,
+                                      return IconButton(
+                                        onPressed: isLoading
+                                            ? null
+                                            : () async {
+                                                await onTogglePlayPause();
+                                              },
+                                        padding: EdgeInsets.zero,
+                                        constraints:
+                                            const BoxConstraints.expand(),
+                                        icon: isLoading
+                                            ? const SizedBox(
+                                                width: 22,
+                                                height: 22,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2.5,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            : Icon(
+                                                playing
+                                                    ? Icons.pause
+                                                    : Icons.play_arrow,
+                                                size: 28,
                                                 color: Colors.white,
                                               ),
-                                            )
-                                          : Icon(
-                                              playing
-                                                  ? Icons.pause
-                                                  : Icons.play_arrow,
-                                              size: 28,
-                                              color: Colors.white,
-                                            ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed:
+                                      hasNext ? audioPlayer.seekToNext : null,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints.tightFor(
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  icon: SvgPicture.asset(
+                                    'assets/icons/next.svg',
+                                    width: 30,
+                                    height: 30,
+                                    colorFilter: ColorFilter.mode(
+                                      isDark
+                                          ? Colors.white
+                                          : const Color(0xFF111827),
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                                StreamBuilder<LoopMode>(
+                                  stream: audioPlayer.loopModeStream,
+                                  builder: (context, snap) {
+                                    final loopMode = snap.data ?? LoopMode.off;
+
+                                    return IconButton(
+                                      onPressed: () async {
+                                        final next = loopMode == LoopMode.one
+                                            ? LoopMode.off
+                                            : LoopMode.one;
+                                        await audioPlayer.setLoopMode(next);
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      constraints:
+                                          const BoxConstraints.tightFor(
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                      icon: Icon(
+                                        Icons.repeat_rounded,
+                                        size: 24,
+                                        color: loopMode == LoopMode.one
+                                            ? onBar
+                                            : mutedOnBar,
+                                      ),
                                     );
                                   },
                                 ),
-                              ),
-                              IconButton(
-                                onPressed:
-                                    hasNext ? audioPlayer.seekToNext : null,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(
-                                  width: 40,
-                                  height: 40,
-                                ),
-                                icon: SvgPicture.asset(
-                                  'assets/icons/next.svg',
-                                  width: 30,
-                                  height: 30,
-                                  colorFilter: ColorFilter.mode(
-                                    isDark
-                                        ? Colors.white
-                                        : const Color(0xFF111827),
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                              ),
-                              StreamBuilder<LoopMode>(
-                                stream: audioPlayer.loopModeStream,
-                                builder: (context, snap) {
-                                  final loopMode = snap.data ?? LoopMode.off;
-
-                                  return IconButton(
-                                    onPressed: () async {
-                                      final next = loopMode == LoopMode.one
-                                          ? LoopMode.off
-                                          : LoopMode.one;
-                                      await audioPlayer.setLoopMode(next);
-                                    },
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints.tightFor(
-                                      width: 40,
-                                      height: 40,
-                                    ),
-                                    icon: Icon(
-                                      Icons.repeat_rounded,
-                                      size: 24,
-                                      color: loopMode == LoopMode.one
-                                          ? onBar
-                                          : mutedOnBar,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                              ],
+                            ),
                           );
                         },
                       );

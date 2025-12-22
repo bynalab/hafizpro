@@ -1,0 +1,205 @@
+{
+  "@@locale": "en",
+  "appTitle": "Quran Hafiz",
+  "hello": "Hello",
+  "start": "Start",
+  "settings": "Settings",
+  "autoplayVerse": "Autoplay verse",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageArabic": "Arabic",
+  "languageSelectTitle": "Choose language",
+  "selectFavoriteReciter": "Select your favorite reciter",
+  "searchReciters": "Search reciters...",
+  "visitWebsite": "Visit Our Website",
+  "joinWhatsappChannel": "Join WhatsApp Channel",
+  "whatsappFeedbackGroup": "WhatsApp Feedback Group",
+  "rateThisApp": "Rate This App",
+  "debugRatingSystem": "Debug Rating System",
+  "save": "Save",
+  "disable": "Disable",
+  "ok": "OK",
+  "notifications": "Notifications",
+  "enableNotifications": "Enable Notifications",
+  "notificationsDailyMotivationSubtitle": "Receive daily motivational messages",
+  "notificationTime": "Notification Time",
+  "changesSaved": "Changes Saved!",
+  "settingsLoadingTitle": "Loading Settings...",
+  "notificationSubtitleEnabled": "Notification time: {time}",
+  "@notificationSubtitleEnabled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSubtitleDisabled": "Set your notification preference",
+  "settingsAutoPlayTitle": "Auto Play Verse",
+  "settingsAutoPlaySubtitle": "Autoplay the verses as your test begins",
+  "settingsSelectReciterTitle": "Select Reciter",
+  "settingsReportBugTitle": "Report Bug or Request Feature",
+  "settingsReportBugSubtitle": "Talk to us",
+  "settingsOfficialWebsiteTitle": "Official Website",
+  "settingsOfficialWebsiteSubtitle": "Check out our website",
+  "settingsJoinCommunityTitle": "Join our community",
+  "settingsJoinCommunitySubtitle": "Join discussions and get help",
+  "settingsRateUsTitle": "Rate Us",
+  "settingsRateUsSubtitle": "Leave a 5 star review on your app store",
+  "ratingDialogTitle": "Rate Our App",
+  "ratingDialogPrompt": "How would you rate your experience with Hafiz Pro?",
+  "ratingDialogMaybeLater": "Maybe Later",
+  "ratingDialogSubmit": "Submit",
+  "ratingDialogHintPositive": "Optional: tell us what you like",
+  "ratingDialogHintNegative": "Tell us what we can improve",
+  "ratingMessage1": "We're sorry to hear that. Please let us know how we can improve.",
+  "ratingMessage2": "We appreciate your feedback. We're working to make it better.",
+  "ratingMessage3": "Thank you for your feedback. We'll keep improving.",
+  "ratingMessage4": "Great! We're glad you're enjoying the app.",
+  "ratingMessage5": "Excellent! Thank you for the amazing rating.",
+  "errorLaunchingUrl": "Error launching URL: {url}. Error: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "Error opening rating dialog: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "Master the Quran, one Ayah at a time",
+  "splashAyahTranslation": "\"And We have certainly made the Qur'an easy for remembrance, so is there any who will remember?\" (Q54:17)",
+  "onboardingPage1Title": "Immerse yourself in the\nwords of Allah",
+  "onboardingPage1Subtitle": "Read, listen, and reflect on the\nQuran — anytime, anywhere.",
+  "onboardingPage1Cta": "Start Reading",
+  "onboardingPage2Title": "Listen to beautiful\nrecitations and follow\nalong",
+  "onboardingPage2Subtitle": "Choose your favorite reciter and feel\nthe verses come alive.",
+  "onboardingPage2Cta": "Start Listening",
+  "onboardingPage3Title": "Test your knowledge of the\nQur’an",
+  "onboardingPage3Subtitle": "Guess the Surah or Ayah from what\nyou hear — by Juz, Surah, or\nrandomly.",
+  "onboardingPage3Cta": "Start Playing",
+  "mainMenuSettingsShowcaseTitle": "Settings",
+  "mainMenuSettingsShowcaseDescription": "Change autoplay settings and select your favorite reciter",
+  "mainMenuLastReadShowcaseTitle": "Last Read",
+  "mainMenuLastReadShowcaseDescription": "This shows your last read Surah and Ayah.",
+  "mainMenuQuranCardTitle": "Read Quran",
+  "mainMenuQuranCardDescription": "Start your memorization journey by reading and listening to each Surah.",
+  "mainMenuSurahCardTitle": "By Surah",
+  "mainMenuSurahCardDescription": "Test your memorization by selecting a specific Surah.",
+  "mainMenuJuzCardTitle": "By Juz",
+  "mainMenuJuzCardDescription": "Begin your test journey by selecting a specific Juz of the Quran.",
+  "mainMenuRandomCardTitle": "Randomly",
+  "mainMenuRandomCardDescription": "Challenge yourself with verses selected at random from across the Holy Quran.",
+  "mainMenuTestsHeader": "Tests",
+  "mainMenuExitHint": "Press back again within two seconds to exit the app",
+  "mainMenuExitSnack": "Press back again to exit",
+  "mainMenuExitDialogTitle": "Are you sure?",
+  "mainMenuExitDialogContent": "Do you want to exit?",
+  "commonNo": "No",
+  "commonYes": "Yes",
+  "commonLoadingSubtitle": "Loading...",
+  "surahListTitle": "Surah List",
+  "surahListSearchHint": "Search Surah",
+  "surahListDesktopPlaceholder": "Select a Surah",
+  "surahListTestDescription": "Listen to a verse from a surah and\nguess the next verse.",
+  "juzListTitle": "Juz List",
+  "juzListSearchHint": "Search Juz",
+  "juzListSelectTitle": "Select a Juz",
+  "juzListTestDescription": "Listen to a verse from a Juz and\nguess the next verse.",
+  "juzListTypeNumberHint": "Type Juz number",
+  "testReadEntireSurah": "Read Entire Surah",
+  "testReadEntireJuz": "Read Entire Juz",
+  "testErrorTitle": "Failed to Load Test",
+  "testErrorMessage": "Unable to load the surah for testing. Please check your connection and try again.",
+  "juzTestErrorTitle": "Failed to Load Juz Test",
+  "juzTestErrorMessage": "Unable to load the juz for testing. Please check your connection and try again.",
+  "juzLoadingTitle": "Loading Juz...",
+  "juzLoadingSubtitle": "جارٍ تحميل الجزء",
+  "juzErrorTitle": "Failed to Load Juz",
+  "juzErrorMessage": "Please check your internet connection or try again shortly.",
+  "changeReciter": "Change Reciter",
+  "errorRetryButton": "Try Again",
+  "testRefreshAyah": "Refresh Ayah",
+  "testLoadingAyahTitle": "Loading Ayah",
+  "testGuessNextAyah": "Guess the next Ayah",
+  "testBeginningOfSurah": "Beginning of Surah",
+  "testEndOfSurah": "End of Surah",
+  "testVersesCount": "{count} Verses",
+  "@testVersesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "testMenuTitle": "Test Your Knowledge of the Qur’an",
+  "testMenuSubtitle": "Challenge yourself by listening to an ayah of the Quran and guessing the next one.",
+  "testMenuOptionBySurahSubtitle": "Test your knowledge based\non different surahs",
+  "testMenuOptionByJuzSubtitle": "Test how well you know each\nJuz.",
+  "testMenuOptionRandomTitle": "Random Verses",
+  "testMenuOptionRandomSubtitle": "Get verses from anywhere in\nthe Qur’an.",
+  "bottomNavQuran": "Quran",
+  "bottomNavTest": "Test",
+  "segmentSurah": "Surah",
+  "segmentJuz": "Juz",
+  "searchBySurahHint": "Search by Surah",
+  "searchByJuzHint": "Search by Juz",
+  "dashboardChallengeTitle": "Challenge yourself",
+  "dashboardChallengeDescription": "Listen to an ayah of\nthe Quran and guess\nthe next one.",
+  "dashboardListenReadHeader": "Listen/Read",
+  "dashboardContinueLastTestTitle": "Continue your last test",
+  "dashboardNowPlayingTitle": "Now Playing",
+  "juzNumberLabel": "Juz {number}",
+  "@juzNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "verseNumberLabel": "Verse {number}",
+  "@verseNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadTitle": "Last Read",
+  "lastReadDescription": "This shows your last read Surah and Ayah.",
+  "lastReadContinue": "Continue",
+  "lastReadNone": "No last read",
+  "lastReadAyahNumber": "Ayah no. {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "Failed to Load Surah",
+  "quranViewErrorMessage": "Please check your internet connection or try again shortly.",
+  "quranViewPlayFullSurah": "Play Full Surah",
+  "quranViewPlayingFullSurah": "Playing Full Surah",
+  "lastReadNoData": "No last read",
+  "lastReadContinueButton": "Continue",
+  "readingPreferencesTitle": "Reading Preferences",
+  "translationLabel": "Translation",
+  "translationSubtitle": "Show meaning under each ayah",
+  "transliterationLabel": "Transliteration",
+  "transliterationSubtitle": "Show pronunciation in Latin letters",
+  "surahLoadingTitle": "Loading Surah...",
+  "surahLoadingSubtitle": "جارٍ التحميل"
+}

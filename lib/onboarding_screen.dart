@@ -4,6 +4,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -20,27 +21,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   int _index = 0;
 
-  final _pages = const <_OnboardingPageData>[
-    _OnboardingPageData(
-      imageAsset: 'assets/img/onboarding/1.png',
-      title: 'Immerse yourself in the\nwords of Allah\\u',
-      subtitle: 'Read, listen, and reflect on the\nQuran — anytime, anywhere.',
-      cta: 'Start Reading',
-    ),
-    _OnboardingPageData(
-      imageAsset: 'assets/img/onboarding/2.png',
-      title: 'Listen\\u to beautiful\nrecitations and follow\nalong',
-      subtitle: 'Choose your favorite reciter and feel\nthe verses come alive.',
-      cta: 'Start Listening',
-    ),
-    _OnboardingPageData(
-      imageAsset: 'assets/img/onboarding/3.png',
-      title: 'Test your knowledge of the\nQur\u2019an',
-      subtitle:
-          'Guess the Surah or Ayah from what\nyou hear — by Juz, Surah, or\nrandomly.',
-      cta: 'Start Playing',
-    ),
-  ];
+  List<_OnboardingPageData> _pages(BuildContext context) =>
+      <_OnboardingPageData>[
+        _OnboardingPageData(
+          imageAsset: 'assets/img/onboarding/1.png',
+          title: context.l10n.onboardingPage1Title,
+          subtitle: context.l10n.onboardingPage1Subtitle,
+          cta: context.l10n.onboardingPage1Cta,
+        ),
+        _OnboardingPageData(
+          imageAsset: 'assets/img/onboarding/2.png',
+          title: context.l10n.onboardingPage2Title,
+          subtitle: context.l10n.onboardingPage2Subtitle,
+          cta: context.l10n.onboardingPage2Cta,
+        ),
+        _OnboardingPageData(
+          imageAsset: 'assets/img/onboarding/3.png',
+          title: context.l10n.onboardingPage3Title,
+          subtitle: context.l10n.onboardingPage3Subtitle,
+          cta: context.l10n.onboardingPage3Cta,
+        ),
+      ];
 
   @override
   void dispose() {
@@ -63,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextOrFinish() {
-    if (_index >= _pages.length - 1) {
+    if (_index >= _pages(context).length - 1) {
       _finish();
       return;
     }
@@ -76,6 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pages = _pages(context);
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0E0E0E) : AppColors.gray500,
       body: Container(
@@ -96,15 +98,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             child: Column(
               children: [
-                _ProgressIndicator(current: _index, total: _pages.length),
+                _ProgressIndicator(current: _index, total: pages.length),
                 const SizedBox(height: 12),
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: _pages.length,
+                    itemCount: pages.length,
                     onPageChanged: (i) => setState(() => _index = i),
                     itemBuilder: (context, i) {
-                      final p = _pages[i];
+                      final p = pages[i];
 
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     child: Text(
-                      _pages[_index].cta,
+                      pages[_index].cta,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

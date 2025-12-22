@@ -8,6 +8,7 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 
@@ -185,7 +186,7 @@ class ChallengeContainer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Challenge yourself',
+              context.l10n.dashboardChallengeTitle,
               style: GoogleFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -216,7 +217,7 @@ class ChallengeContainer extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Listen to an ayah of\nthe Quran and guess\nthe next one.',
+                            context.l10n.dashboardChallengeDescription,
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -741,7 +742,7 @@ class BottomPillNav extends StatelessWidget {
           Expanded(
             child: PillNavItem(
               active: index == 0,
-              label: 'Quran',
+              label: context.l10n.bottomNavQuran,
               icon: SvgPicture.asset(
                 'assets/img/quran-01.svg',
                 width: 18,
@@ -760,7 +761,7 @@ class BottomPillNav extends StatelessWidget {
           Expanded(
             child: PillNavItem(
               active: index == 1,
-              label: 'Test',
+              label: context.l10n.bottomNavTest,
               icon: SvgPicture.asset(
                 'assets/img/brain.svg',
                 width: 18,

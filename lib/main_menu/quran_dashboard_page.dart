@@ -19,6 +19,7 @@ import 'package:hafiz_test/surah/test_by_surah.dart';
 // import 'package:hafiz_test/surah/surah_list_screen.dart';
 // import 'package:hafiz_test/enum/surah_select_action.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 // import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
@@ -146,15 +147,15 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   SearchField(
                     controller: widget.searchController,
                     hintText: widget.segmentIndex == 0
-                        ? 'Search by Surah'
-                        : 'Search by Juz',
+                        ? context.l10n.searchBySurahHint
+                        : context.l10n.searchByJuzHint,
                   ),
                   const SizedBox(height: 14),
                   if (!_isSearching) ...[
                     if (lastRead == null)
                       DashboardFeatureCard(
                         background: _DashboardPalette.cardTeal(context),
-                        title: 'Challenge yourself',
+                        title: context.l10n.dashboardChallengeTitle,
                         onTap: () {
                           AnalyticsService.trackButtonClick(
                               'Challenge Yourself',
@@ -186,7 +187,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Listen to an ayah of\nthe Quran and guess\nthe next one.',
+                                context.l10n.dashboardChallengeDescription,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -219,7 +220,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                         }
 
                         final title = currentJuzNumber != null
-                            ? 'Juz $currentJuzNumber'
+                            ? context.l10n.juzNumberLabel(currentJuzNumber)
                             : (currentSurahName ?? '');
 
                         return Column(
@@ -274,7 +275,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                     // _ContinueReadingCard(lastRead: lastRead),
                     const SizedBox(height: 16),
                     Text(
-                      'Listen/Read',
+                      context.l10n.dashboardListenReadHeader,
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -296,8 +297,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                     color: _DashboardPalette.pinnedHeaderBg(context),
                     padding: const EdgeInsets.only(bottom: 12),
                     child: SegmentedSwitch(
-                      leftLabel: 'Surah',
-                      rightLabel: 'Juz',
+                      leftLabel: context.l10n.segmentSurah,
+                      rightLabel: context.l10n.segmentJuz,
                       index: widget.segmentIndex,
                       onChanged: widget.onSegmentChanged,
                     ),
@@ -424,7 +425,7 @@ class _ContinueLastTestCard extends StatelessWidget {
 
     return DashboardFeatureCard(
       background: _DashboardPalette.cardTeal(context),
-      title: 'Continue your last test',
+      title: context.l10n.dashboardContinueLastTestTitle,
       onTap: () {
         Navigator.push(
           context,
@@ -468,7 +469,7 @@ class _ContinueLastTestCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Verse ${ayah.numberInSurah}',
+                  context.l10n.verseNumberLabel(ayah.numberInSurah),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -598,7 +599,7 @@ class _NowPlayingCard extends StatelessWidget {
     return DashboardFeatureCard(
       onTap: onTap,
       background: _DashboardPalette.cardPurple(context),
-      title: 'Now Playing',
+      title: context.l10n.dashboardNowPlayingTitle,
       right: Image.asset(
         'assets/img/headset_icon.png',
         width: 84,

@@ -1,0 +1,205 @@
+{
+  "@@locale": "ar",
+  "appTitle": "حافظ القرآن",
+  "hello": "مرحبا",
+  "start": "ابدأ",
+  "settings": "الإعدادات",
+  "autoplayVerse": "تشغيل الآية تلقائيًا",
+  "theme": "السمة",
+  "themeSystem": "النظام",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "language": "اللغة",
+  "languageEnglish": "الإنجليزية",
+  "languageArabic": "العربية",
+  "languageSelectTitle": "اختر اللغة",
+  "selectFavoriteReciter": "اختر قارئك المفضل",
+  "searchReciters": "ابحث عن القرّاء...",
+  "visitWebsite": "زيارة موقعنا",
+  "joinWhatsappChannel": "انضم إلى قناة الواتساب",
+  "whatsappFeedbackGroup": "مجموعة ملاحظات الواتساب",
+  "rateThisApp": "قيّم هذا التطبيق",
+  "debugRatingSystem": "تصحيح نظام التقييم",
+  "save": "حفظ",
+  "disable": "تعطيل",
+  "ok": "حسنًا",
+  "notifications": "الإشعارات",
+  "enableNotifications": "تفعيل الإشعارات",
+  "notificationsDailyMotivationSubtitle": "استلام رسائل تحفيزية يومية",
+  "notificationTime": "وقت الإشعار",
+  "changesSaved": "تم حفظ التغييرات!",
+  "settingsLoadingTitle": "جارٍ تحميل الإعدادات...",
+  "notificationSubtitleEnabled": "وقت الإشعار: {time}",
+  "@notificationSubtitleEnabled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSubtitleDisabled": "اضبط تفضيلات الإشعارات",
+  "settingsAutoPlayTitle": "تشغيل الآية تلقائيًا",
+  "settingsAutoPlaySubtitle": "تشغيل الآيات تلقائيًا عند بدء الاختبار",
+  "settingsSelectReciterTitle": "اختر قارئًا",
+  "settingsReportBugTitle": "الإبلاغ عن خطأ أو طلب ميزة",
+  "settingsReportBugSubtitle": "تواصل معنا",
+  "settingsOfficialWebsiteTitle": "الموقع الرسمي",
+  "settingsOfficialWebsiteSubtitle": "اطّلع على موقعنا",
+  "settingsJoinCommunityTitle": "انضم إلى مجتمعنا",
+  "settingsJoinCommunitySubtitle": "انضم للنقاشات واحصل على المساعدة",
+  "settingsRateUsTitle": "قيّمنا",
+  "settingsRateUsSubtitle": "اترك تقييم 5 نجوم على متجر التطبيقات",
+  "ratingDialogTitle": "قيّم التطبيق",
+  "ratingDialogPrompt": "كيف تقيّم تجربتك مع حافظ برو؟",
+  "ratingDialogMaybeLater": "ربما لاحقًا",
+  "ratingDialogSubmit": "إرسال",
+  "ratingDialogHintPositive": "اختياري: أخبرنا ما الذي أعجبك",
+  "ratingDialogHintNegative": "أخبرنا كيف يمكننا التحسين",
+  "ratingMessage1": "نأسف لسماع ذلك. أخبرنا كيف يمكننا التحسن.",
+  "ratingMessage2": "نقدّر ملاحظاتك. نحن نعمل على التحسين.",
+  "ratingMessage3": "شكرًا لملاحظاتك. سنواصل التحسين.",
+  "ratingMessage4": "رائع! سعداء لأنك تستمتع بالتطبيق.",
+  "ratingMessage5": "ممتاز! شكرًا على التقييم الرائع.",
+  "errorLaunchingUrl": "حدث خطأ أثناء فتح الرابط: {url}. الخطأ: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "حدث خطأ أثناء فتح نافذة التقييم: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "أتقن القرآن، آية بعد آية",
+  "splashAyahTranslation": "\"ولقد يسرنا القرآن للذكر فهل من مدكر\" (القمر: 17)",
+  "onboardingPage1Title": "تعمّق في\nكلام الله",
+  "onboardingPage1Subtitle": "اقرأ واستمع وتدبّر\nالقرآن — في أي وقت وأي مكان.",
+  "onboardingPage1Cta": "ابدأ القراءة",
+  "onboardingPage2Title": "استمع إلى\nتلاوات جميلة وتابع\nمع القراءة",
+  "onboardingPage2Subtitle": "اختر قارئك المفضل ودع\nالآيات تنبض بالحياة.",
+  "onboardingPage2Cta": "ابدأ الاستماع",
+  "onboardingPage3Title": "اختبر معرفتك\nبالقرآن",
+  "onboardingPage3Subtitle": "خمّن السورة أو الآية مما\nتسمعه — حسب الجزء أو السورة أو\nعشوائيًا.",
+  "onboardingPage3Cta": "ابدأ اللعب",
+  "mainMenuSettingsShowcaseTitle": "الإعدادات",
+  "mainMenuSettingsShowcaseDescription": "غيّر إعدادات التشغيل التلقائي واختر قارئك المفضل",
+  "mainMenuLastReadShowcaseTitle": "آخر موضع قراءة",
+  "mainMenuLastReadShowcaseDescription": "يُظهر آخر سورة وآية قرأتها.",
+  "mainMenuQuranCardTitle": "قراءة القرآن",
+  "mainMenuQuranCardDescription": "ابدأ رحلة الحفظ بقراءة كل سورة والاستماع إليها.",
+  "mainMenuSurahCardTitle": "حسب السورة",
+  "mainMenuSurahCardDescription": "اختبر حفظك باختيار سورة معيّنة.",
+  "mainMenuJuzCardTitle": "حسب الجزء",
+  "mainMenuJuzCardDescription": "ابدأ الاختبار باختيار جزء معيّن من القرآن.",
+  "mainMenuRandomCardTitle": "عشوائي",
+  "mainMenuRandomCardDescription": "تحدَّ نفسك بآيات مختارة عشوائيًا من أنحاء المصحف.",
+  "mainMenuTestsHeader": "الاختبارات",
+  "mainMenuExitHint": "اضغط زر الرجوع مرة أخرى خلال ثانيتين للخروج من التطبيق",
+  "mainMenuExitSnack": "اضغط مرة أخرى للخروج",
+  "mainMenuExitDialogTitle": "هل أنت متأكد؟",
+  "mainMenuExitDialogContent": "هل تريد الخروج من التطبيق؟",
+  "commonNo": "لا",
+  "commonYes": "نعم",
+  "commonLoadingSubtitle": "جارٍ التحميل...",
+  "surahListTitle": "قائمة السور",
+  "surahListSearchHint": "ابحث عن سورة",
+  "surahListDesktopPlaceholder": "اختر سورة",
+  "surahListTestDescription": "استمع إلى آية من سورة\nوخمن الآية التالية.",
+  "juzListTitle": "قائمة الأجزاء",
+  "juzListSearchHint": "ابحث عن جزء",
+  "juzListSelectTitle": "اختر جزءًا",
+  "juzListTestDescription": "استمع إلى آية من جزء\nوخمن الآية التالية.",
+  "juzListTypeNumberHint": "اكتب رقم الجزء",
+  "testReadEntireSurah": "اقرأ السورة كاملة",
+  "testReadEntireJuz": "اقرأ الجزء كاملاً",
+  "testErrorTitle": "فشل في تحميل الاختبار",
+  "testErrorMessage": "تعذر تحميل السورة للاختبار. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+  "juzTestErrorTitle": "فشل في تحميل اختبار الجزء",
+  "juzTestErrorMessage": "تعذر تحميل الجزء للاختبار. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+  "juzLoadingTitle": "جارٍ تحميل الجزء...",
+  "juzLoadingSubtitle": "جارٍ تحميل الجزء",
+  "juzErrorTitle": "فشل في تحميل الجزء",
+  "juzErrorMessage": "يرجى التحقق من اتصالك بالإنترنت أو المحاولة مرة أخرى لاحقًا.",
+  "changeReciter": "تغيير القارئ",
+  "errorRetryButton": "حاول مرة أخرى",
+  "testRefreshAyah": "تحديث الآية",
+  "testLoadingAyahTitle": "جارٍ تحميل الآية",
+  "testGuessNextAyah": "خمّن الآية التالية",
+  "testBeginningOfSurah": "بداية السورة",
+  "testEndOfSurah": "نهاية السورة",
+  "testVersesCount": "{count} آيات",
+  "@testVersesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "testMenuTitle": "اختبر معرفتك بالقرآن",
+  "testMenuSubtitle": "تحدَّ نفسك بالاستماع إلى آية من القرآن ومحاولة تخمين الآية التالية.",
+  "testMenuOptionBySurahSubtitle": "اختبر معرفتك حسب\nالسور المختلفة",
+  "testMenuOptionByJuzSubtitle": "اختبر مدى معرفتك بكل\nجزء.",
+  "testMenuOptionRandomTitle": "آيات عشوائية",
+  "testMenuOptionRandomSubtitle": "احصل على آيات من أي مكان\nفي القرآن.",
+  "bottomNavQuran": "القرآن",
+  "bottomNavTest": "اختبار",
+  "segmentSurah": "سورة",
+  "segmentJuz": "جزء",
+  "searchBySurahHint": "ابحث بالسورة",
+  "searchByJuzHint": "ابحث بالجزء",
+  "dashboardChallengeTitle": "تحدَّ نفسك",
+  "dashboardChallengeDescription": "استمع إلى آية من\nالقرآن وخمّن\nالآية التالية.",
+  "dashboardListenReadHeader": "استماع/قراءة",
+  "dashboardContinueLastTestTitle": "تابع آخر اختبار",
+  "dashboardNowPlayingTitle": "يتم التشغيل الآن",
+  "juzNumberLabel": "الجزء {number}",
+  "@juzNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "verseNumberLabel": "الآية {number}",
+  "@verseNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadTitle": "آخر موضع قراءة",
+  "lastReadDescription": "يُظهر آخر سورة وآية قرأتها.",
+  "lastReadContinue": "تابع",
+  "lastReadNone": "لا يوجد آخر موضع قراءة",
+  "lastReadAyahNumber": "الآية رقم {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "فشل في تحميل السورة",
+  "quranViewErrorMessage": "يرجى التحقق من اتصالك بالإنترنت أو المحاولة مرة أخرى لاحقًا.",
+  "quranViewPlayFullSurah": "تشغيل السورة كاملة",
+  "quranViewPlayingFullSurah": "يتم تشغيل السورة كاملة الآن",
+  "lastReadNoData": "لا يوجد آخر موضع قراءة",
+  "lastReadContinueButton": "تابع",
+  "readingPreferencesTitle": "تفضيلات القراءة",
+  "translationLabel": "الترجمة",
+  "translationSubtitle": "إظهار المعنى أسفل كل آية",
+  "transliterationLabel": "النقل الحرفي",
+  "transliterationSubtitle": "إظهار النطق بالحروف اللاتينية",
+  "surahLoadingTitle": "جارٍ تحميل السورة...",
+  "surahLoadingSubtitle": "جارٍ التحميل"
+}

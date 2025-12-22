@@ -15,6 +15,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/bismillah.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class JuzQuranView extends StatefulWidget {
@@ -285,10 +286,10 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     final showTransliteration = prefs.showTransliteration;
 
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: SurahLoader(
-          title: 'Loading Juz...',
-          subtitle: 'جارٍ تحميل الجزء',
+          title: context.l10n.juzLoadingTitle,
+          subtitle: context.l10n.juzLoadingSubtitle,
         ),
       );
     }
@@ -296,11 +297,10 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     if (_hasError) {
       return Scaffold(
         body: CustomErrorWidget(
-          title: 'Failed to Load Juz',
-          message:
-              'Please check your internet connection or try again shortly. $_error',
-          icon: Icons.menu_book_rounded,
-          color: Colors.green,
+          title: context.l10n.juzErrorTitle,
+          message: '${context.l10n.juzErrorMessage} $_error',
+          icon: Icons.menu_book_outlined,
+          color: Colors.purple.shade700,
           onRetry: _load,
         ),
       );
@@ -323,23 +323,27 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                   children: [
                     Align(
                       alignment: Alignment.topLeft,
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color:
-                                isDark ? const Color(0xFF1A1A1A) : Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 18,
+                      child: Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.white
-                                  : const Color(0xFF111827),
+                                  ? const Color(0xFF1A1A1A)
+                                  : Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 18,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111827),
+                              ),
                             ),
                           ),
                         ),
@@ -388,7 +392,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${widget.juz.ayahCount} verses',
+                            context.l10n.testVersesCount(widget.juz.ayahCount),
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,

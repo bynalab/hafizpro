@@ -16,6 +16,7 @@ import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/test_screen.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class TestByJuz extends StatefulWidget {
   final int juzNumber;
@@ -144,30 +145,33 @@ class _TestPage extends State<TestByJuz> {
           automaticallyImplyLeading: false,
           title: Row(
             children: [
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                borderRadius: BorderRadius.circular(999),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHigh
-                        .withValues(alpha: 0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    'assets/img/arrow_back.svg',
-                    width: 18,
-                    height: 18,
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHigh
+                          .withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(
+                      'assets/img/arrow_back.svg',
+                      width: 18,
+                      height: 18,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 14),
               Text(
-                'Juz ${widget.juzNumber}',
+                context.l10n.juzNumberLabel(widget.juzNumber),
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -183,16 +187,15 @@ class _TestPage extends State<TestByJuz> {
           children: [
             if (hasError)
               CustomErrorWidget(
-                title: 'Failed to Load Juz Test',
-                message: errorMessage ??
-                    'Unable to load the juz for testing. Please check your connection and try again.',
+                title: context.l10n.juzTestErrorTitle,
+                message: errorMessage ?? context.l10n.juzTestErrorMessage,
                 icon: Icons.quiz_outlined,
                 color: Colors.purple.shade700,
                 onRetry: () async {
                   await init();
                 },
                 secondaryActionLabel:
-                    _isReciterModeError ? 'Change Reciter' : null,
+                    _isReciterModeError ? context.l10n.changeReciter : null,
                 onSecondaryAction:
                     _isReciterModeError ? _changeReciterAndRetry : null,
               )
@@ -202,7 +205,7 @@ class _TestPage extends State<TestByJuz> {
                   surah: surah,
                   currentAyah: isLoading ? Ayah() : currentAyah,
                   isLoading: isLoading,
-                  readFullLabel: 'Read Entire Juz',
+                  readFullLabel: context.l10n.testReadEntireJuz,
                   onReadFull: () async {
                     final juz = findJuzByNumber(widget.juzNumber);
                     await Navigator.push(
