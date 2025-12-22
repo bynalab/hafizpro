@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
+import 'package:hafiz_test/widget/app_switch.dart';
 
 class NotificationSheetResult {
   final bool enabled;
@@ -221,11 +222,9 @@ class NotificationsSheet extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Switch(
+                      AppSwitch(
                         value: localEnabled,
                         onChanged: (v) => setSheetState(() => localEnabled = v),
-                        activeTrackColor: AppColors.green500,
-                        activeColor: Colors.white,
                       ),
                     ],
                   ),
@@ -310,17 +309,20 @@ class NotificationsSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: localEnabled
-                        ? () => setSheetState(() => showSaved = true)
-                        : null,
+                    onPressed: () {
+                      // Allow saving both enabling and disabling.
+                      setSheetState(() => showSaved = true);
+                    },
                     child: Text(
-                      'Save',
+                      localEnabled ? 'Save' : 'Disable',
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: localEnabled
                             ? Colors.white
-                            : const Color(0xFF9CA3AF),
+                            : (isDark
+                                ? const Color(0xFFF3F4F6)
+                                : const Color(0xFF111827)),
                       ),
                     ),
                   ),

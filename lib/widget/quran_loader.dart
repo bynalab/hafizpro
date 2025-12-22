@@ -15,8 +15,10 @@ class QuranLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const brandGreen = Color(0xFF004B40);
-    const textDark = Color(0xFF0F172A);
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = scheme.onSurface;
+    final spinnerColor = scheme.primary;
 
     return Center(
       child: Padding(
@@ -25,7 +27,7 @@ class QuranLoader extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Opacity(
-              opacity: 0.22,
+              opacity: isDark ? 0.12 : 0.22,
               child: Image.asset(
                 'assets/img/faded_vector_quran.png',
                 width: iconSize,
@@ -33,12 +35,12 @@ class QuranLoader extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const SizedBox(
+            SizedBox(
               width: 28,
               height: 28,
               child: CircularProgressIndicator.adaptive(
                 strokeWidth: 3.2,
-                valueColor: AlwaysStoppedAnimation<Color>(brandGreen),
+                valueColor: AlwaysStoppedAnimation<Color>(spinnerColor),
               ),
             ),
             const SizedBox(height: 14),
@@ -47,7 +49,7 @@ class QuranLoader extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: textDark,
+                color: textColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -57,7 +59,7 @@ class QuranLoader extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: textDark,
+                color: textColor,
               ),
               textAlign: TextAlign.center,
             ),

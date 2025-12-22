@@ -7,11 +7,14 @@ import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/quran/widgets/reading_preferences_button.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/bismillah.dart';
+import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class JuzQuranView extends StatefulWidget {
@@ -26,6 +29,7 @@ class JuzQuranView extends StatefulWidget {
 class _JuzQuranViewState extends State<JuzQuranView> {
   final _surahServices = getIt<SurahServices>();
   final _audioCenter = getIt<AudioCenter>();
+  final _storage = getIt<IStorageService>();
 
   bool _isLoading = true;
   bool _hasError = false;
@@ -276,9 +280,17 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final prefs = getReadingPreferences(_storage);
+    final showTranslation = prefs.showTranslation;
+    final showTransliteration = prefs.showTransliteration;
 
     if (_isLoading) {
-      return const Scaffold(body: SurahLoader());
+      return const Scaffold(
+        body: SurahLoader(
+          title: 'Loading Juz...',
+          subtitle: 'جارٍ تحميل الجزء',
+        ),
+      );
     }
 
     if (_hasError) {
@@ -346,6 +358,16 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                 isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: ReadingPreferencesButton(
+                        storage: _storage,
+                        isDark: isDark,
+                        onChanged: () {
+                          if (mounted) setState(() {});
+                        },
                       ),
                     ),
                     Align(
@@ -428,6 +450,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             text: entry.displayText ?? ayah.text,
                           ),
                           playingIndexNotifier: _playingIndexNotifier,
+                          showTranslation: showTranslation,
+                          showTransliteration: showTransliteration,
                           backgroundColor: isDark
                               ? (isEven
                                   ? const Color(0xFF101010)

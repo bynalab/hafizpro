@@ -6,10 +6,12 @@ import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
+import 'package:hafiz_test/quran/widgets/reading_preferences_button.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
@@ -25,6 +27,8 @@ class _QuranViewState extends State<QuranView> {
     audioCenter: getIt<AudioCenter>(),
     surahService: getIt<SurahServices>(),
   );
+
+  final _storage = getIt<IStorageService>();
 
   double _speed = 1.5;
   bool _isAutoSwitching = false;
@@ -186,6 +190,16 @@ class _QuranViewState extends State<QuranView> {
                             color:
                                 isDark ? Colors.white : const Color(0xFF111827),
                           ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ReadingPreferencesButton(
+                          storage: _storage,
+                          isDark: isDark,
+                          onChanged: () {
+                            if (mounted) setState(() {});
+                          },
                         ),
                       ),
                     ],

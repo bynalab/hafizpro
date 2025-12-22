@@ -52,19 +52,25 @@ class QuranViewModel {
       // Only reflect existing playback state if the currently playing surah
       // matches the surah being viewed.
       if (audioCenter.isCurrentSurah(surahNumber)) {
-        final seqLen = audioPlayer.sequence.length;
-        isPlaylist = seqLen > 1;
+        if (audioCenter.isLoading) {
+          isPlaylist = true;
+          playingIndexNotifier.value = 0;
+          isPlayingNotifier.value = false;
+        } else {
+          final seqLen = audioPlayer.sequence.length;
+          isPlaylist = seqLen > 1;
 
-        isPlayingNotifier.value = audioPlayer.playing;
+          isPlayingNotifier.value = audioPlayer.playing;
 
-        if (isPlaylist) {
-          final idx = audioPlayer.currentIndex;
-          if (idx != null) {
-            final mapped = idx - audioCenter.readingPlaylistIndexOffset;
-            if (mapped >= 0) {
-              playingIndexNotifier.value = mapped;
-            } else {
-              playingIndexNotifier.value = 0;
+          if (isPlaylist) {
+            final idx = audioPlayer.currentIndex;
+            if (idx != null) {
+              final mapped = idx - audioCenter.readingPlaylistIndexOffset;
+              if (mapped >= 0) {
+                playingIndexNotifier.value = mapped;
+              } else {
+                playingIndexNotifier.value = 0;
+              }
             }
           }
         }
@@ -134,6 +140,8 @@ class QuranViewModel {
         }
         return;
       }
+
+      if (audioCenter.isLoading) return;
 
       if (index == null) return;
 

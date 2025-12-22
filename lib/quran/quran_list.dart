@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/bismillah.dart';
+import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class QuranAyahList extends StatelessWidget {
@@ -27,6 +30,11 @@ class QuranAyahList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final storage = getIt<IStorageService>();
+    final prefs = getReadingPreferences(storage);
+    final showTranslation = prefs.showTranslation;
+    final showTransliteration = prefs.showTransliteration;
+
     return ScrollablePositionedList.separated(
       padding: const EdgeInsets.symmetric(vertical: 30),
       itemCount: surah.ayahs.length + _offset,
@@ -60,6 +68,8 @@ class QuranAyahList extends StatelessWidget {
           index: ayahIndex,
           ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
+          showTranslation: showTranslation,
+          showTransliteration: showTransliteration,
           backgroundColor: isDark
               ? (isEven ? const Color(0xFF101010) : const Color(0xFF0E0E0E))
               : (isEven ? AppColors.gray500 : AppColors.gray50),

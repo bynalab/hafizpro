@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:hafiz_test/widget/quran_loader.dart';
 
 class SurahLoader extends StatelessWidget {
-  const SurahLoader({super.key});
+  final String title;
+  final String subtitle;
+
+  const SurahLoader({
+    super.key,
+    this.title = 'Loading Surah...',
+    this.subtitle = 'جارٍ التحميل',
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const QuranLoader(
-      title: 'Loading Surah...',
-      subtitle: 'جارٍ التحميل',
+    return QuranLoader(
+      title: title,
+      subtitle: subtitle,
     );
   }
 }

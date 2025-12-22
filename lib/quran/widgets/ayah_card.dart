@@ -9,6 +9,8 @@ class AyahCard extends StatelessWidget {
   final ValueNotifier<int?> playingIndexNotifier;
   final void Function(int)? onPlayPressed;
   final Color backgroundColor;
+  final bool showTranslation;
+  final bool showTransliteration;
 
   // We derive contrast from the actual card background color (not Theme.brightness)
   // because some screens may intentionally render light cards in dark mode (or vice
@@ -44,6 +46,8 @@ class AyahCard extends StatelessWidget {
     required this.playingIndexNotifier,
     this.backgroundColor = Colors.white,
     this.onPlayPressed,
+    this.showTranslation = true,
+    this.showTransliteration = true,
   });
 
   @override
@@ -130,7 +134,8 @@ class AyahCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if ((ayah.transliteration ?? '').trim().isNotEmpty) ...[
+                if (showTransliteration &&
+                    (ayah.transliteration ?? '').trim().isNotEmpty) ...[
                   const SizedBox(height: 14),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -145,7 +150,8 @@ class AyahCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                 ],
-                if ((ayah.translation ?? '').trim().isNotEmpty) ...[
+                if (showTranslation &&
+                    (ayah.translation ?? '').trim().isNotEmpty) ...[
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(

@@ -9,6 +9,8 @@ import 'package:hafiz_test/model/playback_snapshot.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
+import 'package:hafiz_test/util/internet_checker.dart';
 import 'package:just_audio/just_audio.dart';
 
 enum PlaybackOwner { reading, test, juz }
@@ -326,6 +328,15 @@ class AudioCenter extends ChangeNotifier {
   Future<void> playSingleAyah(Surah surah, AudioSource source) async {
     if (isLoading) return;
 
+    final hasInternet = await hasInternetConnection();
+    if (!hasInternet) {
+      AppMessenger.showSnackBar(
+        'No internet connection. Audio needs internet.',
+      );
+
+      return;
+    }
+
     isLoading = true;
     _readingWasPlaylist = false;
     setCurrentSurah(surah);
@@ -346,6 +357,15 @@ class AudioCenter extends ChangeNotifier {
     bool forceReload = false,
   }) async {
     if (isLoading) return;
+
+    final hasInternet = await hasInternetConnection();
+    if (!hasInternet) {
+      AppMessenger.showSnackBar(
+        'No internet connection. Audio needs internet.',
+      );
+
+      return;
+    }
 
     if (_playbackOwner != PlaybackOwner.reading) {
       _playbackOwner = PlaybackOwner.reading;
@@ -423,6 +443,15 @@ class AudioCenter extends ChangeNotifier {
   Future<void> playFromAyahIndex(Surah surah, int index) async {
     if (isLoading) return;
 
+    final hasInternet = await hasInternetConnection();
+    if (!hasInternet) {
+      AppMessenger.showSnackBar(
+        'No internet connection. Audio needs internet.',
+      );
+
+      return;
+    }
+
     // Force reading mode for surah playback.
     if (_playbackOwner != PlaybackOwner.reading) {
       _playbackOwner = PlaybackOwner.reading;
@@ -455,6 +484,15 @@ class AudioCenter extends ChangeNotifier {
     bool forceReload = false,
   }) async {
     if (isLoading) return;
+
+    final hasInternet = await hasInternetConnection();
+    if (!hasInternet) {
+      AppMessenger.showSnackBar(
+        'No internet connection. Audio needs internet.',
+      );
+
+      return;
+    }
 
     final audioPlayer = _audioServices.audioPlayer;
 

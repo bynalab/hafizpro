@@ -6,12 +6,12 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
-import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/settings/settings_controller.dart';
 import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/widget/app_switch.dart';
 import 'package:hafiz_test/widget/quran_loader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -226,11 +226,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: 'Auto Play Verse',
                     subtitle: 'Autoplay the verses as your test begins',
-                    trailing: Switch(
+                    trailing: AppSwitch(
                       value: controller.autoPlay,
                       onChanged: controller.setAutoPlay,
-                      activeTrackColor: AppColors.green500,
-                      activeColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 10),

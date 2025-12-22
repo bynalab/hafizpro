@@ -4,6 +4,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/splash_screen.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/util/app_theme.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -52,6 +53,13 @@ class QuranHafiz extends StatefulWidget {
 class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
   late final ThemeController _themeController;
   bool _sessionEnded = false;
+
+  ThemeMode get _themeMode {
+    final mode = _themeController.mode;
+    if (mode == 'light') return ThemeMode.light;
+    if (mode == 'dark') return ThemeMode.dark;
+    return ThemeMode.system;
+  }
 
   @override
   void initState() {
@@ -118,10 +126,12 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: appScaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
+      title: 'Quran Hafiz',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.values.byName(_themeController.mode),
+      themeMode: _themeMode,
       home: kIsWeb ? const MainMenu() : const SplashScreen(),
     );
   }
