@@ -13,6 +13,7 @@ class QuranAyahList extends StatelessWidget {
   final Surah surah;
   final bool showBismillah;
   final ValueNotifier<int?> playingIndexNotifier;
+  final ValueNotifier<bool> isPlayingNotifier;
   final ItemScrollController scrollController;
   final void Function(int index) onControlPressed;
 
@@ -21,6 +22,7 @@ class QuranAyahList extends StatelessWidget {
     required this.surah,
     required this.showBismillah,
     required this.playingIndexNotifier,
+    required this.isPlayingNotifier,
     required this.scrollController,
     required this.onControlPressed,
   });
@@ -68,6 +70,7 @@ class QuranAyahList extends StatelessWidget {
           index: ayahIndex,
           ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
+          isPlayingNotifier: isPlayingNotifier,
           showTranslation: showTranslation,
           showTransliteration: showTransliteration,
           backgroundColor: isDark

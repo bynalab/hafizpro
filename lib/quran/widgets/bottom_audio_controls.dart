@@ -293,27 +293,63 @@ class BottomAudioControls extends StatelessWidget {
                                   stream: audioPlayer.loopModeStream,
                                   builder: (context, snap) {
                                     final loopMode = snap.data ?? LoopMode.off;
+                                    final isLooping = loopMode == LoopMode.one;
 
-                                    return IconButton(
-                                      onPressed: () async {
-                                        final next = loopMode == LoopMode.one
-                                            ? LoopMode.off
-                                            : LoopMode.one;
-                                        await audioPlayer.setLoopMode(next);
-                                      },
-                                      padding: EdgeInsets.zero,
-                                      constraints:
-                                          const BoxConstraints.tightFor(
-                                        width: 40,
-                                        height: 40,
-                                      ),
-                                      icon: Icon(
-                                        Icons.repeat_rounded,
-                                        size: 24,
-                                        color: loopMode == LoopMode.one
-                                            ? onBar
-                                            : mutedOnBar,
-                                      ),
+                                    return Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () async {
+                                            final next =
+                                                loopMode == LoopMode.one
+                                                    ? LoopMode.off
+                                                    : LoopMode.one;
+                                            await audioPlayer.setLoopMode(next);
+                                          },
+                                          padding: EdgeInsets.zero,
+                                          constraints:
+                                              const BoxConstraints.tightFor(
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                          icon: Icon(
+                                            Icons.repeat_rounded,
+                                            size: 24,
+                                            color:
+                                                isLooping ? onBar : mutedOnBar,
+                                          ),
+                                        ),
+                                        if (isLooping)
+                                          Positioned(
+                                            top: 2,
+                                            right: 2,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                color: onBar,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              constraints: const BoxConstraints(
+                                                minWidth: 14,
+                                                minHeight: 14,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  '1',
+                                                  style: GoogleFonts.cairo(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: isDark
+                                                        ? const Color(
+                                                            0xFF1D353B)
+                                                        : const Color(
+                                                            0xFF78B7C6),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     );
                                   },
                                 ),

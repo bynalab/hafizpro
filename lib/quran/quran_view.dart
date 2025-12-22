@@ -230,6 +230,7 @@ class _QuranViewState extends State<QuranView> {
                                 ),
                                 playingIndexNotifier:
                                     viewModel.playingIndexNotifier,
+                                isPlayingNotifier: viewModel.isPlayingNotifier,
                                 scrollController:
                                     viewModel.itemScrollController,
                                 onControlPressed:

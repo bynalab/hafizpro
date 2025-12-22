@@ -37,6 +37,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   String _error = '';
 
   final _playingIndexNotifier = ValueNotifier<int?>(null);
+  final _isPlayingNotifier = ValueNotifier<bool>(false);
 
   double _speed = 1.5;
 
@@ -164,6 +165,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     _audioCenter.juzPlayingIndexNotifier
         .removeListener(_onJuzAudioIndexChanged);
     _playingIndexNotifier.dispose();
+    _isPlayingNotifier.dispose();
     super.dispose();
   }
 
@@ -261,9 +263,16 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     final current = _playingIndexNotifier.value;
     final audioPlayer = _audioCenter.audioPlayer;
 
-    if (current == globalIndex && audioPlayer.playing) {
-      await audioPlayer.stop();
-      _playingIndexNotifier.value = null;
+    // If the tapped ayah is already selected, toggle pause/play.
+    if (current == globalIndex &&
+        _audioCenter.playbackOwner == PlaybackOwner.juz) {
+      if (audioPlayer.playing) {
+        await audioPlayer.pause();
+        _isPlayingNotifier.value = false;
+      } else {
+        await audioPlayer.play();
+        _isPlayingNotifier.value = true;
+      }
       return;
     }
 
@@ -275,6 +284,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
     // Start (or seek within) the Juz playlist from the tapped verse so playback
     // continues to the next verses within the Juz.
+    _isPlayingNotifier.value = true;
     await _audioCenter.toggleJuz(widget.juz, startIndex: globalIndex);
   }
 
@@ -454,6 +464,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             text: entry.displayText ?? ayah.text,
                           ),
                           playingIndexNotifier: _playingIndexNotifier,
+                          isPlayingNotifier: _isPlayingNotifier,
                           showTranslation: showTranslation,
                           showTransliteration: showTransliteration,
                           backgroundColor: isDark

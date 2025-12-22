@@ -213,6 +213,16 @@ class QuranViewModel {
     final currentSurah = surah;
     if (currentSurah == null) return;
 
+    // If the tapped ayah is already playing, toggle pause/play.
+    if (playingIndexNotifier.value == index && isPlaylist) {
+      if (isPlayingNotifier.value) {
+        await audioPlayer.pause();
+      } else {
+        await audioPlayer.play();
+      }
+      return;
+    }
+
     // Card tap should behave like "play from here" (continue to next verse),
     // not "play one verse then stop/auto-advance".
     isPlaylist = true;

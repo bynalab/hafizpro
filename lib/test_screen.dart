@@ -498,25 +498,56 @@ class _TestPage extends State<TestScreen> {
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          loop = !loop;
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              loop = !loop;
 
-                          loopMode = loop ? LoopMode.one : LoopMode.off;
-                          audioServices.setLoopMode(loopMode);
+                              loopMode = loop ? LoopMode.one : LoopMode.off;
+                              audioServices.setLoopMode(loopMode);
 
-                          AnalyticsService.trackRepeatSwitch(loop,
-                              audioName: currentAudioName);
+                              AnalyticsService.trackRepeatSwitch(loop,
+                                  audioName: currentAudioName);
 
-                          setState(() {});
-                        },
-                        icon: Icon(
-                          Icons.repeat_rounded,
-                          size: 30,
-                          color: loop
-                              ? primary
-                              : onSurfaceMuted.withValues(alpha: 0.65),
-                        ),
+                              setState(() {});
+                            },
+                            icon: Icon(
+                              Icons.repeat_rounded,
+                              size: 30,
+                              color: loop
+                                  ? primary
+                                  : onSurfaceMuted.withValues(alpha: 0.65),
+                            ),
+                          ),
+                          if (loop)
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '1',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: onPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),

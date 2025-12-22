@@ -7,6 +7,7 @@ class AyahCard extends StatelessWidget {
   final Ayah ayah;
   final int index;
   final ValueNotifier<int?> playingIndexNotifier;
+  final ValueNotifier<bool> isPlayingNotifier;
   final void Function(int)? onPlayPressed;
   final Color backgroundColor;
   final bool showTranslation;
@@ -44,6 +45,7 @@ class AyahCard extends StatelessWidget {
     required this.ayah,
     required this.index,
     required this.playingIndexNotifier,
+    required this.isPlayingNotifier,
     this.backgroundColor = Colors.white,
     this.onPlayPressed,
     this.showTranslation = true,
@@ -55,118 +57,125 @@ class AyahCard extends StatelessWidget {
     return ValueListenableBuilder<int?>(
       valueListenable: playingIndexNotifier,
       builder: (context, currentPlayingIndex, _) {
-        final isActive = currentPlayingIndex == index;
+        return ValueListenableBuilder<bool>(
+          valueListenable: isPlayingNotifier,
+          builder: (context, isPlaying, _) {
+            final isActive = currentPlayingIndex == index && isPlaying;
 
-        final isDarkCard = _isDarkColor(backgroundColor);
-        final textColor = isDarkCard ? Colors.white : AppColors.black500;
-        final borderColor = isActive
-            ? const Color(0xFF78B7C6)
-            : (isDarkCard
-                ? Colors.white.withValues(alpha: 0.16)
-                : const Color(0xFFE5E7EB));
-        final chipBorderColor = isDarkCard
-            ? Colors.white.withValues(alpha: 0.75)
-            : const Color(0xFF111827);
+            final isDarkCard = _isDarkColor(backgroundColor);
+            final textColor = isDarkCard ? Colors.white : AppColors.black500;
+            final borderColor = isActive
+                ? const Color(0xFF78B7C6)
+                : (isDarkCard
+                    ? Colors.white.withValues(alpha: 0.16)
+                    : const Color(0xFFE5E7EB));
+            final chipBorderColor = isDarkCard
+                ? Colors.white.withValues(alpha: 0.75)
+                : const Color(0xFF111827);
 
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(18, 6, 18, 6),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: borderColor,
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(18, 6, 18, 6),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: borderColor,
+                  ),
+                ),
+                child: Column(
                   children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: chipBorderColor),
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 34,
+                          height: 34,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: chipBorderColor),
+                          ),
+                          child: Text(
+                            '${ayah.numberInSurah}',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => onPlayPressed?.call(index),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: chipBorderColor),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                isActive
+                                    ? Icons.pause
+                                    : Icons.play_arrow_rounded,
+                                size: 20,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Align(
+                      alignment: Alignment.centerRight,
                       child: Text(
-                        '${ayah.numberInSurah}',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
+                        _arabicDisplayText(ayah.text),
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
+                        style: GoogleFonts.amiri(
+                          fontSize: 24,
+                          height: 2,
                           color: textColor,
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => onPlayPressed?.call(index),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: chipBorderColor),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            isActive ? Icons.stop : Icons.play_arrow_rounded,
-                            size: 20,
+                    if (showTransliteration &&
+                        (ayah.transliteration ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          ayah.transliteration!.trim(),
+                          textAlign: TextAlign.left,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
                             color: textColor,
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (showTranslation &&
+                        (ayah.translation ?? '').trim().isNotEmpty) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          ayah.translation!.trim(),
+                          textAlign: TextAlign.left,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 14),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    _arabicDisplayText(ayah.text),
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
-                    style: GoogleFonts.amiri(
-                      fontSize: 24,
-                      height: 2,
-                      color: textColor,
-                    ),
-                  ),
-                ),
-                if (showTransliteration &&
-                    (ayah.transliteration ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      ayah.transliteration!.trim(),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-                if (showTranslation &&
-                    (ayah.translation ?? '').trim().isNotEmpty) ...[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      ayah.translation!.trim(),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
