@@ -50,8 +50,10 @@ class AppTheme {
           const Color(0xFF0BB38A).withValues(alpha: 0.85),
         ),
       ),
-      dialogBackgroundColor: const Color(0xFF1A1A1A),
       useMaterial3: true,
+      dialogTheme: const DialogThemeData(
+        backgroundColor: Color(0xFF1A1A1A),
+      ),
     );
   }
 }
