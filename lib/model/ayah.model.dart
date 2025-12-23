@@ -5,6 +5,8 @@ class Ayah {
   final String audio;
   final List<String> audioSecondary;
   final String text;
+  final String? translation;
+  final String? transliteration;
   final int numberInSurah;
   final int juz;
   final int manzil;
@@ -19,6 +21,8 @@ class Ayah {
     this.audio = '',
     this.audioSecondary = const [],
     this.text = '',
+    this.translation,
+    this.transliteration,
     this.numberInSurah = 0,
     this.juz = 0,
     this.manzil = 0,
@@ -29,12 +33,50 @@ class Ayah {
     // this.sajda = false,
   });
 
+  Ayah copyWith({
+    int? number,
+    String? audio,
+    List<String>? audioSecondary,
+    String? text,
+    String? translation,
+    String? transliteration,
+    int? numberInSurah,
+    int? juz,
+    int? manzil,
+    int? page,
+    int? ruku,
+    int? hizbQuarter,
+    Surah? surah,
+  }) {
+    return Ayah(
+      number: number ?? this.number,
+      audio: audio ?? this.audio,
+      audioSecondary: audioSecondary ?? this.audioSecondary,
+      text: text ?? this.text,
+      translation: translation ?? this.translation,
+      transliteration: transliteration ?? this.transliteration,
+      numberInSurah: numberInSurah ?? this.numberInSurah,
+      juz: juz ?? this.juz,
+      manzil: manzil ?? this.manzil,
+      page: page ?? this.page,
+      ruku: ruku ?? this.ruku,
+      hizbQuarter: hizbQuarter ?? this.hizbQuarter,
+      surah: surah ?? this.surah,
+    );
+  }
+
   factory Ayah.fromJson(Map<String, dynamic> json) {
     return Ayah(
       number: json['number'],
       audio: json['audio'] ?? '',
       audioSecondary: ((json['audioSecondary'] ?? []) as List).cast<String>(),
       text: json['text'],
+      translation: (json['translation'] ??
+              json['textTranslation'] ??
+              json['englishTranslation'])
+          ?.toString(),
+      transliteration:
+          (json['transliteration'] ?? json['textTransliteration'])?.toString(),
       numberInSurah: json['numberInSurah'],
       juz: json['juz'],
       manzil: json['manzil'],
@@ -52,6 +94,8 @@ class Ayah {
       'audio': audio,
       'audioSecondary': audioSecondary,
       'text': text,
+      'translation': translation,
+      'transliteration': transliteration,
       'numberInSurah': numberInSurah,
       'juz': juz,
       'manzil': manzil,

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 
 class AudioServices {
@@ -12,8 +11,31 @@ class AudioServices {
 
   final audioPlayer = AudioPlayer();
 
-  Future<void> setAudioSource(AudioSource audioSource) async {
+  Future<void> setAudioSource(AudioSource audioSource,
+      {bool preload = true}) async {
     try {
+      if (kIsWeb) {
+        await setWebAudioSource(audioSource);
+
+        return;
+      }
+
+      await audioPlayer.setAudioSource(audioSource, preload: preload);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Sets the [audioSource] for audio playback specifically optimized for the web platform.
+  ///
+  /// On the web, this method ensures that playback:
+  /// 1. Stops any existing audio without tracking the event.
+  /// 2. Sets the new audio source for the player.
+  ///
+  /// Any errors encountered are caught and printed for debugging.
+  Future<void> setWebAudioSource(AudioSource audioSource) async {
+    try {
+      await stop(trackEvent: false);
       await audioPlayer.setAudioSource(audioSource);
     } catch (e) {
       debugPrint(e.toString());
@@ -22,8 +44,8 @@ class AudioServices {
 
   Future<void> setPlaylistAudio(List<AudioSource> audioSources) async {
     try {
+      await stop(trackEvent: false);
       await audioPlayer.setAudioSources(audioSources);
-      await stop();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -33,7 +55,7 @@ class AudioServices {
     try {
       // If playback has completed, restart from beginning
       if (audioPlayer.processingState == ProcessingState.completed) {
-        await stop();
+        await stop(trackEvent: false);
         await seek(Duration.zero, index: 0);
       }
 
@@ -67,13 +89,16 @@ class AudioServices {
     }
   }
 
-  Future<void> stop({String? audioName}) async {
+  Future<void> stop({String? audioName, bool trackEvent = true}) async {
     try {
       await audioPlayer.stop();
 
       // Track audio stop with context
-      AnalyticsService.trackAudioControl('stop', audioName ?? 'Audio Playback',
-          audioType: 'recitation');
+      if (trackEvent) {
+        AnalyticsService.trackAudioControl(
+            'stop', audioName ?? 'Audio Playback',
+            audioType: 'recitation');
+      }
     } catch (e) {
       debugPrint('Error stopping audio: ${e.toString()}');
     }
@@ -105,11 +130,21 @@ class AudioServices {
     Duration? position,
     int? index,
   }) async {
-    await audioPlayer.stop();
-    await audioPlayer.seek(position ?? Duration.zero, index: index);
-    await audioPlayer.setAudioSource(
-      preload: false,
-      audioSource ?? AudioSource.uri(Uri(), tag: MediaItem(id: '', title: '')),
-    );
+    await stop(trackEvent: false);
+    await seek(position ?? Duration.zero, index: index);
+
+    // Avoid setting an invalid/empty Uri() which can confuse platform decoders.
+    // If no source is provided, clear the player's playlist.
+    if (audioSource == null) {
+      try {
+        await setPlaylistAudio([]);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+
+      return;
+    }
+
+    await setAudioSource(audioSource, preload: false);
   }
 }

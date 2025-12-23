@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
-import 'package:hafiz_test/services/audio_services.dart';
+import 'package:hafiz_test/quran/widgets/reading_preferences_button.dart';
+import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
@@ -20,22 +25,78 @@ class QuranView extends StatefulWidget {
 
 class _QuranViewState extends State<QuranView> {
   final viewModel = QuranViewModel(
-    audioService: getIt<AudioServices>(),
+    audioCenter: getIt<AudioCenter>(),
     surahService: getIt<SurahServices>(),
   );
+
+  final _storage = getIt<IStorageService>();
+
+  double _speed = 1.5;
+  bool _isAutoSwitching = false;
+
+  void _onPlayingIndexChanged() {
+    final idx = viewModel.playingIndexNotifier.value;
+    if (idx == null) return;
+
+    // The scroll controller may not be attached yet (initial build / rebuild).
+    if (!viewModel.itemScrollController.isAttached) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        viewModel.scrollToVerse(idx);
+      });
+
+      return;
+    }
+
+    viewModel.scrollToVerse(idx);
+  }
 
   @override
   void initState() {
     super.initState();
 
     viewModel.initiateListeners();
+    viewModel.playingIndexNotifier.addListener(_onPlayingIndexChanged);
+    viewModel.audioCenter.addListener(_onAudioCenterChanged);
     viewModel.initialize(widget.surah.number).then((_) {
       setState(() {});
+      _onPlayingIndexChanged();
+    });
+  }
+
+  void _onAudioCenterChanged() {
+    if (!mounted) return;
+
+    // Only auto-switch screens when AudioCenter is in reading mode and has
+    // moved playback to a different surah (auto-advance at end of playlist).
+    if (viewModel.audioCenter.playbackOwner != PlaybackOwner.reading) return;
+
+    final currentSurahNumer = viewModel.audioCenter.currentSurahNumber;
+    if (currentSurahNumer == null || currentSurahNumer == widget.surah.number) {
+      return;
+    }
+
+    if (_isAutoSwitching) return;
+
+    _isAutoSwitching = true;
+
+    final nextSurah = findSurahByNumber(currentSurahNumer);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) {
+          return QuranView(surah: nextSurah);
+        }),
+      ).whenComplete(() => _isAutoSwitching = false);
     });
   }
 
   @override
   void dispose() {
+    viewModel.playingIndexNotifier.removeListener(_onPlayingIndexChanged);
+    viewModel.audioCenter.removeListener(_onAudioCenterChanged);
     viewModel.dispose();
 
     super.dispose();
@@ -50,16 +111,22 @@ class _QuranViewState extends State<QuranView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (viewModel.isLoading) {
-      return Scaffold(body: SurahLoader());
+      return Scaffold(
+        body: SurahLoader(
+          title: context.l10n.surahLoadingTitle,
+          subtitle: context.l10n.surahLoadingSubtitle,
+        ),
+      );
     }
 
     if (viewModel.hasError) {
       return Scaffold(
         body: CustomErrorWidget(
-          title: 'Failed to Load Surah',
-          message:
-              'Please check your internet connection or try again shortly.',
+          title: context.l10n.quranViewErrorTitle,
+          message: '${context.l10n.quranViewErrorMessage} ${viewModel.error}',
           icon: Icons.menu_book_rounded,
           color: Colors.green.shade700,
           onRetry: () async {
@@ -79,142 +146,143 @@ class _QuranViewState extends State<QuranView> {
         }
       },
       child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor:
-              Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-          elevation: 0,
-          foregroundColor: Theme.of(context).colorScheme.onSurface,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
-                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor
+            : const Color(0xFFF9FAFB),
+        body: Column(
+          children: [
+            Container(
+              color: isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6),
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+              child: SafeArea(
+                bottom: false,
+                child: SizedBox(
+                  height: 70,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF1A1A1A)
+                                    : Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 18,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF111827),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          viewModel.surah?.englishName ?? '',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color:
+                                isDark ? Colors.white : const Color(0xFF111827),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ReadingPreferencesButton(
+                          storage: _storage,
+                          isDark: isDark,
+                          onChanged: () {
+                            if (mounted) setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-          title: ValueListenableBuilder<int?>(
-            valueListenable: viewModel.playingIndexNotifier,
-            builder: (context, index, _) {
-              final ayahs = viewModel.surah.ayahs;
-              final valid = index != null && index >= 0 && index < ayahs.length;
-              final verseText = valid
-                  ? ' - Verse ${ayahs[index].numberInSurah} of ${viewModel.surah.numberOfAyahs}'
-                  : '';
-              return Text(
-                '${viewModel.surah.englishName}$verseText',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              );
-            },
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.only(bottom: 80),
-                decoration: BoxDecoration(
-                  image: const DecorationImage(
-                    image: AssetImage('assets/img/surah_background.png'),
-                    fit: BoxFit.cover,
+            Expanded(
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: viewModel.surah == null
+                            ? const SizedBox.shrink()
+                            : QuranAyahList(
+                                surah: viewModel.surah!,
+                                showBismillah: viewModel.shouldShowBismillah(
+                                  viewModel.surah?.number,
+                                ),
+                                playingIndexNotifier:
+                                    viewModel.playingIndexNotifier,
+                                isPlayingNotifier: viewModel.isPlayingNotifier,
+                                scrollController:
+                                    viewModel.itemScrollController,
+                                onControlPressed:
+                                    viewModel.onAyahControlPressed,
+                              ),
+                      ),
+                      const SizedBox(height: 150),
+                    ],
                   ),
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black.withValues(alpha: 0.3)
-                      : null,
-                  backgroundBlendMode:
-                      Theme.of(context).brightness == Brightness.dark
-                          ? BlendMode.multiply
-                          : null,
-                ),
-                child: QuranAyahList(
-                  surah: viewModel.surah,
-                  playingIndexNotifier: viewModel.playingIndexNotifier,
-                  scrollController: viewModel.itemScrollController,
-                  onControlPressed: viewModel.onAyahControlPressed,
-                ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ListenableBuilder(
+                      listenable: viewModel.audioCenter,
+                      builder: (context, _) {
+                        return BottomAudioControls(
+                          playingIndexListenable:
+                              viewModel.playingIndexNotifier,
+                          titleBuilder: (index) {
+                            final surah = viewModel.surah;
+                            if (surah == null) return '';
+
+                            final ayahs = surah.ayahs;
+                            final i = index;
+                            final valid =
+                                i != null && i >= 0 && i < ayahs.length;
+                            final current = valid ? ayahs[i] : null;
+
+                            return current == null
+                                ? surah.englishName
+                                : '${surah.englishName}: ${current.numberInSurah}';
+                          },
+                          audioCenter: viewModel.audioCenter,
+                          audioPlayer: viewModel.audioPlayer,
+                          isContextActive: viewModel.surah == null
+                              ? false
+                              : viewModel.audioCenter
+                                  .isCurrentSurah(viewModel.surah!.number),
+                          speed: _speed,
+                          onSpeedChanged: (nextSpeed) async {
+                            _speed = nextSpeed;
+                            await viewModel.audioPlayer.setSpeed(_speed);
+                            setState(() {});
+                          },
+                          onTogglePlayPause: viewModel.togglePlayPause,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: viewModel.isPlayingNotifier,
-                  builder: (_, __, ___) {
-                    return Container(
-                      height: 80,
-                      margin: const EdgeInsets.all(12),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surface
-                            .withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            viewModel.isPlayingPlaylist
-                                ? 'Playing Full Surah'
-                                : 'Play Full Surah',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: viewModel.togglePlayPause,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: viewModel.isPlayingPlaylist
-                                    ? Colors.red.shade600
-                                    : Theme.of(context).colorScheme.primary,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 4,
-                                    offset: const Offset(2, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                viewModel.isPlayingPlaylist
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                color: Colors.white,
-                                size: 25,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

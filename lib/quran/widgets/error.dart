@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hafiz_test/widget/button.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class CustomErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
   final IconData icon;
   final Color color;
   final String title;
@@ -12,6 +15,8 @@ class CustomErrorWidget extends StatelessWidget {
     super.key,
     required this.message,
     required this.onRetry,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
     this.icon = Icons.error_outline_rounded,
     this.color = const Color(0xFFDC3545),
     this.title = 'Oops!',
@@ -60,15 +65,29 @@ class CustomErrorWidget extends StatelessWidget {
             const SizedBox(height: 24),
             Button(
               onPressed: onRetry,
-              child: const Text(
-                "Try Again",
-                style: TextStyle(
+              child: Text(
+                context.l10n.errorRetryButton,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                   color: Colors.white,
                 ),
               ),
             ),
+            if (secondaryActionLabel != null && onSecondaryAction != null) ...[
+              const SizedBox(height: 12),
+              Button(
+                onPressed: onSecondaryAction,
+                child: Text(
+                  secondaryActionLabel!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

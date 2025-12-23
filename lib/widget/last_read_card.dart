@@ -7,6 +7,7 @@ import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/widget/showcase.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class LastReadCard extends StatelessWidget {
   final GlobalKey lastReadKey;
@@ -53,13 +54,13 @@ class LastReadCard extends StatelessWidget {
             children: [
               ShowCase(
                 widgetKey: lastReadKey,
-                title: 'Last Read',
-                description: 'This shows your last read Surah and Ayah.',
+                title: context.l10n.lastReadTitle,
+                description: context.l10n.lastReadDescription,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Last Read',
+                      context.l10n.lastReadTitle,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: Theme.of(context).brightness == Brightness.dark
@@ -125,7 +126,7 @@ class LastReadCard extends StatelessWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'Continue',
+                      context.l10n.lastReadContinueButton,
                       style: GoogleFonts.montserrat(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -159,7 +160,7 @@ class LastReadWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (lastRead == null) {
       return Text(
-        'No last read',
+        context.l10n.lastReadNoData,
         style: GoogleFonts.inter(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -187,7 +188,7 @@ class LastReadWidget extends StatelessWidget {
           ),
         ),
         Text(
-          'Ayah no. ${ayah.numberInSurah}',
+          context.l10n.lastReadAyahNumber(ayah.numberInSurah),
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w300,

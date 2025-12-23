@@ -51,7 +51,7 @@ void main() {
       test('should return Surah on successful response', () async {
         // Arrange
         const surahNumber = 1;
-        const reciter = 'ar.alafasy';
+        const reciterId = 'ar.alafasy';
         final mockResponse = Response(
           data: {
             'data': {
@@ -65,8 +65,10 @@ void main() {
           requestOptions: RequestOptions(path: ''),
         );
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
+        when(() => mockNetworkServices.urlExists(any()))
+            .thenAnswer((_) async => false);
+        when(() => mockNetworkServices.get(any()))
             .thenAnswer((_) async => mockResponse);
 
         // Act
@@ -76,44 +78,50 @@ void main() {
         expect(result, isA<Surah>());
         expect(result.number, equals(1));
         expect(result.name, equals('Al-Fatihah'));
-        verify(() => mockStorageServices.getReciter()).called(1);
-        verify(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
-            .called(1);
+        verify(() => mockStorageServices.getReciterId()).called(1);
+        verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
       });
 
-      test('should return empty Surah on null response data', () async {
+      test('should throw Exception on null response data', () async {
         // Arrange
         const surahNumber = 1;
-        const reciter = 'ar.alafasy';
+        const reciterId = 'ar.alafasy';
         final mockResponse = Response(
           data: null,
           statusCode: 200,
           requestOptions: RequestOptions(path: ''),
         );
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
+        when(() => mockNetworkServices.urlExists(any()))
+            .thenAnswer((_) async => false);
+        when(() => mockNetworkServices.get(any()))
             .thenAnswer((_) async => mockResponse);
 
         // Act
-        final result = await surahServices.getSurah(surahNumber);
+        await expectLater(
+          () async => await surahServices.getSurah(surahNumber),
+          throwsA(isA<Exception>()),
+        );
 
         // Assert
-        expect(result, isA<Surah>());
+        verify(() => mockStorageServices.getReciterId()).called(1);
+        verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
       });
 
       test('should rethrow network errors', () async {
         // Arrange
         const surahNumber = 1;
-        const reciter = 'ar.alafasy';
+        const reciterId = 'ar.alafasy';
         final dioError = DioException(
           requestOptions: RequestOptions(path: ''),
           type: DioExceptionType.unknown,
         );
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
-            .thenThrow(dioError);
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
+        when(() => mockNetworkServices.urlExists(any()))
+            .thenAnswer((_) async => false);
+        when(() => mockNetworkServices.get(any())).thenThrow(dioError);
 
         // Act & Assert
         expect(

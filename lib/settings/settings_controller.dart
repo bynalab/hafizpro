@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/audio_center.dart';
+import 'package:hafiz_test/services/notification_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/theme_controller.dart';
+
+class SettingsController extends ChangeNotifier {
+  final IStorageService _storage;
+  final ThemeController _theme;
+  final NotificationService _notifications;
+
+  SettingsController({
+    IStorageService? storage,
+    ThemeController? theme,
+    NotificationService? notifications,
+  })  : _storage = storage ?? getIt<IStorageService>(),
+        _theme = theme ?? getIt<ThemeController>(),
+        _notifications = notifications ?? getIt<NotificationService>();
+
+  bool isLoading = true;
+
+  bool autoPlay = true;
+  String? reciter;
+  late ThemeMode themeMode;
+
+  bool notificationsEnabled = false;
+  TimeOfDay notificationTime = const TimeOfDay(hour: 20, minute: 0);
+
+  void load() {
+    try {
+      autoPlay = _storage.checkAutoPlay();
+      reciter = _storage.getReciterId();
+      themeMode = ThemeMode.values.byName(_theme.mode);
+
+      final rawEnabled = _storage.getString('notifications_enabled');
+      notificationsEnabled = rawEnabled == 'true';
+
+      final rawTime = _storage.getString('notification_time');
+      if (rawTime != null && rawTime.contains(':')) {
+        final parts = rawTime.split(':');
+        if (parts.length == 2) {
+          final h = int.tryParse(parts[0]);
+          final m = int.tryParse(parts[1]);
+          if (h != null && m != null) {
+            notificationTime = TimeOfDay(hour: h, minute: m);
+          }
+        }
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> setAutoPlay(bool value) async {
+    final oldValue = autoPlay;
+    autoPlay = value;
+    notifyListeners();
+
+    AnalyticsService.trackSettingsChanged('autoplay', oldValue, value);
+    await _storage.setAutoPlay(value);
+  }
+
+  Future<void> setReciter(String identifier) async {
+    final oldValue = reciter;
+    reciter = identifier;
+    notifyListeners();
+
+    AnalyticsService.trackSettingsChanged('reciter', oldValue, identifier);
+    await _storage.setReciterId(identifier);
+    await getIt<AudioCenter>().onReciterChanged();
+  }
+
+  Future<void> setNotifications({
+    required bool enabled,
+    required TimeOfDay time,
+  }) async {
+    notificationsEnabled = enabled;
+    notificationTime = time;
+    notifyListeners();
+
+    await _storage.setString('notifications_enabled', enabled.toString());
+    await _storage.setString(
+      'notification_time',
+      '${time.hour}:${time.minute}',
+    );
+
+    try {
+      if (enabled) {
+        await _notifications.scheduleDailyMotivation(time);
+      } else {
+        await _notifications.cancelDailyMotivation();
+      }
+    } catch (_) {
+      // Keep settings saved even if scheduling fails.
+    }
+  }
+}

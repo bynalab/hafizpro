@@ -1,0 +1,720 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
+
+import 'package:hafiz_test/data/juz_list.dart';
+import 'package:hafiz_test/data/surah_list.dart';
+import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/model/juz.model.dart';
+import 'package:hafiz_test/juz/juz_quran_view.dart';
+import 'package:hafiz_test/quran/quran_view.dart';
+import 'package:hafiz_test/services/audio_center.dart';
+import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/surah/test_by_surah.dart';
+// import 'package:hafiz_test/surah/surah_list_screen.dart';
+// import 'package:hafiz_test/enum/surah_select_action.dart';
+import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
+// import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
+
+import 'package:hafiz_test/main_menu/widgets.dart';
+
+class _DashboardPalette {
+  static bool _isDark(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  static Color iconButtonBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
+  }
+
+  static Color primaryText(BuildContext context) {
+    return _isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+  }
+
+  static Color secondaryText(BuildContext context) {
+    return const Color(0xFF9CA3AF);
+  }
+
+  static Color pinnedHeaderBg(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF0B0B0B) : Colors.white;
+  }
+
+  static Color cardTeal(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF1B5E63) : const Color(0xFFBFE7EA);
+  }
+
+  static Color cardPurple(BuildContext context) {
+    return _isDark(context) ? const Color(0xFF3B2448) : const Color(0xFFE6BDEB);
+  }
+}
+
+class QuranDashboardPage extends StatefulWidget {
+  const QuranDashboardPage({
+    super.key,
+    required this.segmentIndex,
+    required this.onSegmentChanged,
+    required this.searchController,
+    required this.query,
+    required this.onOpenSettings,
+    required this.onToggleTheme,
+  });
+
+  final int segmentIndex;
+  final ValueChanged<int> onSegmentChanged;
+  final TextEditingController searchController;
+  final String query;
+  final VoidCallback onOpenSettings;
+  final VoidCallback onToggleTheme;
+
+  @override
+  State<QuranDashboardPage> createState() => _QuranDashboardPageState();
+}
+
+class _QuranDashboardPageState extends State<QuranDashboardPage> {
+  bool get _isSearching => widget.query.trim().isNotEmpty;
+
+  final _audioCenter = getIt<AudioCenter>();
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    const pillOuterBottomPadding = 18.0;
+    const pillHeight = 44.0;
+    const pillVerticalPadding = 8.0;
+    const bottomNavReserved =
+        pillOuterBottomPadding + pillHeight + (pillVerticalPadding * 2);
+
+    final displaySurahs = _isSearching ? searchSurah(widget.query) : surahList;
+    final displayJuz = _isSearching ? searchJuz(widget.query) : juzList;
+
+    final lastRead = getIt<IStorageService>().getLastRead();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: AnimatedBuilder(
+        animation: _audioCenter,
+        builder: (context, _) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      CircleIconButton(
+                        background: AppColors.green500,
+                        icon: SvgPicture.asset(
+                          'assets/img/quran-01.svg',
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        onTap: () {},
+                      ),
+                      const Spacer(),
+                      CircleIconButton(
+                        background: _DashboardPalette.iconButtonBg(context),
+                        icon: Icon(
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Icons.light_mode
+                              : Icons.dark_mode,
+                          color: _DashboardPalette.primaryText(context),
+                        ),
+                        onTap: widget.onToggleTheme,
+                      ),
+                      const SizedBox(width: 10),
+                      CircleIconButton(
+                        background: _DashboardPalette.iconButtonBg(context),
+                        icon: const Icon(
+                          Icons.settings,
+                          color: null,
+                        ),
+                        onTap: widget.onOpenSettings,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  SearchField(
+                    controller: widget.searchController,
+                    hintText: widget.segmentIndex == 0
+                        ? context.l10n.searchBySurahHint
+                        : context.l10n.searchByJuzHint,
+                  ),
+                  const SizedBox(height: 14),
+                  if (!_isSearching) ...[
+                    if (lastRead == null)
+                      DashboardFeatureCard(
+                        background: _DashboardPalette.cardTeal(context),
+                        title: context.l10n.dashboardChallengeTitle,
+                        onTap: () {
+                          AnalyticsService.trackButtonClick(
+                              'Challenge Yourself',
+                              screen: 'Main Menu');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const TestBySurah(),
+                            ),
+                          );
+                        },
+                        right: Image.asset(
+                          'assets/img/quran_question_icon.png',
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.contain,
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/img/brain.svg',
+                              width: 22,
+                              height: 22,
+                              colorFilter: ColorFilter.mode(
+                                _DashboardPalette.primaryText(context),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                context.l10n.dashboardChallengeDescription,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: _DashboardPalette.primaryText(context),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: _DashboardPalette.primaryText(context),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      _ContinueLastTestCard(lastRead: lastRead),
+                    ListenableBuilder(
+                      listenable: _audioCenter,
+                      builder: (context, _) {
+                        final currentSurahNumber =
+                            _audioCenter.currentSurahNumber;
+                        final currentSurahName = _audioCenter.currentSurahName;
+                        final currentJuzNumber = _audioCenter.currentJuzNumber;
+
+                        if (currentJuzNumber == null &&
+                            (currentSurahNumber == null ||
+                                currentSurahName == null)) {
+                          return const SizedBox.shrink();
+                        }
+
+                        final title = currentJuzNumber != null
+                            ? context.l10n.juzNumberLabel(currentJuzNumber)
+                            : (currentSurahName ?? '');
+
+                        return Column(
+                          children: [
+                            const SizedBox(height: 14),
+                            _NowPlayingCard(
+                              audioPlayer: _audioCenter.audioPlayer,
+                              title: title,
+                              isLoading: _audioCenter.isLoading,
+                              onTap: () {
+                                final juzNumber = currentJuzNumber;
+                                if (juzNumber != null) {
+                                  final juz = findJuzByNumber(juzNumber);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => JuzQuranView(juz: juz),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                final surahNumber = currentSurahNumber;
+                                final surahName = currentSurahName;
+                                if (surahNumber == null || surahName == null) {
+                                  return;
+                                }
+
+                                final surah = Surah(
+                                  number: surahNumber,
+                                  englishName: surahName,
+                                );
+
+                                AnalyticsService.trackSurahSelected(
+                                  surah.englishName,
+                                  surah.number,
+                                );
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => QuranView(surah: surah),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+                        );
+                      },
+                    ),
+                    // _ContinueReadingCard(lastRead: lastRead),
+                    const SizedBox(height: 16),
+                    Text(
+                      context.l10n.dashboardListenReadHeader,
+                      style: GoogleFonts.cairo(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: _DashboardPalette.primaryText(context),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ],
+              ),
+            ),
+            if (!_isSearching)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PinnedSegmentHeaderDelegate(
+                  minExtent: 58,
+                  maxExtent: 58,
+                  child: Container(
+                    color: _DashboardPalette.pinnedHeaderBg(context),
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: SegmentedSwitch(
+                      leftLabel: context.l10n.segmentSurah,
+                      rightLabel: context.l10n.segmentJuz,
+                      index: widget.segmentIndex,
+                      onChanged: widget.onSegmentChanged,
+                    ),
+                  ),
+                ),
+              )
+            else
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            if (widget.segmentIndex == 0)
+              SliverList.separated(
+                itemCount: displaySurahs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final surah = displaySurahs[i];
+
+                  return SurahCard(
+                    surah: surah,
+                    onTap: () {
+                      AnalyticsService.trackSurahSelected(
+                        surah.englishName,
+                        surah.number,
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) {
+                            return QuranView(surah: surah);
+                          },
+                        ),
+                      );
+                    },
+                    onPlay: () async {
+                      await _audioCenter.toggleSurah(surah);
+                    },
+                    isPlaying: _audioCenter.isCurrentSurah(surah.number) &&
+                        _audioCenter.isPlaying,
+                    isLoading: _audioCenter.isCurrentSurah(surah.number) &&
+                        _audioCenter.isLoading,
+                  );
+                },
+              )
+            else
+              SliverList.separated(
+                itemCount: displayJuz.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final JuzModel juz = displayJuz[i];
+                  final juzNumber = juz.number;
+
+                  return JuzCard(
+                    juz: juz,
+                    onTap: () {
+                      AnalyticsService.trackJuzSelected(juzNumber);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => JuzQuranView(juz: juz),
+                        ),
+                      );
+                    },
+                    onPlay: () async {
+                      AnalyticsService.trackJuzSelected(juzNumber);
+                      await _audioCenter.toggleJuz(juz);
+                    },
+                    isPlaying: _audioCenter.isCurrentJuz(juzNumber) &&
+                        _audioCenter.isPlaying,
+                    isLoading: _audioCenter.isCurrentJuz(juzNumber) &&
+                        _audioCenter.isLoading,
+                  );
+                },
+              ),
+            SliverToBoxAdapter(
+              child: SizedBox(height: bottomNavReserved + bottomInset + 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PinnedSegmentHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _PinnedSegmentHeaderDelegate({
+    required this.minExtent,
+    required this.maxExtent,
+    required this.child,
+  });
+
+  @override
+  final double minExtent;
+
+  @override
+  final double maxExtent;
+
+  final Widget child;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(covariant _PinnedSegmentHeaderDelegate oldDelegate) {
+    return minExtent != oldDelegate.minExtent ||
+        maxExtent != oldDelegate.maxExtent ||
+        child != oldDelegate.child;
+  }
+}
+
+class _ContinueLastTestCard extends StatelessWidget {
+  const _ContinueLastTestCard({required this.lastRead});
+
+  final (Surah, Ayah) lastRead;
+
+  @override
+  Widget build(BuildContext context) {
+    final surah = lastRead.$1;
+    final ayah = lastRead.$2;
+
+    return DashboardFeatureCard(
+      background: _DashboardPalette.cardTeal(context),
+      title: context.l10n.dashboardContinueLastTestTitle,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => TestBySurah(
+              surahNumber: surah.number,
+              ayahNumber: ayah.numberInSurah,
+            ),
+          ),
+        );
+      },
+      right: Image.asset(
+        'assets/img/quran_question_icon.png',
+        width: 72,
+        height: 72,
+        fit: BoxFit.contain,
+      ),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/img/brain.svg',
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(
+              _DashboardPalette.primaryText(context),
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  surah.englishName,
+                  style: GoogleFonts.cairo(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: _DashboardPalette.primaryText(context),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  context.l10n.verseNumberLabel(ayah.numberInSurah),
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: _DashboardPalette.secondaryText(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(
+            Icons.arrow_forward,
+            color: _DashboardPalette.primaryText(context),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// class _ContinueReadingCard extends StatelessWidget {
+//   const _ContinueReadingCard({required this.lastRead});
+
+//   final (Surah, Ayah)? lastRead;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return DashboardFeatureCard(
+//       background: const Color(0xFFF7CFC7),
+//       title: 'Continue Reading',
+//       onTap: () {
+//         if (lastRead == null) {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder: (_) => const SurahListScreen(
+//                 actionType: SurahSelectionAction.read,
+//               ),
+//             ),
+//           );
+//           return;
+//         }
+
+//         final surah = lastRead!.$1;
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
+//         );
+//       },
+//       right: Image.asset(
+//         'assets/img/open_book_glass_icon.png',
+//         width: 84,
+//         height: 84,
+//         fit: BoxFit.contain,
+//       ),
+//       child: Row(
+//         children: [
+//           const Icon(CupertinoIcons.book, color: Color(0xFF111827)),
+//           const SizedBox(width: 12),
+//           Expanded(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 if (lastRead == null) ...[
+//                   Text(
+//                     'Pick a Surah',
+//                     style: GoogleFonts.cairo(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w700,
+//                       color: const Color(0xFF111827),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     'Start reading where you want',
+//                     style: GoogleFonts.inter(
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w500,
+//                       color: const Color(0xFF9CA3AF),
+//                     ),
+//                   ),
+//                 ] else ...[
+//                   Text(
+//                     lastRead!.$1.englishName,
+//                     style: GoogleFonts.cairo(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w700,
+//                       color: const Color(0xFF111827),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     'Verse ${lastRead!.$2.numberInSurah}',
+//                     style: GoogleFonts.inter(
+//                       fontSize: 14,
+//                       fontWeight: FontWeight.w500,
+//                       color: const Color(0xFF9CA3AF),
+//                     ),
+//                   ),
+//                 ],
+//               ],
+//             ),
+//           ),
+//           const SizedBox(width: 8),
+//           const Icon(Icons.arrow_forward, color: Color(0xFF111827)),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+class _NowPlayingCard extends StatelessWidget {
+  final String title;
+  final AudioPlayer audioPlayer;
+  final VoidCallback onTap;
+  final bool isLoading;
+
+  const _NowPlayingCard({
+    required this.audioPlayer,
+    required this.title,
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DashboardFeatureCard(
+      onTap: onTap,
+      background: _DashboardPalette.cardPurple(context),
+      title: context.l10n.dashboardNowPlayingTitle,
+      right: Image.asset(
+        'assets/img/headset_icon.png',
+        width: 84,
+        height: 84,
+        fit: BoxFit.contain,
+      ),
+      child: StreamBuilder<PlayerState>(
+        stream: audioPlayer.playerStateStream,
+        builder: (context, snap) {
+          final state = snap.data;
+          final processingState =
+              state?.processingState ?? audioPlayer.processingState;
+          final playing = (state?.playing ?? audioPlayer.playing) &&
+              processingState != ProcessingState.completed;
+
+          return Row(
+            children: [
+              Icon(
+                CupertinoIcons.waveform,
+                color: _DashboardPalette.primaryText(context),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: _DashboardPalette.primaryText(context),
+                      ),
+                    ),
+                    // const SizedBox(height: 10),
+                    // CumulativePlaylistProgressBar(
+                    //   audioPlayer: audioPlayer,
+                    //   minHeight: 4,
+                    //   backgroundColor:
+                    //       const Color(0xFF111827).withValues(alpha: 0.15),
+                    //   valueColor: const Color(0xFF111827),
+                    // ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: !isLoading && audioPlayer.hasPrevious
+                              ? () => audioPlayer.seekToPrevious()
+                              : null,
+                          icon: SvgPicture.asset(
+                            'assets/icons/previous.svg',
+                            width: 22,
+                            height: 22,
+                            colorFilter: ColorFilter.mode(
+                              _DashboardPalette.primaryText(context),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: isLoading
+                              ? null
+                              : () async {
+                                  if (playing) {
+                                    await audioPlayer.pause();
+                                  } else {
+                                    if (processingState ==
+                                        ProcessingState.completed) {
+                                      await audioPlayer.seek(Duration.zero,
+                                          index: 0);
+                                    }
+                                    await audioPlayer.play();
+                                  }
+                                },
+                          icon: isLoading
+                              ? SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      _DashboardPalette.primaryText(context),
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  playing
+                                      ? CupertinoIcons.pause_circle_fill
+                                      : CupertinoIcons.play_circle_fill,
+                                  size: 36,
+                                ),
+                        ),
+                        IconButton(
+                          onPressed: !isLoading && audioPlayer.hasNext
+                              ? () => audioPlayer.seekToNext()
+                              : null,
+                          icon: SvgPicture.asset(
+                            'assets/icons/next.svg',
+                            width: 22,
+                            height: 22,
+                            colorFilter: ColorFilter.mode(
+                              _DashboardPalette.primaryText(context),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

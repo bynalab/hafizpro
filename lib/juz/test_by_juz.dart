@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,11 +5,18 @@ import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/data/juz_list.dart';
+import 'package:hafiz_test/juz/juz_quran_view.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/test_screen.dart';
+import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class TestByJuz extends StatefulWidget {
   final int juzNumber;
@@ -22,31 +28,79 @@ class TestByJuz extends StatefulWidget {
 }
 
 class _TestPage extends State<TestByJuz> {
-  bool isLoading = false;
+  final surahServices = getIt<SurahServices>();
+  final ayahServices = getIt<AyahServices>();
+  final audioCenter = getIt<AudioCenter>();
+  final storageServices = getIt<IStorageService>();
+
+  bool isLoading = true;
+  bool hasError = false;
+  String? errorMessage;
 
   late Ayah currentAyah;
 
   Surah surah = Surah();
 
+  bool get _isReciterModeError {
+    return (errorMessage ?? '').toLowerCase().contains('surah-by-surah');
+  }
+
+  Future<void> _changeReciterAndRetry() async {
+    final selected = await ReciterPickerSheet(
+      selected: storageServices.getReciterId(),
+    ).openBottomSheet(context);
+    if (selected == null) return;
+
+    await storageServices.setReciterId(selected.identifier);
+    // await getIt<AudioCenter>().onReciterChanged();
+    await init();
+  }
+
   Future<void> init() async {
-    setState(() => isLoading = true);
+    if (!mounted) return;
 
-    // The Ayah returned from this function does not contain `audioSource`
-    final ayahFromJuz =
-        await getIt<AyahServices>().getRandomAyahFromJuz(widget.juzNumber);
+    setState(() {
+      isLoading = true;
+      hasError = false;
+      errorMessage = null;
+    });
 
-    final surahNumber = ayahFromJuz.surah?.number ?? 0;
-    surah = await getIt<SurahServices>().getSurah(surahNumber);
+    try {
+      // The Ayah returned from this function does not contain `audioSource`
+      final ayahFromJuz =
+          await ayahServices.getRandomAyahFromJuz(widget.juzNumber);
 
-    // Hence, the need to loop through surah ayahs to get audioSource for `ayahFromJuz`
-    currentAyah = surah.ayahs.firstWhere(
-      (ayah) => ayah.number == ayahFromJuz.number,
-    );
+      final surahNumber = ayahFromJuz.surah?.number ?? 0;
+      surah = await surahServices.getSurah(surahNumber);
 
-    await getIt<AudioServices>().setAudioSource(currentAyah.audioSource);
+      if (surah.isSurahLevelAudio) {
+        throw StateError(
+          'Selected reciter audio is surah-by-surah, which cannot be used for Test. Please choose a verse-by-verse reciter.',
+        );
+      }
 
-    if (mounted) {
-      setState(() => isLoading = false);
+      // Hence, the need to loop through surah ayahs to get audioSource for `ayahFromJuz`
+      currentAyah = surah.ayahs.firstWhere(
+        (ayah) => ayah.number == ayahFromJuz.number,
+      );
+
+      await getIt<AudioServices>().setAudioSource(currentAyah.audioSource);
+
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          hasError = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading juz for test: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          hasError = true;
+          errorMessage = e.toString();
+        });
+      }
     }
   }
 
@@ -54,7 +108,16 @@ class _TestPage extends State<TestByJuz> {
   void initState() {
     super.initState();
 
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      audioCenter.beginTestSession();
+      init();
+    });
+  }
+
+  @override
+  void dispose() {
+    audioCenter.endTestSession();
+    super.dispose();
   }
 
   @override
@@ -77,21 +140,41 @@ class _TestPage extends State<TestByJuz> {
           surfaceTintColor: Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).colorScheme.primary
               : const Color(0xFF004B40),
-          scrolledUnderElevation: 10,
+          scrolledUnderElevation: 0,
           centerTitle: false,
           automaticallyImplyLeading: false,
           title: Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset('assets/img/arrow_back.svg'),
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  borderRadius: BorderRadius.circular(999),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHigh
+                          .withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(
+                      'assets/img/arrow_back.svg',
+                      width: 18,
+                      height: 18,
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(width: 13),
+              const SizedBox(width: 14),
               Text(
-                surah.englishName,
+                context.l10n.juzNumberLabel(widget.juzNumber),
                 style: GoogleFonts.montserrat(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Theme.of(context).colorScheme.onSurface
                       : const Color(0xFF222222),
@@ -102,19 +185,36 @@ class _TestPage extends State<TestByJuz> {
         ),
         body: Stack(
           children: [
-            if (isLoading)
-              const Center(
-                child: CircularProgressIndicator.adaptive(
-                  strokeWidth: 5,
-                  backgroundColor: Colors.blueGrey,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+            if (hasError)
+              CustomErrorWidget(
+                title: context.l10n.juzTestErrorTitle,
+                message: errorMessage ?? context.l10n.juzTestErrorMessage,
+                icon: Icons.quiz_outlined,
+                color: Colors.purple.shade700,
+                onRetry: () async {
+                  await init();
+                },
+                secondaryActionLabel:
+                    _isReciterModeError ? context.l10n.changeReciter : null,
+                onSecondaryAction:
+                    _isReciterModeError ? _changeReciterAndRetry : null,
               )
             else
               SingleChildScrollView(
                 child: TestScreen(
                   surah: surah,
-                  currentAyah: currentAyah,
+                  currentAyah: isLoading ? Ayah() : currentAyah,
+                  isLoading: isLoading,
+                  readFullLabel: context.l10n.testReadEntireJuz,
+                  onReadFull: () async {
+                    final juz = findJuzByNumber(widget.juzNumber);
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JuzQuranView(juz: juz),
+                      ),
+                    );
+                  },
                   onRefresh: init,
                 ),
               ),

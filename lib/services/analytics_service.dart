@@ -2,6 +2,7 @@
 
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:hafiz_test/config/analytics_config.dart';
+import 'package:flutter/foundation.dart';
 
 class AnalyticsService {
   static const String _projectToken = AnalyticsConfig.mixpanelProjectToken;
@@ -28,8 +29,19 @@ class AnalyticsService {
             'Initializing Mixpanel with token: ${_projectToken.substring(0, 8)}...');
       }
 
+      // Skip Mixpanel initialization on web for now due to compatibility issues
+      if (kIsWeb) {
+        if (AnalyticsConfig.debugMode) {
+          print('⚠️ Skipping Mixpanel initialization on web platform');
+        }
+        _isInitialized = true;
+        _sessionStartTime = DateTime.now();
+        return;
+      }
+
       _mixpanel =
           await Mixpanel.init(_projectToken, trackAutomaticEvents: true);
+
       _isInitialized = true;
 
       // Initialize session tracking
@@ -40,6 +52,11 @@ class AnalyticsService {
       }
     } catch (e) {
       print('❌ Failed to initialize Mixpanel: $e');
+      // Don't fail the app if analytics fails
+      if (kDebugMode) {
+        print('Analytics initialization failed, continuing without analytics');
+      }
+      _isInitialized = true; // Mark as initialized to prevent repeated attempts
     }
   }
 
