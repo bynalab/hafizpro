@@ -42,6 +42,10 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Generated localization files
+lib/l10n/app_localizations*.dart
+.dart_tool/flutter_gen/
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
