@@ -59,7 +59,7 @@ class NotificationService {
     tz.initializeTimeZones();
     try {
       final localTz = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(localTz));
+      tz.setLocalLocation(tz.getLocation(localTz.identifier));
     } catch (_) {
       // If timezone resolution fails, tz.local still works but may default.
     }
