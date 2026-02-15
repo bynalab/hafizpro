@@ -305,8 +305,10 @@ class _TestPage extends State<TestBySurah> {
                     );
                   },
                   onRefresh: _onRefresh,
-                  onNextBoundary: _onNextSurah,
-                  onPreviousBoundary: _onPreviousSurah,
+                  onNextBoundary:
+                      _sortedSurahNumbers.isNotEmpty ? _onNextSurah : null,
+                  onPreviousBoundary:
+                      _sortedSurahNumbers.isNotEmpty ? _onPreviousSurah : null,
                 ),
               ),
           ],
