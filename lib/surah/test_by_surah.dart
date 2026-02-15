@@ -189,6 +189,7 @@ class _TestPage extends State<TestBySurah> {
     if (widget.surahNumbers != null && widget.surahNumbers!.isNotEmpty) {
       _currentSurahNumber = null; // Forces picking a new random one in init()
     }
+
     init();
   }
 
