@@ -731,7 +731,7 @@ class BottomPillNav extends StatelessWidget {
     final isDark = _DashboardPalette._isDark(context);
 
     return Container(
-      width: 240,
+      width: 340,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: _DashboardPalette.pillBg(context),
@@ -757,7 +757,7 @@ class BottomPillNav extends StatelessWidget {
               onTap: () => onChanged(0),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 4),
           Expanded(
             child: PillNavItem(
               active: index == 1,
@@ -774,6 +774,21 @@ class BottomPillNav extends StatelessWidget {
                 ),
               ),
               onTap: () => onChanged(1),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: PillNavItem(
+              active: index == 2,
+              label: 'Adhkar',
+              icon: Icon(
+                Icons.spa_outlined,
+                size: 18,
+                color: index == 2
+                    ? Colors.white
+                    : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+              ),
+              onTap: () => onChanged(2),
             ),
           ),
         ],
