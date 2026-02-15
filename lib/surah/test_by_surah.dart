@@ -1,6 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
@@ -16,12 +18,19 @@ import 'package:hafiz_test/test_screen.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
+import 'package:hafiz_test/util/util.dart';
 
 class TestBySurah extends StatefulWidget {
   final int? surahNumber;
   final int? ayahNumber;
+  final List<int>? surahNumbers;
 
-  const TestBySurah({super.key, this.surahNumber, this.ayahNumber});
+  const TestBySurah({
+    super.key,
+    this.surahNumber,
+    this.ayahNumber,
+    this.surahNumbers,
+  });
 
   @override
   State<StatefulWidget> createState() => _TestPage();
@@ -36,7 +45,18 @@ class _TestPage extends State<TestBySurah> {
   bool hasError = false;
   String? errorMessage;
 
-  late int surahNumber;
+  int? _currentSurahNumber;
+  int? _currentAyahNumber;
+
+  List<int> get _sortedSurahNumbers => widget.surahNumbers ?? [];
+
+  int get _currentIndex {
+    final sortedList = _sortedSurahNumbers;
+    if (sortedList.isEmpty || _currentSurahNumber == null) return -1;
+    return sortedList.indexOf(_currentSurahNumber!);
+  }
+
+  late Surah surah = Surah();
   late Ayah currentAyah;
 
   @override
@@ -54,8 +74,6 @@ class _TestPage extends State<TestBySurah> {
     audioCenter.endTestSession();
     super.dispose();
   }
-
-  Surah surah = Surah();
 
   bool get _isReciterModeError {
     return (errorMessage ?? '').toLowerCase().contains('surah-by-surah');
@@ -82,16 +100,21 @@ class _TestPage extends State<TestBySurah> {
     });
 
     try {
-      if (widget.surahNumber == null) {
-        surahNumber = surahServices.getRandomSurahNumber();
+      final sortedList = _sortedSurahNumbers;
+      if (_currentSurahNumber != null) {
+        // Use the surah number from state (for navigation)
+      } else if (sortedList.isNotEmpty) {
+        // First load of custom selection: Pick a random surah from the list
+        final random = Random();
+        _currentSurahNumber = sortedList[random.nextInt(sortedList.length)];
+      } else if (widget.surahNumber == null) {
+        _currentSurahNumber = surahServices.getRandomSurahNumber();
       } else {
-        surahNumber = widget.surahNumber!;
+        _currentSurahNumber = widget.surahNumber!;
       }
 
-      if (surah.ayahs.isEmpty || surah.isSurahLevelAudio) {
-        // Avoid refetching surah if it's ayahs are already loaded
-        surah = await surahServices.getSurah(surahNumber);
-      }
+      int surahNumberToLoad = _currentSurahNumber!;
+      surah = await surahServices.getSurah(surahNumberToLoad);
 
       if (surah.isSurahLevelAudio) {
         throw StateError(
@@ -108,6 +131,8 @@ class _TestPage extends State<TestBySurah> {
       setState(() {
         isLoading = false;
         hasError = false;
+        // Reset navigation ayah number after consumption
+        _currentAyahNumber = null;
       });
     } catch (e) {
       debugPrint('Error loading surah for test: $e');
@@ -121,7 +146,56 @@ class _TestPage extends State<TestBySurah> {
     }
   }
 
+  void _onNextSurah() {
+    final currentIndex = _currentIndex;
+    if (currentIndex == -1) return;
+
+    final sortedList = _sortedSurahNumbers;
+    if (currentIndex < sortedList.length - 1) {
+      setState(() {
+        _currentSurahNumber = sortedList[currentIndex + 1];
+        _currentAyahNumber = 1;
+      });
+
+      init();
+    } else {
+      showSnackBar(context, context.l10n.testEndOfSurah);
+    }
+  }
+
+  void _onPreviousSurah() {
+    final currentIndex = _currentIndex;
+    if (currentIndex == -1) return;
+
+    if (currentIndex > 0) {
+      final sortedList = _sortedSurahNumbers;
+      final prevSurahNumber = sortedList[currentIndex - 1];
+      // We need the last ayah number of the previous surah
+      final prevSurahData = findSurahByNumber(prevSurahNumber);
+
+      setState(() {
+        _currentSurahNumber = prevSurahNumber;
+        _currentAyahNumber = prevSurahData.numberOfAyahs;
+      });
+
+      init();
+    } else {
+      showSnackBar(context, context.l10n.testBeginningOfSurah);
+    }
+  }
+
+  void _onRefresh() {
+    // For refresh, we want a new random surah (if multi-mode) or same surah random ayah
+    if (widget.surahNumbers != null && widget.surahNumbers!.isNotEmpty) {
+      _currentSurahNumber = null; // Forces picking a new random one in init()
+    }
+    init();
+  }
+
   Ayah _getAyahForSurah() {
+    if (_currentAyahNumber != null) {
+      return surah.getAyah(_currentAyahNumber);
+    }
     return widget.ayahNumber != null
         ? surah.getAyah(widget.ayahNumber)
         : getIt<AyahServices>().getRandomAyahForSurah(surah.ayahs);
@@ -213,7 +287,7 @@ class _TestPage extends State<TestBySurah> {
                   currentAyah: isLoading ? Ayah() : currentAyah,
                   isLoading: isLoading,
                   onReadFull: () async {
-                    final surahNumber = this.surahNumber;
+                    final surahNumber = _currentSurahNumber ?? 0;
                     final surahName = surah.englishName;
                     if (surahNumber <= 0) return;
 
@@ -229,7 +303,9 @@ class _TestPage extends State<TestBySurah> {
                       ),
                     );
                   },
-                  onRefresh: () async => await init(),
+                  onRefresh: _onRefresh,
+                  onNextBoundary: _onNextSurah,
+                  onPreviousBoundary: _onPreviousSurah,
                 ),
               ),
           ],
