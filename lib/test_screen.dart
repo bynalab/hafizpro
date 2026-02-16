@@ -28,6 +28,8 @@ class TestScreen extends StatefulWidget {
   final Function()? onRefresh;
   final VoidCallback? onReadFull;
   final String readFullLabel;
+  final VoidCallback? onNextBoundary;
+  final VoidCallback? onPreviousBoundary;
 
   const TestScreen({
     super.key,
@@ -37,6 +39,8 @@ class TestScreen extends StatefulWidget {
     this.onReadFull,
     this.readFullLabel = '',
     this.isLoading = false,
+    this.onNextBoundary,
+    this.onPreviousBoundary,
   });
 
   @override
@@ -89,7 +93,11 @@ class _TestPage extends State<TestScreen> {
 
   void playNextAyah() {
     if (currentAyah.numberInSurah >= ayahs.length) {
-      showSnackBar(context, context.l10n.testEndOfSurah);
+      if (widget.onNextBoundary != null) {
+        widget.onNextBoundary!();
+      } else {
+        showSnackBar(context, context.l10n.testEndOfSurah);
+      }
 
       return;
     }
@@ -111,7 +119,11 @@ class _TestPage extends State<TestScreen> {
 
   void playPreviousAyah() {
     if (currentAyah.numberInSurah == 1) {
-      showSnackBar(context, context.l10n.testBeginningOfSurah);
+      if (widget.onPreviousBoundary != null) {
+        widget.onPreviousBoundary!();
+      } else {
+        showSnackBar(context, context.l10n.testBeginningOfSurah);
+      }
 
       return;
     }
