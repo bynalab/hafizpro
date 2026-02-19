@@ -20,7 +20,8 @@ class SurahMetaAssetAyahTextSource implements AyahTextSource {
     required String transliterationId,
   }) async {
     try {
-      final raw = await rootBundle.loadString('surah_meta/$surahNumber.json');
+      final raw =
+          await rootBundle.loadString('assets/surah_meta/$surahNumber.json');
       final decoded = json.decode(raw) as Map;
 
       return {
