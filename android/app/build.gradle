@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.bynalab.hafiz_test"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -27,8 +27,8 @@ android {
 
     defaultConfig {
         applicationId "com.bynalab.hafiz_test"
-        minSdkVersion 21
-        targetSdkVersion 35
+        minSdkVersion 24
+        targetSdkVersion 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

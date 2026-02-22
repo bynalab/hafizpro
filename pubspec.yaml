@@ -37,6 +37,9 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
   flutter_timezone: ^5.0.1
+  adhkar: ^0.0.1
+  flutter_tts: ^4.2.5
+  android_intent_plus: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +60,7 @@ flutter:
     - assets/img/
     - assets/icons/
     - assets/img/onboarding/
+    - assets/surah_meta/
     - assets/quran-offline.sqlite
     - shorebird.yaml
 

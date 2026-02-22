@@ -30,14 +30,14 @@ class AnalyticsService {
       }
 
       // Skip Mixpanel initialization on web for now due to compatibility issues
-      if (kIsWeb) {
-        if (AnalyticsConfig.debugMode) {
-          print('⚠️ Skipping Mixpanel initialization on web platform');
-        }
-        _isInitialized = true;
-        _sessionStartTime = DateTime.now();
-        return;
-      }
+      // if (kIsWeb) {
+      //   if (AnalyticsConfig.debugMode) {
+      //     print('⚠️ Skipping Mixpanel initialization on web platform');
+      //   }
+      //   _isInitialized = true;
+      //   _sessionStartTime = DateTime.now();
+      //   return;
+      // }
 
       _mixpanel =
           await Mixpanel.init(_projectToken, trackAutomaticEvents: true);
