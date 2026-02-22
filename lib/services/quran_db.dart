@@ -46,7 +46,7 @@ class QuranDbAyahRow {
 
 class QuranDb {
   static const String assetPath = 'assets/quran-offline.sqlite';
-  static const String _fileName = 'quran-offline.sqlite';
+  static const String _fileName = 'quran-offline-v1.sqlite';
 
   static const String defaultTranslationId = 'en_default';
   static const String defaultTransliterationId = 'tr_default';
