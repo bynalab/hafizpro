@@ -49,7 +49,12 @@ A Flutter application designed to help Muslims test and improve their Quran memo
    flutter pub get
    ```
 
-3. **Run the app**
+3. **Generate Internationalization**
+   ```bash
+   flutter gen-l10n
+   ```
+
+4. **Run the app**
    ```bash
    flutter run
    ```

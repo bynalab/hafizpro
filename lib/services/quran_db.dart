@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -64,7 +65,7 @@ class QuranDbAyahRow {
 
 class QuranDb {
   static const String assetPath = 'assets/quran-offline.sqlite';
-  static const String _fileName = 'quran-offline.sqlite';
+  static const String _fileName = 'quran-offline-v1.sqlite';
 
   static const String defaultTranslationId = 'en_default';
   static const String defaultTransliterationId = 'tr_default';
@@ -78,6 +79,9 @@ class QuranDb {
     final destPath = p.join(docs.path, _fileName);
 
     final destFile = File(destPath);
+
+    // One-time cleanup for legacy database file
+    await _cleanupLegacyDatabase(docs.path, destPath);
 
     if (!destFile.existsSync()) {
       destFile.parent.createSync(recursive: true);
@@ -93,6 +97,23 @@ class QuranDb {
       readOnly: true,
       singleInstance: true,
     );
+  }
+
+  Future<void> _cleanupLegacyDatabase(
+      String docsPath, String currentDestPath) async {
+    try {
+      final legacyPath = p.join(docsPath, 'quran-offline.sqlite');
+      // Only delete if it's actually a different path than our current active DB
+      if (legacyPath != currentDestPath) {
+        final legacyFile = File(legacyPath);
+        if (await legacyFile.exists()) {
+          debugPrint('QuranDb: Cleaning up legacy database file: $legacyPath');
+          await legacyFile.delete();
+        }
+      }
+    } catch (e) {
+      debugPrint('QuranDb: Error cleaning up legacy database: $e');
+    }
   }
 
   Future<List<String>> getAvailableTranslationIds() async {
