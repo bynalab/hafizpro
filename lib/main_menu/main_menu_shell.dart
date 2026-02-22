@@ -9,7 +9,9 @@ import 'package:hafiz_test/util/l10n_extensions.dart';
 
 import 'package:hafiz_test/main_menu/quran_dashboard_page.dart';
 import 'package:hafiz_test/main_menu/test_menu_page.dart';
+import 'package:hafiz_test/adhkar/adhkar_home_page.dart';
 import 'package:hafiz_test/main_menu/widgets.dart';
+import 'package:hafiz_test/adhkar/adhkar_settings_sheet.dart';
 
 class MainMenuShell extends StatefulWidget {
   const MainMenuShell({super.key});
@@ -111,6 +113,12 @@ class _MainMenuShellState extends State<MainMenuShell> {
                   ),
                   TestMenuPage(
                     onOpenSettings: _openSettings,
+                    onToggleTheme: _toggleTheme,
+                  ),
+                  AdhkarHomePage(
+                    onOpenSettings: () {
+                      const AdhkarSettingsSheet().openBottomSheet(context);
+                    },
                     onToggleTheme: _toggleTheme,
                   ),
                 ],

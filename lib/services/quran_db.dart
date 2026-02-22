@@ -4,6 +4,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/model/surah.model.dart';
 
 class QuranDbAyahRow {
   final int ayahId;
@@ -31,6 +33,22 @@ class QuranDbAyahRow {
     this.hizbQuarter,
     this.manzil,
   });
+
+  Ayah toAyah(Surah surah) {
+    return Ayah(
+      number: ayahId,
+      text: textAr,
+      translation: translation,
+      transliteration: transliteration,
+      numberInSurah: ayah,
+      juz: juz ?? 0,
+      manzil: manzil ?? 0,
+      page: page ?? 0,
+      ruku: ruku ?? 0,
+      hizbQuarter: hizbQuarter ?? 0,
+      surah: surah,
+    );
+  }
 
   factory QuranDbAyahRow.fromMap(Map<String, Object?> row) {
     return QuranDbAyahRow(

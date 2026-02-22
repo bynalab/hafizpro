@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/network.services.dart';
+import 'package:hafiz_test/services/surah_source.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
 import 'package:hafiz_test/model/surah.model.dart';
@@ -13,21 +14,26 @@ class MockIStorageService extends Mock implements IStorageService {}
 
 class MockSurahPicker extends Mock implements SurahPicker {}
 
+class MockSurahSource extends Mock implements SurahSource {}
+
 void main() {
   group('SurahServices', () {
     late SurahServices surahServices;
     late MockNetworkServices mockNetworkServices;
     late MockIStorageService mockStorageServices;
     late MockSurahPicker mockSurahPicker;
+    late MockSurahSource mockSurahSource;
 
     setUp(() {
       mockNetworkServices = MockNetworkServices();
       mockStorageServices = MockIStorageService();
       mockSurahPicker = MockSurahPicker();
+      mockSurahSource = MockSurahSource();
       surahServices = SurahServices(
         networkServices: mockNetworkServices,
         storageServices: mockStorageServices,
         surahPicker: mockSurahPicker,
+        surahSource: mockSurahSource,
       );
     });
 
@@ -52,24 +58,17 @@ void main() {
         // Arrange
         const surahNumber = 1;
         const reciterId = 'ar.alafasy';
-        final mockResponse = Response(
-          data: {
-            'data': {
-              'number': 1,
-              'name': 'Al-Fatihah',
-              'englishName': 'The Opener',
-              'ayahs': []
-            }
-          },
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
+
+        final mockSurah = Surah(
+          number: 1,
+          name: 'Al-Fatihah',
+          englishName: 'The Opener',
+          ayahs: const [],
         );
 
         when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
-        when(() => mockNetworkServices.urlExists(any()))
-            .thenAnswer((_) async => false);
-        when(() => mockNetworkServices.get(any()))
-            .thenAnswer((_) async => mockResponse);
+        when(() => mockSurahSource.getSurah(surahNumber))
+            .thenAnswer((_) async => mockSurah);
 
         // Act
         final result = await surahServices.getSurah(surahNumber);
@@ -79,24 +78,17 @@ void main() {
         expect(result.number, equals(1));
         expect(result.name, equals('Al-Fatihah'));
         verify(() => mockStorageServices.getReciterId()).called(1);
-        verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
+        verify(() => mockSurahSource.getSurah(surahNumber)).called(1);
       });
 
       test('should throw Exception on null response data', () async {
         // Arrange
         const surahNumber = 1;
         const reciterId = 'ar.alafasy';
-        final mockResponse = Response(
-          data: null,
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
-        );
 
         when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
-        when(() => mockNetworkServices.urlExists(any()))
-            .thenAnswer((_) async => false);
-        when(() => mockNetworkServices.get(any()))
-            .thenAnswer((_) async => mockResponse);
+        when(() => mockSurahSource.getSurah(surahNumber))
+            .thenThrow(Exception('Failed to load surah'));
 
         // Act
         await expectLater(
@@ -106,7 +98,7 @@ void main() {
 
         // Assert
         verify(() => mockStorageServices.getReciterId()).called(1);
-        verify(() => mockNetworkServices.get(any())).called(greaterThan(0));
+        verify(() => mockSurahSource.getSurah(surahNumber)).called(1);
       });
 
       test('should rethrow network errors', () async {
@@ -119,9 +111,7 @@ void main() {
         );
 
         when(() => mockStorageServices.getReciterId()).thenReturn(reciterId);
-        when(() => mockNetworkServices.urlExists(any()))
-            .thenAnswer((_) async => false);
-        when(() => mockNetworkServices.get(any())).thenThrow(dioError);
+        when(() => mockSurahSource.getSurah(surahNumber)).thenThrow(dioError);
 
         // Act & Assert
         expect(
