@@ -12,49 +12,69 @@ import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 
-class _DashboardPalette {
-  static bool _isDark(BuildContext context) {
+class DashboardPalette {
+  static bool isDark(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark;
   }
 
   static Color segmentedActiveBorder(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF2A6B6F) : Colors.transparent;
+    return isDark(context) ? const Color(0xFF2A6B6F) : Colors.transparent;
   }
 
   static Color searchBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF111111) : Colors.white;
+    return isDark(context) ? const Color(0xFF111111) : Colors.white;
   }
 
   static Color searchBorder(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF242424) : const Color(0xFFE5E7EB);
+    return isDark(context) ? const Color(0xFF242424) : const Color(0xFFE5E7EB);
   }
 
   static Color primaryText(BuildContext context) {
-    return _isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
+    return isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
   }
 
   static Color secondaryText(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+    return isDark(context) ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
   }
 
   static Color segmentedBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF141414) : const Color(0xFFF3F4F6);
+    return isDark(context) ? const Color(0xFF141414) : const Color(0xFFF3F4F6);
   }
 
   static Color segmentedActiveBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF1E1E1E) : Colors.white;
+    return isDark(context) ? const Color(0xFF1E1E1E) : Colors.white;
   }
 
   static Color listTileBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF101010) : Colors.white;
+    return isDark(context) ? const Color(0xFF101010) : Colors.white;
   }
 
   static Color listTileBorder(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF2A2A2A) : const Color(0xFFE5E7EB);
+    return isDark(context) ? const Color(0xFF2A2A2A) : const Color(0xFFE5E7EB);
   }
 
   static Color pillBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF2A6B6F) : const Color(0xFFBFE7EA);
+    return isDark(context) ? const Color(0xFF2A6B6F) : const Color(0xFFBFE7EA);
+  }
+
+  static Color iconButtonBg(BuildContext context) {
+    return isDark(context) ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
+  }
+
+  static Color pinnedHeaderBg(BuildContext context) {
+    return isDark(context) ? const Color(0xFF0B0B0B) : Colors.white;
+  }
+
+  static Color cardPeach(BuildContext context) {
+    return isDark(context) ? const Color(0xFF2D1B18) : const Color(0xFFF7CFC7);
+  }
+
+  static Color cardTeal(BuildContext context) {
+    return isDark(context) ? const Color(0xFF182D2D) : const Color(0xFFBFE7EA);
+  }
+
+  static Color cardPurple(BuildContext context) {
+    return isDark(context) ? const Color(0xFF2D182D) : const Color(0xFFE6BDEB);
   }
 }
 
@@ -71,27 +91,27 @@ class SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48,
+      height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: _DashboardPalette.searchBg(context),
+        color: DashboardPalette.searchBg(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _DashboardPalette.searchBorder(context)),
+        border: Border.all(color: DashboardPalette.searchBorder(context)),
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: _DashboardPalette.secondaryText(context)),
+          Icon(Icons.search, color: DashboardPalette.secondaryText(context)),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
-              style: TextStyle(color: _DashboardPalette.primaryText(context)),
+              style: TextStyle(color: DashboardPalette.primaryText(context)),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: _DashboardPalette.secondaryText(context),
+                  color: DashboardPalette.secondaryText(context),
                 ),
                 border: InputBorder.none,
               ),
@@ -124,7 +144,7 @@ class DashboardFeatureCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(12),
@@ -135,9 +155,9 @@ class DashboardFeatureCard extends StatelessWidget {
             Text(
               title,
               style: GoogleFonts.cairo(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: _DashboardPalette.primaryText(context),
+                color: DashboardPalette.primaryText(context),
               ),
             ),
             const SizedBox(height: 10),
@@ -145,9 +165,10 @@ class DashboardFeatureCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(14),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _DashboardPalette.listTileBg(context),
+                      color: DashboardPalette.listTileBg(context),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: child,
@@ -177,7 +198,7 @@ class ChallengeContainer extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: isDark ? scheme.surfaceContainerHigh : const Color(0xFFBFE7EA),
           borderRadius: BorderRadius.circular(12),
@@ -188,7 +209,7 @@ class ChallengeContainer extends StatelessWidget {
             Text(
               context.l10n.dashboardChallengeTitle,
               style: GoogleFonts.cairo(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: scheme.onSurface,
               ),
@@ -198,7 +219,8 @@ class ChallengeContainer extends StatelessWidget {
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(14),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
                       color: scheme.surface,
                       borderRadius: BorderRadius.circular(10),
@@ -207,38 +229,39 @@ class ChallengeContainer extends StatelessWidget {
                       children: [
                         SvgPicture.asset(
                           'assets/img/brain.svg',
-                          width: 22,
-                          height: 22,
+                          width: 18,
+                          height: 18,
                           colorFilter: ColorFilter.mode(
                             scheme.onSurface,
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             context.l10n.dashboardChallengeDescription,
                             style: GoogleFonts.inter(
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: scheme.onSurface,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Icon(
-                          Icons.arrow_forward,
+                          Icons.arrow_forward_ios_rounded,
+                          size: 14,
                           color: scheme.onSurface,
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Image.asset(
                   'assets/img/quran_question_icon.png',
-                  width: 72,
-                  height: 72,
+                  width: 56,
+                  height: 56,
                   fit: BoxFit.contain,
                 ),
               ],
@@ -269,7 +292,7 @@ class SegmentedSwitch extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: _DashboardPalette.segmentedBg(context),
+        color: DashboardPalette.segmentedBg(context),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -306,7 +329,7 @@ class _SegmentedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = _DashboardPalette._isDark(context);
+    final isDark = DashboardPalette.isDark(context);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
@@ -314,12 +337,12 @@ class _SegmentedItem extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: active
-            ? _DashboardPalette.segmentedActiveBg(context)
+            ? DashboardPalette.segmentedActiveBg(context)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         border: active && isDark
             ? Border.all(
-                color: _DashboardPalette.segmentedActiveBorder(context)
+                color: DashboardPalette.segmentedActiveBorder(context)
                     .withValues(alpha: 0.55),
                 width: 1,
               )
@@ -341,7 +364,7 @@ class _SegmentedItem extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: active
               ? AppColors.green500
-              : _DashboardPalette.secondaryText(context),
+              : DashboardPalette.secondaryText(context),
         ),
       ),
     );
@@ -409,9 +432,9 @@ class SurahCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: _DashboardPalette.listTileBg(context),
+          color: DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _DashboardPalette.listTileBorder(context)),
+          border: Border.all(color: DashboardPalette.listTileBorder(context)),
         ),
         child: Row(
           children: [
@@ -426,7 +449,7 @@ class SurahCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: _DashboardPalette.primaryText(context),
+                      color: DashboardPalette.primaryText(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -435,7 +458,7 @@ class SurahCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: _DashboardPalette.secondaryText(context),
+                      color: DashboardPalette.secondaryText(context),
                     ),
                   ),
                 ],
@@ -450,7 +473,7 @@ class SurahCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _DashboardPalette.primaryText(context),
+                      color: DashboardPalette.primaryText(context),
                       width: 1.4,
                     ),
                   ),
@@ -461,7 +484,7 @@ class SurahCard extends StatelessWidget {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              _DashboardPalette.primaryText(context),
+                              DashboardPalette.primaryText(context),
                             ),
                           ),
                         )
@@ -469,7 +492,7 @@ class SurahCard extends StatelessWidget {
                           isPlaying
                               ? Icons.pause_rounded
                               : Icons.play_arrow_rounded,
-                          color: _DashboardPalette.primaryText(context),
+                          color: DashboardPalette.primaryText(context),
                         ),
                 ),
               ),
@@ -547,9 +570,9 @@ class JuzCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: _DashboardPalette.listTileBg(context),
+          color: DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _DashboardPalette.listTileBorder(context)),
+          border: Border.all(color: DashboardPalette.listTileBorder(context)),
         ),
         child: Row(
           children: [
@@ -564,7 +587,7 @@ class JuzCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: _DashboardPalette.primaryText(context),
+                      color: DashboardPalette.primaryText(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -573,7 +596,7 @@ class JuzCard extends StatelessWidget {
                     style: GoogleFonts.cairo(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: _DashboardPalette.secondaryText(context),
+                      color: DashboardPalette.secondaryText(context),
                     ),
                   ),
                 ],
@@ -588,7 +611,7 @@ class JuzCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _DashboardPalette.primaryText(context),
+                      color: DashboardPalette.primaryText(context),
                       width: 1.4,
                     ),
                   ),
@@ -599,13 +622,13 @@ class JuzCard extends StatelessWidget {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              _DashboardPalette.primaryText(context),
+                              DashboardPalette.primaryText(context),
                             ),
                           ),
                         )
                       : Icon(
                           isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                          color: _DashboardPalette.primaryText(context),
+                          color: DashboardPalette.primaryText(context),
                         ),
                 ),
               ),
@@ -639,7 +662,7 @@ class TestOptionContainer extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(14),
@@ -648,7 +671,8 @@ class TestOptionContainer extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.all(14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: scheme.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -664,7 +688,7 @@ class TestOptionContainer extends StatelessWidget {
                         color: scheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: GoogleFonts.inter(
@@ -678,8 +702,8 @@ class TestOptionContainer extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            SizedBox(width: 56, height: 56, child: Center(child: icon)),
+            const SizedBox(width: 10),
+            SizedBox(width: 48, height: 48, child: Center(child: icon)),
           ],
         ),
       ),
@@ -704,8 +728,8 @@ class CircleIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 44,
-        height: 44,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: background,
           shape: BoxShape.circle,
@@ -728,13 +752,13 @@ class BottomPillNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = _DashboardPalette._isDark(context);
+    final isDark = DashboardPalette.isDark(context);
 
     return Container(
       width: 340,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: _DashboardPalette.pillBg(context),
+        color: DashboardPalette.pillBg(context),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

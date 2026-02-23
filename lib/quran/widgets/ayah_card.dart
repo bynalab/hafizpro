@@ -12,6 +12,9 @@ class AyahCard extends StatelessWidget {
   final Color backgroundColor;
   final bool showTranslation;
   final bool showTransliteration;
+  final double arabicFontSize;
+  final bool isCompleted;
+  final void Function(int)? onMarkAsRead;
 
   // We derive contrast from the actual card background color (not Theme.brightness)
   // because some screens may intentionally render light cards in dark mode (or vice
@@ -50,7 +53,15 @@ class AyahCard extends StatelessWidget {
     this.onPlayPressed,
     this.showTranslation = true,
     this.showTransliteration = true,
+    this.arabicFontSize = 24.0,
+    this.isCompleted = false,
+    this.onMarkAsRead,
+    this.isBookmarked = false,
+    this.onBookmark,
   });
+
+  final bool isBookmarked;
+  final void Function(int)? onBookmark;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +115,66 @@ class AyahCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => onMarkAsRead?.call(index),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isCompleted
+                                  ? const Color(0xFF78B7C6)
+                                      .withValues(alpha: 0.2)
+                                  : null,
+                              border: Border.all(
+                                color: isCompleted
+                                    ? const Color(0xFF78B7C6)
+                                    : chipBorderColor,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                isCompleted ? Icons.check : Icons.done_all,
+                                size: 18,
+                                color: isCompleted
+                                    ? const Color(0xFF78B7C6)
+                                    : textColor.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => onBookmark?.call(index),
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isBookmarked
+                                  ? const Color(0xFF78B7C6)
+                                      .withValues(alpha: 0.2)
+                                  : null,
+                              border: Border.all(
+                                color: isBookmarked
+                                    ? const Color(0xFF78B7C6)
+                                    : chipBorderColor,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                isBookmarked
+                                    ? Icons.bookmark_rounded
+                                    : Icons.bookmark_outline_rounded,
+                                size: 18,
+                                color: isBookmarked
+                                    ? const Color(0xFF78B7C6)
+                                    : textColor.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ),
+                        ),
                         const Spacer(),
                         GestureDetector(
                           onTap: () => onPlayPressed?.call(index),
@@ -135,7 +206,7 @@ class AyahCard extends StatelessWidget {
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                         style: GoogleFonts.amiri(
-                          fontSize: 24,
+                          fontSize: arabicFontSize,
                           height: 2,
                           color: textColor,
                         ),

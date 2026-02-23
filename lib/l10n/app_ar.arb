@@ -205,5 +205,15 @@
   "transliterationLabel": "النقل الحرفي",
   "transliterationSubtitle": "إظهار النطق بالحروف اللاتينية",
   "surahLoadingTitle": "جارٍ تحميل السورة...",
-  "surahLoadingSubtitle": "جارٍ التحميل"
+  "surahLoadingSubtitle": "جارٍ التحميل",
+  "saveProgressTitle": "حفظ التقدم",
+  "saveProgressPrompt": "تحديد حتى الآية {number} كمقروء؟",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "تحديد كمقروء"
 }

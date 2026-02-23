@@ -10,6 +10,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/juz.model.dart';
+import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/juz/juz_quran_view.dart';
 import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/services/audio_center.dart';
@@ -23,36 +24,7 @@ import 'package:hafiz_test/util/l10n_extensions.dart';
 // import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
-
-class _DashboardPalette {
-  static bool _isDark(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark;
-  }
-
-  static Color iconButtonBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
-  }
-
-  static Color primaryText(BuildContext context) {
-    return _isDark(context) ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
-  }
-
-  static Color secondaryText(BuildContext context) {
-    return const Color(0xFF9CA3AF);
-  }
-
-  static Color pinnedHeaderBg(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF0B0B0B) : Colors.white;
-  }
-
-  static Color cardTeal(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF1B5E63) : const Color(0xFFBFE7EA);
-  }
-
-  static Color cardPurple(BuildContext context) {
-    return _isDark(context) ? const Color(0xFF3B2448) : const Color(0xFFE6BDEB);
-  }
-}
+import 'package:hafiz_test/main_menu/widgets/quran_progress_card.dart';
 
 class QuranDashboardPage extends StatefulWidget {
   const QuranDashboardPage({
@@ -93,7 +65,9 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
     final displaySurahs = _isSearching ? searchSurah(widget.query) : surahList;
     final displayJuz = _isSearching ? searchJuz(widget.query) : juzList;
 
-    final lastRead = getIt<IStorageService>().getLastRead();
+    final storage = getIt<IStorageService>();
+    final lastRead = storage.getLastRead();
+    final bookmark = storage.getBookmark();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -123,18 +97,18 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       ),
                       const Spacer(),
                       CircleIconButton(
-                        background: _DashboardPalette.iconButtonBg(context),
+                        background: DashboardPalette.iconButtonBg(context),
                         icon: Icon(
                           Theme.of(context).brightness == Brightness.dark
                               ? Icons.light_mode
                               : Icons.dark_mode,
-                          color: _DashboardPalette.primaryText(context),
+                          color: DashboardPalette.primaryText(context),
                         ),
                         onTap: widget.onToggleTheme,
                       ),
                       const SizedBox(width: 10),
                       CircleIconButton(
-                        background: _DashboardPalette.iconButtonBg(context),
+                        background: DashboardPalette.iconButtonBg(context),
                         icon: const Icon(
                           Icons.settings,
                           color: null,
@@ -143,18 +117,20 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   SearchField(
                     controller: widget.searchController,
                     hintText: widget.segmentIndex == 0
                         ? context.l10n.searchBySurahHint
                         : context.l10n.searchByJuzHint,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   if (!_isSearching) ...[
+                    const QuranProgressCard(),
+                    const SizedBox(height: 10),
                     if (lastRead == null)
                       DashboardFeatureCard(
-                        background: _DashboardPalette.cardTeal(context),
+                        background: DashboardPalette.cardTeal(context),
                         title: context.l10n.dashboardChallengeTitle,
                         onTap: () {
                           AnalyticsService.trackButtonClick(
@@ -169,42 +145,45 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                         },
                         right: Image.asset(
                           'assets/img/quran_question_icon.png',
-                          width: 72,
-                          height: 72,
+                          width: 56,
+                          height: 56,
                           fit: BoxFit.contain,
                         ),
                         child: Row(
                           children: [
                             SvgPicture.asset(
                               'assets/img/brain.svg',
-                              width: 22,
-                              height: 22,
+                              width: 18,
+                              height: 18,
                               colorFilter: ColorFilter.mode(
-                                _DashboardPalette.primaryText(context),
+                                DashboardPalette.primaryText(context),
                                 BlendMode.srcIn,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 context.l10n.dashboardChallengeDescription,
                                 style: GoogleFonts.inter(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: _DashboardPalette.primaryText(context),
+                                  color: DashboardPalette.primaryText(context),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Icon(
-                              Icons.arrow_forward,
-                              color: _DashboardPalette.primaryText(context),
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: DashboardPalette.primaryText(context),
                             ),
                           ],
                         ),
                       )
                     else
                       _ContinueLastTestCard(lastRead: lastRead),
+                    const SizedBox(height: 10),
+                    _ContinueReadingCard(bookmark: bookmark),
                     ListenableBuilder(
                       listenable: _audioCenter,
                       builder: (context, _) {
@@ -225,7 +204,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
 
                         return Column(
                           children: [
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 10),
                             _NowPlayingCard(
                               audioPlayer: _audioCenter.audioPlayer,
                               title: title,
@@ -279,7 +258,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: _DashboardPalette.primaryText(context),
+                        color: DashboardPalette.primaryText(context),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -294,7 +273,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   minExtent: 58,
                   maxExtent: 58,
                   child: Container(
-                    color: _DashboardPalette.pinnedHeaderBg(context),
+                    color: DashboardPalette.pinnedHeaderBg(context),
                     padding: const EdgeInsets.only(bottom: 12),
                     child: SegmentedSwitch(
                       leftLabel: context.l10n.segmentSurah,
@@ -424,7 +403,7 @@ class _ContinueLastTestCard extends StatelessWidget {
     final ayah = lastRead.$2;
 
     return DashboardFeatureCard(
-      background: _DashboardPalette.cardTeal(context),
+      background: DashboardPalette.cardTeal(context),
       title: context.l10n.dashboardContinueLastTestTitle,
       onTap: () {
         Navigator.push(
@@ -450,7 +429,7 @@ class _ContinueLastTestCard extends StatelessWidget {
             width: 22,
             height: 22,
             colorFilter: ColorFilter.mode(
-              _DashboardPalette.primaryText(context),
+              DashboardPalette.primaryText(context),
               BlendMode.srcIn,
             ),
           ),
@@ -464,7 +443,7 @@ class _ContinueLastTestCard extends StatelessWidget {
                   style: GoogleFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: _DashboardPalette.primaryText(context),
+                    color: DashboardPalette.primaryText(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -473,7 +452,7 @@ class _ContinueLastTestCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: _DashboardPalette.secondaryText(context),
+                    color: DashboardPalette.secondaryText(context),
                   ),
                 ),
               ],
@@ -482,7 +461,7 @@ class _ContinueLastTestCard extends StatelessWidget {
           const SizedBox(width: 8),
           Icon(
             Icons.arrow_forward,
-            color: _DashboardPalette.primaryText(context),
+            color: DashboardPalette.primaryText(context),
           ),
         ],
       ),
@@ -490,96 +469,117 @@ class _ContinueLastTestCard extends StatelessWidget {
   }
 }
 
-// class _ContinueReadingCard extends StatelessWidget {
-//   const _ContinueReadingCard({required this.lastRead});
+class _ContinueReadingCard extends StatelessWidget {
+  const _ContinueReadingCard({required this.bookmark});
 
-//   final (Surah, Ayah)? lastRead;
+  final Bookmark? bookmark;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return DashboardFeatureCard(
-//       background: const Color(0xFFF7CFC7),
-//       title: 'Continue Reading',
-//       onTap: () {
-//         if (lastRead == null) {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(
-//               builder: (_) => const SurahListScreen(
-//                 actionType: SurahSelectionAction.read,
-//               ),
-//             ),
-//           );
-//           return;
-//         }
+  @override
+  Widget build(BuildContext context) {
+    if (bookmark == null) return const SizedBox.shrink();
 
-//         final surah = lastRead!.$1;
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(builder: (_) => QuranView(surah: surah)),
-//         );
-//       },
-//       right: Image.asset(
-//         'assets/img/open_book_glass_icon.png',
-//         width: 84,
-//         height: 84,
-//         fit: BoxFit.contain,
-//       ),
-//       child: Row(
-//         children: [
-//           const Icon(CupertinoIcons.book, color: Color(0xFF111827)),
-//           const SizedBox(width: 12),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 if (lastRead == null) ...[
-//                   Text(
-//                     'Pick a Surah',
-//                     style: GoogleFonts.cairo(
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.w700,
-//                       color: const Color(0xFF111827),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 4),
-//                   Text(
-//                     'Start reading where you want',
-//                     style: GoogleFonts.inter(
-//                       fontSize: 14,
-//                       fontWeight: FontWeight.w500,
-//                       color: const Color(0xFF9CA3AF),
-//                     ),
-//                   ),
-//                 ] else ...[
-//                   Text(
-//                     lastRead!.$1.englishName,
-//                     style: GoogleFonts.cairo(
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.w700,
-//                       color: const Color(0xFF111827),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 4),
-//                   Text(
-//                     'Verse ${lastRead!.$2.numberInSurah}',
-//                     style: GoogleFonts.inter(
-//                       fontSize: 14,
-//                       fontWeight: FontWeight.w500,
-//                       color: const Color(0xFF9CA3AF),
-//                     ),
-//                   ),
-//                 ],
-//               ],
-//             ),
-//           ),
-//           const SizedBox(width: 8),
-//           const Icon(Icons.arrow_forward, color: Color(0xFF111827)),
-//         ],
-//       ),
-//     );
-//   }
-// }
+    final isDark = DashboardPalette.isDark(context);
+    final surah = bookmark!.surah;
+    final ayah = bookmark!.ayah;
+    final isJuzContext = bookmark!.viewContext == BookmarkViewContext.juz;
+
+    String contextText = '';
+    if (isJuzContext) {
+      contextText =
+          'Juz ${bookmark!.juzNumber}, ${surah.englishName}, Verse ${ayah.numberInSurah}';
+    } else {
+      contextText = '${surah.englishName}, Verse ${ayah.numberInSurah}';
+    }
+
+    return DashboardFeatureCard(
+      background: DashboardPalette.cardPeach(context),
+      title: 'Continue Reading',
+      onTap: () {
+        if (isJuzContext) {
+          final juz = findJuzByNumber(bookmark!.juzNumber!);
+          // We need an "initialAyahIndex" for JuzView.
+          // Since we save the bookmark which includes the ayah, we can calculate its index in the juz.
+          // For now, let's just use 0 if not easily available, but better to implement the logic.
+
+          // Actually, we can calculate the global ayah index in the juz if we have the surah and ayah.
+          // But a simpler way is to pass the surah/ayah to JuzView and let it find the index.
+          // However, my updated JuzView expects initialAyahIndex.
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => JuzQuranView(
+                juz: juz,
+                initialSurahNumber: surah.number,
+                initialAyahNumber: ayah.numberInSurah,
+              ),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => QuranView(
+                surah: surah,
+                initialAyahNumber: ayah.numberInSurah,
+              ),
+            ),
+          );
+        }
+      },
+      right: Image.asset(
+        'assets/img/open_book_glass_icon.png',
+        width: 64,
+        height: 64,
+        fit: BoxFit.contain,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black26 : Colors.white54,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(CupertinoIcons.book,
+                size: 18, color: DashboardPalette.primaryText(context)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isJuzContext
+                      ? 'Juz ${bookmark!.juzNumber}'
+                      : surah.englishName,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: DashboardPalette.primaryText(context),
+                  ),
+                ),
+                Text(
+                  contextText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: DashboardPalette.secondaryText(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.arrow_forward_ios_rounded,
+              size: 14, color: DashboardPalette.primaryText(context)),
+        ],
+      ),
+    );
+  }
+}
 
 class _NowPlayingCard extends StatelessWidget {
   final String title;
@@ -598,7 +598,7 @@ class _NowPlayingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DashboardFeatureCard(
       onTap: onTap,
-      background: _DashboardPalette.cardPurple(context),
+      background: DashboardPalette.cardPurple(context),
       title: context.l10n.dashboardNowPlayingTitle,
       right: Image.asset(
         'assets/img/headset_icon.png',
@@ -619,7 +619,7 @@ class _NowPlayingCard extends StatelessWidget {
             children: [
               Icon(
                 CupertinoIcons.waveform,
-                color: _DashboardPalette.primaryText(context),
+                color: DashboardPalette.primaryText(context),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -631,7 +631,7 @@ class _NowPlayingCard extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: _DashboardPalette.primaryText(context),
+                        color: DashboardPalette.primaryText(context),
                       ),
                     ),
                     // const SizedBox(height: 10),
@@ -654,7 +654,7 @@ class _NowPlayingCard extends StatelessWidget {
                             width: 22,
                             height: 22,
                             colorFilter: ColorFilter.mode(
-                              _DashboardPalette.primaryText(context),
+                              DashboardPalette.primaryText(context),
                               BlendMode.srcIn,
                             ),
                           ),
@@ -681,7 +681,7 @@ class _NowPlayingCard extends StatelessWidget {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      _DashboardPalette.primaryText(context),
+                                      DashboardPalette.primaryText(context),
                                     ),
                                   ),
                                 )
@@ -701,7 +701,7 @@ class _NowPlayingCard extends StatelessWidget {
                             width: 22,
                             height: 22,
                             colorFilter: ColorFilter.mode(
-                              _DashboardPalette.primaryText(context),
+                              DashboardPalette.primaryText(context),
                               BlendMode.srcIn,
                             ),
                           ),

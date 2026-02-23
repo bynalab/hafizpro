@@ -188,6 +188,8 @@ class _TestPage extends State<TestScreen> {
         );
 
         storageServices.saveLastRead(surah, currentAyah);
+        await storageServices.markAyahsAsRead(
+            surah.number, currentAyah.numberInSurah);
 
         // Track test session completion for rating system
         await RatingService.trackTestSessionCompleted();

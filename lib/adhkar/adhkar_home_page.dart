@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/adhkar/adhkar_list_page.dart';
 import 'package:adhkar/adhkar.dart';
@@ -22,56 +23,55 @@ class AdhkarHomePage extends StatelessWidget {
     final textColor = isDark ? Colors.white : const Color(0xFF111827);
     final subtitleColor =
         isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final iconBg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF2F2F2);
+    final titleColor =
+        isDark ? const Color(0xFFF3F4F6) : const Color(0xFF111827);
 
     return Scaffold(
       backgroundColor: Colors.transparent, // Handled by parent
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              // Header Row
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isDark
-                          ? const Color(0xFF1E293B)
-                          : const Color(0xFFE0F2F1), // Example color
+                  CircleIconButton(
+                    background: AppColors.green500,
+                    icon: SvgPicture.asset(
+                      'assets/img/quran-01.svg',
+                      width: 20,
+                      height: 20,
+                      colorFilter:
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
-                    padding: const EdgeInsets.all(8),
-                    child: SvgPicture.asset(
-                        'assets/img/logo.svg', // Assuming logo exists
-                        colorFilter: ColorFilter.mode(
-                            isDark ? Colors.white : AppColors.green500,
-                            BlendMode.srcIn)),
+                    onTap: () {},
                   ),
-                  Row(
-                    children: [
-                      _CircleIconBtn(
-                        icon: isDark
-                            ? Icons.light_mode_outlined
-                            : Icons.dark_mode_outlined,
-                        onTap: onToggleTheme,
-                        isDark: isDark,
-                      ),
-                      const SizedBox(width: 12),
-                      _CircleIconBtn(
-                        icon: Icons.settings_outlined,
-                        onTap: onOpenSettings,
-                        isDark: isDark,
-                      ),
-                    ],
+                  const Spacer(),
+                  CircleIconButton(
+                    background: iconBg,
+                    icon: Icon(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                      color: titleColor,
+                    ),
+                    onTap: onToggleTheme,
+                  ),
+                  const SizedBox(width: 10),
+                  CircleIconButton(
+                    background: iconBg,
+                    icon: const Icon(
+                      Icons.settings,
+                      color: null,
+                    ),
+                    onTap: onOpenSettings,
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text(
                 'Adhkar',
                 style: GoogleFonts.outfit(
@@ -149,37 +149,6 @@ class AdhkarHomePage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => AdhkarListPage(adhkarCategory: adhkar)),
-    );
-  }
-}
-
-class _CircleIconBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isDark;
-
-  const _CircleIconBtn({
-    required this.icon,
-    required this.onTap,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
-          ),
-        ),
-        child: Icon(icon,
-            size: 20, color: isDark ? Colors.white : const Color(0xFF374151)),
-      ),
     );
   }
 }

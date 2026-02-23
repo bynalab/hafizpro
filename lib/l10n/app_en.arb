@@ -205,5 +205,15 @@
   "transliterationLabel": "Transliteration",
   "transliterationSubtitle": "Show pronunciation in Latin letters",
   "surahLoadingTitle": "Loading Surah...",
-  "surahLoadingSubtitle": "جارٍ التحميل"
+  "surahLoadingSubtitle": "جارٍ التحميل",
+  "saveProgressTitle": "Save Progress",
+  "saveProgressPrompt": "Mark up to Verse {number} as read?",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "Mark as Read"
 }

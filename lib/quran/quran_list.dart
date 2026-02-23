@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
@@ -15,7 +16,11 @@ class QuranAyahList extends StatelessWidget {
   final ValueNotifier<int?> playingIndexNotifier;
   final ValueNotifier<bool> isPlayingNotifier;
   final ItemScrollController scrollController;
+  final ItemPositionsListener itemPositionsListener;
   final void Function(int index) onControlPressed;
+  final VoidCallback? onProgressUpdated;
+  final VoidCallback? onBookmarkUpdated;
+  final int? juzNumber;
 
   const QuranAyahList({
     super.key,
@@ -24,7 +29,11 @@ class QuranAyahList extends StatelessWidget {
     required this.playingIndexNotifier,
     required this.isPlayingNotifier,
     required this.scrollController,
+    required this.itemPositionsListener,
     required this.onControlPressed,
+    this.onProgressUpdated,
+    this.onBookmarkUpdated,
+    this.juzNumber,
   });
 
   int get _offset => showBismillah ? 1 : 0;
@@ -36,15 +45,20 @@ class QuranAyahList extends StatelessWidget {
     final prefs = getReadingPreferences(storage);
     final showTranslation = prefs.showTranslation;
     final showTransliteration = prefs.showTransliteration;
+    final arabicFontSize = prefs.arabicFontSize;
+
+    final bookmark = storage.getBookmark();
 
     return ScrollablePositionedList.separated(
       padding: const EdgeInsets.symmetric(vertical: 30),
       itemCount: surah.ayahs.length + _offset,
       itemScrollController: scrollController,
+      itemPositionsListener: itemPositionsListener,
       itemBuilder: (_, index) {
         if (showBismillah && index == 0) {
           return Padding(
-            padding: EdgeInsets.fromLTRB(18, 6, 18, 12),
+            key: const ValueKey('bismillah'),
+            padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
             child: Text(
               Bismillah.glyph,
               textAlign: TextAlign.center,
@@ -66,17 +80,44 @@ class QuranAyahList extends StatelessWidget {
             ? Bismillah.trimLeadingForDisplay(ayah.text)
             : ayah.text;
 
+        final isCompleted =
+            storage.isAyahCompleted(surah.number, ayah.numberInSurah);
+
+        final isBookmarked = bookmark != null &&
+            bookmark.surah.number == surah.number &&
+            bookmark.ayah.numberInSurah == ayah.numberInSurah &&
+            bookmark.viewContext == BookmarkViewContext.surah;
+
         return AyahCard(
+          key: ValueKey('ayah_${ayah.numberInSurah}_$arabicFontSize'),
           index: ayahIndex,
           ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
           isPlayingNotifier: isPlayingNotifier,
           showTranslation: showTranslation,
           showTransliteration: showTransliteration,
+          arabicFontSize: arabicFontSize,
+          isCompleted: isCompleted,
           backgroundColor: isDark
               ? (isEven ? const Color(0xFF101010) : const Color(0xFF0E0E0E))
               : (isEven ? AppColors.gray500 : AppColors.gray50),
           onPlayPressed: (_) => onControlPressed(ayahIndex),
+          onMarkAsRead: (idx) async {
+            await storage.markAyahsAsRead(
+                surah.number, surah.ayahs[idx].numberInSurah);
+            onProgressUpdated?.call();
+          },
+          isBookmarked: isBookmarked,
+          onBookmark: (idx) async {
+            final selectedAyah = surah.ayahs[idx];
+            await storage.saveBookmark(Bookmark(
+              surah: surah,
+              ayah: selectedAyah,
+              viewContext: BookmarkViewContext.surah,
+              timestamp: DateTime.now(),
+            ));
+            onBookmarkUpdated?.call();
+          },
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 2),

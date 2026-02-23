@@ -26,7 +26,6 @@ dependencies:
   intl: ^0.20.2
   flutter_svg: ^2.0.9
   marquee: ^2.3.0
-  audio_video_progress_bar: ^2.0.3
   showcaseview: ^4.0.1
   scrollable_positioned_list: ^0.3.8
   get_it: ^8.1.0

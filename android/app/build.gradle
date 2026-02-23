@@ -13,7 +13,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.bynalab.hafiz_test"
     compileSdkVersion 36
-    ndkVersion flutter.ndkVersion
+    ndkVersion "27.0.11718014"
 
     compileOptions {
         coreLibraryDesugaringEnabled true

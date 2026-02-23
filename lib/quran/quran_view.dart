@@ -6,7 +6,7 @@ import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
-import 'package:hafiz_test/quran/widgets/reading_preferences_button.dart';
+import 'package:hafiz_test/quran/widgets/quran_settings_button.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -16,8 +16,9 @@ import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
+  final int? initialAyahNumber;
 
-  const QuranView({super.key, required this.surah});
+  const QuranView({super.key, required this.surah, this.initialAyahNumber});
 
   @override
   State<QuranView> createState() => _QuranViewState();
@@ -59,8 +60,14 @@ class _QuranViewState extends State<QuranView> {
     viewModel.playingIndexNotifier.addListener(_onPlayingIndexChanged);
     viewModel.audioCenter.addListener(_onAudioCenterChanged);
     viewModel.initialize(widget.surah.number).then((_) {
-      setState(() {});
-      _onPlayingIndexChanged();
+      if (mounted) {
+        setState(() {});
+        if (widget.initialAyahNumber != null) {
+          viewModel.scrollToVerse(widget.initialAyahNumber! - 1);
+        } else {
+          _onPlayingIndexChanged();
+        }
+      }
     });
   }
 
@@ -102,6 +109,128 @@ class _QuranViewState extends State<QuranView> {
     super.dispose();
   }
 
+  Future<bool> _handlePop() async {
+    final positions = viewModel.itemPositionsListener.itemPositions.value;
+    if (positions.isEmpty) return true;
+
+    // Find the first (top-most) visible item
+    final topItem = positions.reduce((a, b) => a.index < b.index ? a : b);
+
+    // Adjust for Bismillah offset
+    final showBismillah =
+        viewModel.shouldShowBismillah(viewModel.surah?.number);
+    final offset = showBismillah ? 1 : 0;
+
+    final ayahIndex = topItem.index - offset;
+    if (ayahIndex < 0 || viewModel.surah == null) return true;
+
+    final ayah = viewModel.surah!.ayahs[ayahIndex];
+
+    // Check if this verse is already completed
+    if (_storage.isAyahCompleted(widget.surah.number, ayah.numberInSurah)) {
+      return true;
+    }
+
+    final shouldSave = await _showSaveProgressSheet(ayah.numberInSurah);
+    if (shouldSave == true) {
+      await _storage.markAyahsAsRead(widget.surah.number, ayah.numberInSurah);
+      return true;
+    }
+
+    if (shouldSave == false) {
+      return true; // Use chose not to save
+    }
+
+    return false; // User cancelled the pop (dismissed sheet without choice)
+  }
+
+  Future<bool?> _showSaveProgressSheet(int ayahNumber) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1F2937) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              context.l10n.saveProgressTitle,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF111827),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.saveProgressPrompt(ayahNumber),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: isDark ? Colors.white70 : const Color(0xFF4B5563),
+              ),
+            ),
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(
+                      context.l10n.commonNo,
+                      style: TextStyle(
+                        color:
+                            isDark ? Colors.white60 : const Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF78B7C6),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      context.l10n.commonYes,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void setState(fn) {
     if (mounted) {
@@ -139,10 +268,17 @@ class _QuranViewState extends State<QuranView> {
     }
 
     return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          // Track back press
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        final shouldPop = await _handlePop();
+        if (shouldPop && mounted) {
           AnalyticsService.trackBackPress(fromScreen: 'Quran View');
+
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
         }
       },
       child: Scaffold(
@@ -202,7 +338,7 @@ class _QuranViewState extends State<QuranView> {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: ReadingPreferencesButton(
+                        child: QuranSettingsButton(
                           storage: _storage,
                           isDark: isDark,
                           onChanged: () {
@@ -233,8 +369,12 @@ class _QuranViewState extends State<QuranView> {
                                 isPlayingNotifier: viewModel.isPlayingNotifier,
                                 scrollController:
                                     viewModel.itemScrollController,
+                                itemPositionsListener:
+                                    viewModel.itemPositionsListener,
                                 onControlPressed:
                                     viewModel.onAyahControlPressed,
+                                onProgressUpdated: () => setState(() {}),
+                                onBookmarkUpdated: () => setState(() {}),
                               ),
                       ),
                       const SizedBox(height: 150),

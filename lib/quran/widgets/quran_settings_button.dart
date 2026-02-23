@@ -6,12 +6,12 @@ import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
-class ReadingPreferencesButton extends StatelessWidget {
+class QuranSettingsButton extends StatelessWidget {
   final IStorageService storage;
   final VoidCallback onChanged;
   final bool isDark;
 
-  const ReadingPreferencesButton({
+  const QuranSettingsButton({
     super.key,
     required this.storage,
     required this.onChanged,
@@ -35,11 +35,14 @@ class ReadingPreferencesButton extends StatelessWidget {
         final prefs = getReadingPreferences(storage);
         bool showTranslation = prefs.showTranslation;
         bool showTransliteration = prefs.showTransliteration;
+        double arabicFontSize = prefs.arabicFontSize;
 
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
             final panelBg = isDark ? const Color(0xFF121212) : Colors.white;
             final onPanel = isDark ? Colors.white : const Color(0xFF111827);
+            final muted =
+                isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
             return SafeArea(
               child: Container(
@@ -117,6 +120,51 @@ class ReadingPreferencesButton extends StatelessWidget {
                               onChanged();
                             },
                           ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Icon(Icons.format_size_rounded,
+                                  size: 20, color: onPanel),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Font Size",
+                                style: GoogleFonts.cairo(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: onPanel,
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                "${arabicFontSize.toInt()}px",
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: muted,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: _activeTrack,
+                              inactiveTrackColor: _inactiveTrack,
+                              thumbColor: _activeTrack,
+                              overlayColor: _activeTrack.withValues(alpha: 0.1),
+                              trackHeight: 4,
+                            ),
+                            child: Slider(
+                              value: arabicFontSize,
+                              min: 18,
+                              max: 48,
+                              divisions: 15,
+                              onChanged: (v) async {
+                                await setArabicFontSizePreference(storage, v);
+                                setSheetState(() => arabicFontSize = v);
+                                onChanged();
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -143,7 +191,7 @@ class ReadingPreferencesButton extends StatelessWidget {
         ),
         child: Center(
           child: Icon(
-            Icons.translate_rounded,
+            Icons.settings_rounded,
             size: 20,
             color: isDark ? Colors.white : const Color(0xFF111827),
           ),

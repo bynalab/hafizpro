@@ -5,11 +5,12 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
-import 'package:hafiz_test/quran/widgets/reading_preferences_button.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/quran/widgets/quran_settings_button.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -20,8 +21,17 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class JuzQuranView extends StatefulWidget {
   final JuzModel juz;
+  final int? initialAyahIndex;
+  final int? initialSurahNumber;
+  final int? initialAyahNumber;
 
-  const JuzQuranView({super.key, required this.juz});
+  const JuzQuranView({
+    super.key,
+    required this.juz,
+    this.initialAyahIndex,
+    this.initialSurahNumber,
+    this.initialAyahNumber,
+  });
 
   @override
   State<JuzQuranView> createState() => _JuzQuranViewState();
@@ -136,10 +146,28 @@ class _JuzQuranViewState extends State<JuzQuranView> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // Scroll to the currently playing ayah if we're in the right juz.
         if (!mounted) return;
-        if (!_audioCenter.isCurrentJuz(widget.juz.number)) return;
 
-        final idx = _audioCenter.juzPlayingIndexNotifier.value ??
-            _audioCenter.audioPlayer.currentIndex;
+        int? idx = widget.initialAyahIndex;
+
+        if (idx == null &&
+            widget.initialSurahNumber != null &&
+            widget.initialAyahNumber != null) {
+          // Find the global index for the target surah/ayah
+          for (final entry in _entries) {
+            if (entry.type == _JuzEntryType.ayah &&
+                entry.surah?.number == widget.initialSurahNumber &&
+                entry.ayah?.numberInSurah == widget.initialAyahNumber) {
+              idx = entry.globalAyahIndex;
+              break;
+            }
+          }
+        }
+
+        if (idx == null && _audioCenter.isCurrentJuz(widget.juz.number)) {
+          idx = _audioCenter.juzPlayingIndexNotifier.value ??
+              _audioCenter.audioPlayer.currentIndex;
+        }
+
         _setPlayingIndexAndScroll(idx, animated: false);
       });
     } catch (e) {
@@ -294,6 +322,9 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     final prefs = getReadingPreferences(_storage);
     final showTranslation = prefs.showTranslation;
     final showTransliteration = prefs.showTransliteration;
+    final arabicFontSize = prefs.arabicFontSize;
+
+    final bookmark = _storage.getBookmark();
 
     if (_isLoading) {
       return Scaffold(
@@ -376,7 +407,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                     ),
                     Align(
                       alignment: Alignment.topRight,
-                      child: ReadingPreferencesButton(
+                      child: QuranSettingsButton(
                         storage: _storage,
                         isDark: isDark,
                         onChanged: () {
@@ -435,6 +466,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                         return _SurahMarker(title: entry.surahTitle ?? '');
                       case _JuzEntryType.bismillah:
                         return Padding(
+                          key: const ValueKey('bismillah'),
                           padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
                           child: Text(
                             Bismillah.glyph,
@@ -459,6 +491,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                         }
 
                         return AyahCard(
+                          key: ValueKey(
+                              'ayah_${ayah.surah?.number}_${ayah.numberInSurah}_$arabicFontSize'),
                           index: globalIndex,
                           ayah: ayah.copyWith(
                             text: entry.displayText ?? ayah.text,
@@ -467,6 +501,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                           isPlayingNotifier: _isPlayingNotifier,
                           showTranslation: showTranslation,
                           showTransliteration: showTransliteration,
+                          arabicFontSize: arabicFontSize,
                           backgroundColor: isDark
                               ? (isEven
                                   ? const Color(0xFF101010)
@@ -475,6 +510,27 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                   ? const Color(0xFFFCFCFC)
                                   : const Color(0xFFF2F2F2)),
                           onPlayPressed: _onPlayPressed,
+                          isBookmarked: bookmark != null &&
+                              bookmark.surah.number == ayah.surah?.number &&
+                              bookmark.ayah.numberInSurah ==
+                                  ayah.numberInSurah &&
+                              bookmark.viewContext == BookmarkViewContext.juz &&
+                              bookmark.juzNumber == widget.juz.number,
+                          onBookmark: (idx) async {
+                            final entry =
+                                _entries[_globalAyahIndexToEntryIndex[idx]];
+                            final selectedAyah = entry.ayah!;
+                            final selectedSurah = entry.surah!;
+
+                            await _storage.saveBookmark(Bookmark(
+                              surah: selectedSurah,
+                              ayah: selectedAyah,
+                              juzNumber: widget.juz.number,
+                              viewContext: BookmarkViewContext.juz,
+                              timestamp: DateTime.now(),
+                            ));
+                            if (mounted) setState(() {});
+                          },
                         );
                     }
                   },

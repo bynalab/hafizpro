@@ -1,12 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/util/reciter_audio_profile.dart';
+import 'package:hafiz_test/model/verse_progress.model.dart';
 import 'abstract_storage_service.dart';
 
 class SharedPrefsStorageService implements IStorageService {
+  static const String _keyProgress = 'quran_progress_v2';
+  static const String _keyBookmark = 'quran_bookmark';
+  static const int _totalVerses = 6236;
+
   final SharedPreferences prefs;
 
   SharedPrefsStorageService(this.prefs);
@@ -91,6 +98,22 @@ class SharedPrefsStorageService implements IStorageService {
   }
 
   @override
+  Future<void> saveBookmark(Bookmark bookmark) async {
+    await prefs.setString(_keyBookmark, jsonEncode(bookmark.toJson()));
+  }
+
+  @override
+  Bookmark? getBookmark() {
+    final raw = prefs.getString(_keyBookmark);
+    if (raw == null) return null;
+    try {
+      return Bookmark.fromJson(jsonDecode(raw));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
   bool hasViewedShowcase() {
     return prefs.getBool('has_view_showcase') ?? false;
   }
@@ -124,5 +147,97 @@ class SharedPrefsStorageService implements IStorageService {
   @override
   String? getString(String key) {
     return prefs.getString(key);
+  }
+
+  // --- Progress Tracking Implementation ---
+
+  /// Converts a Surah and Ayah number into a single continuous index (0-6235).
+  /// This mapping allows us to use a flat bitset for the entire Quran.
+  int _getGlobalIndex(int surahNumber, int ayahNumber) {
+    int index = 0;
+    for (int i = 0; i < surahNumber - 1; i++) {
+      index += surahList[i].numberOfAyahs;
+    }
+    return index + ayahNumber - 1;
+  }
+
+  /// Helper to get the global index range [start, end] for a specific Surah.
+  (int, int) _getSurahRange(int surahNumber) {
+    int start = 0;
+    for (int i = 0; i < surahNumber - 1; i++) {
+      start += surahList[i].numberOfAyahs;
+    }
+    final count = surahList[surahNumber - 1].numberOfAyahs;
+    return (start + 1, start + count);
+  }
+
+  VerseProgress _loadProgress() {
+    return VerseProgress.fromJson(_totalVerses, prefs.getString(_keyProgress));
+  }
+
+  Future<void> _saveProgress(VerseProgress progress) async {
+    await prefs.setString(_keyProgress, progress.toJson());
+  }
+
+  @override
+  Future<void> markAyahsAsRead(int surahNumber, int upToAyahNumber) async {
+    final progress = _loadProgress();
+
+    for (int i = 1; i <= upToAyahNumber; i++) {
+      final globalIndex = _getGlobalIndex(surahNumber, i);
+      progress.markRead(globalIndex + 1);
+    }
+
+    await _saveProgress(progress);
+  }
+
+  @override
+  bool isAyahCompleted(int surahNumber, int ayahNumber) {
+    final globalIndex = _getGlobalIndex(surahNumber, ayahNumber);
+    return _loadProgress().isRead(globalIndex + 1);
+  }
+
+  @override
+  int getTotalReadCount() {
+    return _loadProgress().totalRead;
+  }
+
+  @override
+  double getCompletionPercentage() {
+    return _loadProgress().completionPercentage;
+  }
+
+  @override
+  int getSurahReadCount(int surahNumber) {
+    final progress = _loadProgress();
+    final range = _getSurahRange(surahNumber);
+    return progress.countReadInRange(range.$1, range.$2);
+  }
+
+  @override
+  int getCompletedSurahsCount() {
+    int completedCount = 0;
+    final progress = _loadProgress();
+    for (final surah in surahList) {
+      final range = _getSurahRange(surah.number);
+      if (progress.countReadInRange(range.$1, range.$2) ==
+          surah.numberOfAyahs) {
+        completedCount++;
+      }
+    }
+    return completedCount;
+  }
+
+  @override
+  Future<void> clearSurahProgress(int surahNumber) async {
+    final progress = _loadProgress();
+    final range = _getSurahRange(surahNumber);
+    progress.clearRange(range.$1, range.$2);
+    await _saveProgress(progress);
+  }
+
+  @override
+  Future<void> clearAllProgress() async {
+    await _saveProgress(VerseProgress(_totalVerses));
   }
 }
