@@ -42,10 +42,7 @@ class QuranAyahList extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final storage = getIt<IStorageService>();
-    final prefs = getReadingPreferences(storage);
-    final showTranslation = prefs.showTranslation;
-    final showTransliteration = prefs.showTransliteration;
-    final arabicFontSize = prefs.arabicFontSize;
+    final prefs = ReadingPreferences.fromStorage(storage);
 
     final bookmark = storage.getBookmark();
 
@@ -89,14 +86,13 @@ class QuranAyahList extends StatelessWidget {
             bookmark.viewContext == BookmarkViewContext.surah;
 
         return AyahCard(
-          key: ValueKey('ayah_${ayah.numberInSurah}_$arabicFontSize'),
-          index: ayahIndex,
+          key: ValueKey(
+              'ayah_${ayah.numberInSurah}_${prefs.arabicFontSize}_${prefs.arabicFontFamily}'),
+          index: index - _offset,
           ayah: ayah.copyWith(text: displayText),
           playingIndexNotifier: playingIndexNotifier,
           isPlayingNotifier: isPlayingNotifier,
-          showTranslation: showTranslation,
-          showTransliteration: showTransliteration,
-          arabicFontSize: arabicFontSize,
+          prefs: prefs,
           isCompleted: isCompleted,
           backgroundColor: isDark
               ? (isEven ? const Color(0xFF101010) : const Color(0xFF0E0E0E))

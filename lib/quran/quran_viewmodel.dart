@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_center.dart';
@@ -207,15 +207,26 @@ class QuranViewModel {
     await audioCenter.toggleSurah(currentSurah, startIndex: 0);
   }
 
-  void scrollToVerse(int? index) {
+  void scrollToVerse(int? index, {bool isAnimated = true}) {
     if (index == null) return;
 
     if (!itemScrollController.isAttached) return;
 
-    itemScrollController.scrollTo(
-      index: index + _bismillahListOffset,
-      duration: const Duration(milliseconds: 250),
-    );
+    final targetIndex = index + _bismillahListOffset;
+
+    if (isAnimated) {
+      itemScrollController.scrollTo(
+        index: targetIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        alignment: 0.10,
+      );
+    } else {
+      itemScrollController.jumpTo(
+        index: targetIndex,
+        alignment: 0.10,
+      );
+    }
   }
 
   void onAyahControlPressed(int index) async {

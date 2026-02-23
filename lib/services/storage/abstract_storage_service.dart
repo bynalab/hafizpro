@@ -47,6 +47,9 @@ abstract class IStorageService {
   /// Returns the count of Surahs where all ayahs have been completed.
   int getCompletedSurahsCount();
 
+  /// Returns the DateTime when progress for a specific Surah was last updated.
+  DateTime? getSurahLastUpdated(int surahNumber);
+
   /// Resets the progress (marks all ayahs as unread) for a specific Surah.
   Future<void> clearSurahProgress(int surahNumber);
 

@@ -12,6 +12,7 @@ import 'abstract_storage_service.dart';
 class SharedPrefsStorageService implements IStorageService {
   static const String _keyProgress = 'quran_progress_v2';
   static const String _keyBookmark = 'quran_bookmark';
+  static const String _keySurahUpdates = 'quran_surah_updates';
   static const int _totalVerses = 6236;
 
   final SharedPreferences prefs;
@@ -189,6 +190,19 @@ class SharedPrefsStorageService implements IStorageService {
     }
 
     await _saveProgress(progress);
+    await _updateSurahTimestamp(surahNumber);
+  }
+
+  Future<void> _updateSurahTimestamp(int surahNumber) async {
+    final raw = prefs.getString(_keySurahUpdates);
+    Map<String, dynamic> updates = {};
+    if (raw != null) {
+      try {
+        updates = jsonDecode(raw);
+      } catch (_) {}
+    }
+    updates[surahNumber.toString()] = DateTime.now().toIso8601String();
+    await prefs.setString(_keySurahUpdates, jsonEncode(updates));
   }
 
   @override
@@ -234,10 +248,35 @@ class SharedPrefsStorageService implements IStorageService {
     final range = _getSurahRange(surahNumber);
     progress.clearRange(range.$1, range.$2);
     await _saveProgress(progress);
+
+    // Clear timestamp
+    final raw = prefs.getString(_keySurahUpdates);
+    if (raw != null) {
+      try {
+        final updates = Map<String, dynamic>.from(jsonDecode(raw));
+        updates.remove(surahNumber.toString());
+        await prefs.setString(_keySurahUpdates, jsonEncode(updates));
+      } catch (_) {}
+    }
+  }
+
+  @override
+  DateTime? getSurahLastUpdated(int surahNumber) {
+    final raw = prefs.getString(_keySurahUpdates);
+    if (raw == null) return null;
+    try {
+      final updates = jsonDecode(raw);
+      final ts = updates[surahNumber.toString()];
+      if (ts == null) return null;
+      return DateTime.tryParse(ts);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
   Future<void> clearAllProgress() async {
     await _saveProgress(VerseProgress(_totalVerses));
+    await prefs.remove(_keySurahUpdates);
   }
 }

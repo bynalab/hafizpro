@@ -1,31 +1,56 @@
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 
-typedef ReadingPreferences = ({
-  bool showTranslation,
-  bool showTransliteration,
-  double arabicFontSize,
-});
+class ReadingPreferences {
+  final bool showTranslation;
+  final bool showTransliteration;
+  final double arabicFontSize;
+  final String arabicFontFamily;
+
+  const ReadingPreferences({
+    required this.showTranslation,
+    required this.showTransliteration,
+    required this.arabicFontSize,
+    required this.arabicFontFamily,
+  });
+
+  ReadingPreferences copyWith({
+    bool? showTranslation,
+    bool? showTransliteration,
+    double? arabicFontSize,
+    String? arabicFontFamily,
+  }) {
+    return ReadingPreferences(
+      showTranslation: showTranslation ?? this.showTranslation,
+      showTransliteration: showTransliteration ?? this.showTransliteration,
+      arabicFontSize: arabicFontSize ?? this.arabicFontSize,
+      arabicFontFamily: arabicFontFamily ?? this.arabicFontFamily,
+    );
+  }
+
+  factory ReadingPreferences.fromStorage(IStorageService storage) {
+    final showTranslation =
+        (storage.getString(showTranslationKey) ?? 'true') == 'true';
+    final showTransliteration =
+        (storage.getString(showTransliterationKey) ?? 'true') == 'true';
+    final arabicFontSize = double.tryParse(
+          storage.getString(arabicFontSizeKey) ?? '24.0',
+        ) ??
+        24.0;
+    final arabicFontFamily = storage.getString(arabicFontFamilyKey) ?? 'Amiri';
+
+    return ReadingPreferences(
+      showTranslation: showTranslation,
+      showTransliteration: showTransliteration,
+      arabicFontSize: arabicFontSize,
+      arabicFontFamily: arabicFontFamily,
+    );
+  }
+}
 
 const String showTranslationKey = 'show_translation';
 const String showTransliterationKey = 'show_transliteration';
 const String arabicFontSizeKey = 'arabic_font_size_v1';
-
-ReadingPreferences getReadingPreferences(IStorageService storage) {
-  final showTranslation =
-      (storage.getString(showTranslationKey) ?? 'true') == 'true';
-  final showTransliteration =
-      (storage.getString(showTransliterationKey) ?? 'true') == 'true';
-  final arabicFontSize = double.tryParse(
-        storage.getString(arabicFontSizeKey) ?? '24.0',
-      ) ??
-      24.0;
-
-  return (
-    showTranslation: showTranslation,
-    showTransliteration: showTransliteration,
-    arabicFontSize: arabicFontSize,
-  );
-}
+const String arabicFontFamilyKey = 'arabic_font_family_v1';
 
 Future<void> setShowTranslationPreference(
   IStorageService storage,
@@ -46,4 +71,11 @@ Future<void> setArabicFontSizePreference(
   double value,
 ) {
   return storage.setString(arabicFontSizeKey, value.toString());
+}
+
+Future<void> setArabicFontFamilyPreference(
+  IStorageService storage,
+  String value,
+) {
+  return storage.setString(arabicFontFamilyKey, value);
 }

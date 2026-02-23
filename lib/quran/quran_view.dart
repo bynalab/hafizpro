@@ -39,17 +39,21 @@ class _QuranViewState extends State<QuranView> {
     final idx = viewModel.playingIndexNotifier.value;
     if (idx == null) return;
 
+    _scrollWithRetry(idx, animated: true);
+  }
+
+  void _scrollWithRetry(int idx, {required bool animated}) {
     // The scroll controller may not be attached yet (initial build / rebuild).
     if (!viewModel.itemScrollController.isAttached) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        viewModel.scrollToVerse(idx);
+        _scrollWithRetry(idx, animated: animated);
       });
 
       return;
     }
 
-    viewModel.scrollToVerse(idx);
+    viewModel.scrollToVerse(idx, isAnimated: animated);
   }
 
   @override
@@ -63,7 +67,9 @@ class _QuranViewState extends State<QuranView> {
       if (mounted) {
         setState(() {});
         if (widget.initialAyahNumber != null) {
-          viewModel.scrollToVerse(widget.initialAyahNumber! - 1);
+          final targetIdx = widget.initialAyahNumber! - 1;
+          viewModel.playingIndexNotifier.value = targetIdx;
+          _scrollWithRetry(targetIdx, animated: false);
         } else {
           _onPlayingIndexChanged();
         }

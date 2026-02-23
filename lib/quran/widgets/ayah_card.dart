@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/util.dart';
 
 class AyahCard extends StatelessWidget {
   final Ayah ayah;
@@ -10,9 +12,7 @@ class AyahCard extends StatelessWidget {
   final ValueNotifier<bool> isPlayingNotifier;
   final void Function(int)? onPlayPressed;
   final Color backgroundColor;
-  final bool showTranslation;
-  final bool showTransliteration;
-  final double arabicFontSize;
+  final ReadingPreferences prefs;
   final bool isCompleted;
   final void Function(int)? onMarkAsRead;
 
@@ -51,9 +51,7 @@ class AyahCard extends StatelessWidget {
     required this.isPlayingNotifier,
     this.backgroundColor = Colors.white,
     this.onPlayPressed,
-    this.showTranslation = true,
-    this.showTransliteration = true,
-    this.arabicFontSize = 24.0,
+    required this.prefs,
     this.isCompleted = false,
     this.onMarkAsRead,
     this.isBookmarked = false,
@@ -202,17 +200,13 @@ class AyahCard extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        _arabicDisplayText(ayah.text),
+                        '${_arabicDisplayText(ayah.text)} ﴿${toArabicIndicDigits(ayah.numberInSurah.toString())}﴾',
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
-                        style: GoogleFonts.amiri(
-                          fontSize: arabicFontSize,
-                          height: 2,
-                          color: textColor,
-                        ),
+                        style: _getArabicStyle(),
                       ),
                     ),
-                    if (showTransliteration &&
+                    if (prefs.showTransliteration &&
                         (ayah.transliteration ?? '').trim().isNotEmpty) ...[
                       const SizedBox(height: 14),
                       Align(
@@ -228,7 +222,7 @@ class AyahCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                     ],
-                    if (showTranslation &&
+                    if (prefs.showTranslation &&
                         (ayah.translation ?? '').trim().isNotEmpty) ...[
                       Align(
                         alignment: Alignment.centerLeft,
@@ -250,6 +244,29 @@ class AyahCard extends StatelessWidget {
         );
       },
     );
+  }
+
+  TextStyle _getArabicStyle() {
+    final baseStyle = TextStyle(
+      fontSize: prefs.arabicFontSize,
+      height: 2,
+      color: _isDarkColor(backgroundColor) ? Colors.white : AppColors.black500,
+    );
+
+    final family = prefs.arabicFontFamily.toString().toLowerCase();
+    switch (family) {
+      // Amiri is a specific font in google_fonts
+      case 'amiri':
+        return GoogleFonts.amiri(textStyle: baseStyle);
+      // Lateef is a specific font in google_fonts
+      case 'lateef':
+        return GoogleFonts.lateef(textStyle: baseStyle);
+      // Scheherazade New is a specific font in google_fonts
+      case 'scheherazade new':
+        return GoogleFonts.scheherazadeNew(textStyle: baseStyle);
+      default:
+        return GoogleFonts.amiri(textStyle: baseStyle);
+    }
   }
 }
 

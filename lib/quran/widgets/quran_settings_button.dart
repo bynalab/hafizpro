@@ -32,10 +32,7 @@ class QuranSettingsButton extends StatelessWidget {
       backgroundColor: Colors.transparent,
       isScrollControlled: false,
       builder: (ctx) {
-        final prefs = getReadingPreferences(storage);
-        bool showTranslation = prefs.showTranslation;
-        bool showTransliteration = prefs.showTransliteration;
-        double arabicFontSize = prefs.arabicFontSize;
+        ReadingPreferences prefs = ReadingPreferences.fromStorage(storage);
 
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
@@ -90,14 +87,15 @@ class QuranSettingsButton extends StatelessWidget {
                             title: context.l10n.translationLabel,
                             subtitle: context.l10n.translationSubtitle,
                             icon: Icons.translate_rounded,
-                            value: showTranslation,
+                            value: prefs.showTranslation,
                             isDark: isDark,
                             activeTrack: _activeTrack,
                             inactiveTrack: _inactiveTrack,
                             inactiveThumb: _inactiveThumb,
                             onChanged: (v) async {
                               await setShowTranslationPreference(storage, v);
-                              setSheetState(() => showTranslation = v);
+                              setSheetState(() =>
+                                  prefs = prefs.copyWith(showTranslation: v));
                               onChanged();
                             },
                           ),
@@ -106,17 +104,16 @@ class QuranSettingsButton extends StatelessWidget {
                             title: context.l10n.transliterationLabel,
                             subtitle: context.l10n.transliterationSubtitle,
                             icon: Icons.text_fields_rounded,
-                            value: showTransliteration,
+                            value: prefs.showTransliteration,
                             isDark: isDark,
                             activeTrack: _activeTrack,
                             inactiveTrack: _inactiveTrack,
                             inactiveThumb: _inactiveThumb,
                             onChanged: (v) async {
                               await setShowTransliterationPreference(
-                                storage,
-                                v,
-                              );
-                              setSheetState(() => showTransliteration = v);
+                                  storage, v);
+                              setSheetState(() => prefs =
+                                  prefs.copyWith(showTransliteration: v));
                               onChanged();
                             },
                           ),
@@ -136,7 +133,7 @@ class QuranSettingsButton extends StatelessWidget {
                               ),
                               const Spacer(),
                               Text(
-                                "${arabicFontSize.toInt()}px",
+                                "${prefs.arabicFontSize.toInt()}px",
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -154,15 +151,80 @@ class QuranSettingsButton extends StatelessWidget {
                               trackHeight: 4,
                             ),
                             child: Slider(
-                              value: arabicFontSize,
+                              value: prefs.arabicFontSize,
                               min: 18,
                               max: 48,
                               divisions: 15,
                               onChanged: (v) async {
                                 await setArabicFontSizePreference(storage, v);
-                                setSheetState(() => arabicFontSize = v);
+                                setSheetState(() =>
+                                    prefs = prefs.copyWith(arabicFontSize: v));
                                 onChanged();
                               },
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            "Quran Font",
+                            style: GoogleFonts.cairo(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: onPanel,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                _FontOption(
+                                  name: "Amiri",
+                                  isSelected:
+                                      prefs.arabicFontFamily.toLowerCase() ==
+                                          'amiri',
+                                  isDark: isDark,
+                                  onTap: () async {
+                                    await setArabicFontFamilyPreference(
+                                        storage, 'Amiri');
+                                    setSheetState(() => prefs = prefs.copyWith(
+                                        arabicFontFamily: 'Amiri'));
+                                    onChanged();
+                                  },
+                                  fontStyle: GoogleFonts.amiri(),
+                                ),
+                                const SizedBox(width: 10),
+                                _FontOption(
+                                  name: "Lateef",
+                                  isSelected:
+                                      prefs.arabicFontFamily.toLowerCase() ==
+                                          'lateef',
+                                  isDark: isDark,
+                                  onTap: () async {
+                                    await setArabicFontFamilyPreference(
+                                        storage, 'Lateef');
+                                    setSheetState(() => prefs = prefs.copyWith(
+                                        arabicFontFamily: 'Lateef'));
+                                    onChanged();
+                                  },
+                                  fontStyle: GoogleFonts.lateef(),
+                                ),
+                                const SizedBox(width: 10),
+                                _FontOption(
+                                  name: "Scheherazade",
+                                  isSelected:
+                                      prefs.arabicFontFamily.toLowerCase() ==
+                                          'scheherazade new',
+                                  isDark: isDark,
+                                  onTap: () async {
+                                    await setArabicFontFamilyPreference(
+                                        storage, 'Scheherazade New');
+                                    setSheetState(() => prefs = prefs.copyWith(
+                                        arabicFontFamily: 'Scheherazade New'));
+                                    onChanged();
+                                  },
+                                  fontStyle: GoogleFonts.scheherazadeNew(),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -259,6 +321,70 @@ class _PreferenceTile extends StatelessWidget {
             fontWeight: FontWeight.w500,
             color: muted,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FontOption extends StatelessWidget {
+  final String name;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+  final TextStyle fontStyle;
+
+  const _FontOption({
+    required this.name,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+    required this.fontStyle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = AppColors.green500;
+    final bgColor = isSelected
+        ? activeColor.withValues(alpha: 0.1)
+        : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF8FAFC));
+    final borderColor = isSelected
+        ? activeColor
+        : (isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : const Color(0xFFE5E7EB));
+    final textColor = isDark ? Colors.white : const Color(0xFF111827);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: 2),
+        ),
+        child: Column(
+          children: [
+            Text(
+              "بسم الله",
+              style: fontStyle.copyWith(
+                fontSize: 18,
+                color: textColor,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              name,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color:
+                    isSelected ? activeColor : textColor.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
         ),
       ),
     );

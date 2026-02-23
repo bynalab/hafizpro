@@ -319,10 +319,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final prefs = getReadingPreferences(_storage);
-    final showTranslation = prefs.showTranslation;
-    final showTransliteration = prefs.showTransliteration;
-    final arabicFontSize = prefs.arabicFontSize;
+    final prefs = ReadingPreferences.fromStorage(_storage);
 
     final bookmark = _storage.getBookmark();
 
@@ -492,16 +489,14 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
                         return AyahCard(
                           key: ValueKey(
-                              'ayah_${ayah.surah?.number}_${ayah.numberInSurah}_$arabicFontSize'),
+                              'ayah_${ayah.surah?.number}_${ayah.numberInSurah}_${prefs.arabicFontSize}_${prefs.arabicFontFamily}'),
                           index: globalIndex,
                           ayah: ayah.copyWith(
                             text: entry.displayText ?? ayah.text,
                           ),
                           playingIndexNotifier: _playingIndexNotifier,
                           isPlayingNotifier: _isPlayingNotifier,
-                          showTranslation: showTranslation,
-                          showTransliteration: showTransliteration,
-                          arabicFontSize: arabicFontSize,
+                          prefs: prefs,
                           backgroundColor: isDark
                               ? (isEven
                                   ? const Color(0xFF101010)

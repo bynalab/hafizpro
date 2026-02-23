@@ -106,14 +106,15 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.delete_sweep_rounded,
-              color: isDark ? Colors.white70 : const Color(0xFF4B5563),
+          if (totalRead > 0)
+            IconButton(
+              icon: Icon(
+                Icons.delete_sweep_rounded,
+                color: isDark ? Colors.white70 : const Color(0xFF4B5563),
+              ),
+              onPressed: () => _confirmResetAll(context),
+              tooltip: 'Reset All Progress',
             ),
-            onPressed: () => _confirmResetAll(context),
-            tooltip: 'Reset All Progress',
-          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -149,9 +150,11 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
               (context, index) {
                 final surah = surahList[index];
                 final readCount = _storage.getSurahReadCount(surah.number);
+                final lastUpdated = _storage.getSurahLastUpdated(surah.number);
                 return _SurahProgressTile(
                   surah: surah,
                   readCount: readCount,
+                  lastUpdated: lastUpdated,
                   isDark: isDark,
                   onReset: () => _confirmResetSurah(context, surah),
                 );
@@ -312,12 +315,14 @@ class _StatItem extends StatelessWidget {
 class _SurahProgressTile extends StatelessWidget {
   final Surah surah; // Data/Surah type
   final int readCount;
+  final DateTime? lastUpdated;
   final bool isDark;
   final VoidCallback onReset;
 
   const _SurahProgressTile({
     required this.surah,
     required this.readCount,
+    this.lastUpdated,
     required this.isDark,
     required this.onReset,
   });
@@ -403,6 +408,17 @@ class _SurahProgressTile extends StatelessWidget {
                           : const Color(0xFF78B7C6)),
                     ),
                   ),
+                  if (lastUpdated != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      'Last updated: ${formatDateTime(lastUpdated!)}',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
