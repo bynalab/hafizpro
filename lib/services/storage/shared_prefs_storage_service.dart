@@ -195,6 +195,20 @@ class SharedPrefsStorageService implements IStorageService {
   }
 
   @override
+  Future<void> unmarkSpecificAyahsAsRead(
+      int surahNumber, Set<int> ayahNumbers) async {
+    final progress = _loadProgress();
+
+    for (int ayahNumber in ayahNumbers) {
+      final globalIndex = _getGlobalIndex(surahNumber, ayahNumber);
+      progress.unmarkRead(globalIndex + 1);
+    }
+
+    await _saveProgress(progress);
+    await _updateSurahTimestamp(surahNumber);
+  }
+
+  @override
   Future<void> markAyahsAsRead(int surahNumber, int upToAyahNumber) async {
     final progress = _loadProgress();
 

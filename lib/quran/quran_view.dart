@@ -178,6 +178,27 @@ class _QuranViewState extends State<QuranView> {
                   ],
                 ),
               ),
+              TextButton(
+                onPressed: () {
+                  _progressController?.undoMarkAsRead();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  if (mounted) setState(() {});
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF78B7C6),
+                  visualDensity: VisualDensity.compact,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                ),
+                child: Text(
+                  'UNDO',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -28,6 +28,7 @@ abstract class IStorageService {
 
   /// Marks specific ayahs in a Surah as completed.
   Future<void> markSpecificAyahsAsRead(int surahNumber, Set<int> ayahNumbers);
+  Future<void> unmarkSpecificAyahsAsRead(int surahNumber, Set<int> ayahNumbers);
 
   /// Marks all ayahs in a Surah from 1 up to [upToAyahNumber] as completed.
   Future<void> markAyahsAsRead(int surahNumber, int upToAyahNumber);

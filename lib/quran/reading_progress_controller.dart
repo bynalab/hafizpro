@@ -21,6 +21,8 @@ class ReadingProgressController {
 
   // Track if any manual marking happened in this session
   bool _manualMarked = false;
+  Set<int> _lastMarkedAyahs = {};
+  int _previousSavedIndex = -1;
 
   // Rules
   static const double _visibilityThreshold = 0.6;
@@ -182,21 +184,46 @@ class ReadingProgressController {
   void markAsReadUpTo(int index) {
     if (trackingMode == 'off') return;
 
-    // Don't move backwards
-    if (index <= _lastSavedVerseIndex) return;
-
     // Add all ayahs from last saved + 1 to index
+    final newlyAdded = <int>{};
     for (int i = _lastSavedVerseIndex + 1; i <= index; i++) {
-      _confirmedReadVerses.add(i);
+      if (!_confirmedReadVerses.contains(i)) {
+        _confirmedReadVerses.add(i);
+        newlyAdded.add(i + 1);
+      }
     }
 
+    if (newlyAdded.isEmpty) return;
+
     _manualMarked = true;
+    _previousSavedIndex = _lastSavedVerseIndex;
+    _lastMarkedAyahs = newlyAdded;
 
     // Force immediate save for manual mode to satisfy "Update completion analytics accordingly"
     _isSaved = false; // Allow saveProgress to run
     saveProgress();
 
+    // After saveProgress, update the local _lastSavedVerseIndex to prevent double marking
+    _lastSavedVerseIndex = index;
+
     debugPrint('Manual Progress: Marked up to verse ${index + 1}');
+  }
+
+  /// Reverts the last manual marking action.
+  void undoMarkAsRead() {
+    if (_lastMarkedAyahs.isEmpty) return;
+
+    final ayahNumbers = _lastMarkedAyahs;
+    storageService.unmarkSpecificAyahsAsRead(surahNumber, ayahNumbers);
+
+    // Revert local state
+    for (final index in ayahNumbers.map((n) => n - 1)) {
+      _confirmedReadVerses.remove(index);
+    }
+    _lastSavedVerseIndex = _previousSavedIndex;
+    _lastMarkedAyahs = {};
+
+    debugPrint('Manual Progress: Undo completed for Surah $surahNumber');
   }
 
   void dispose() {
