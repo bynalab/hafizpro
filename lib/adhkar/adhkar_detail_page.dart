@@ -24,7 +24,7 @@ class AdhkarDetailPage extends StatefulWidget {
 class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
   final _ttsService = TtsService();
   bool _isSpeakingTranslation = false;
-  bool _isSpeakingArabic = false;
+  // bool _isSpeakingArabic = false;
 
   @override
   void initState() {
@@ -38,11 +38,11 @@ class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
       onStart: () {}, // No global state change here, handled in toggle methods
       onCompletion: () => setState(() {
         _isSpeakingTranslation = false;
-        _isSpeakingArabic = false;
+        // _isSpeakingArabic = false;
       }),
       onPause: () => setState(() {
         _isSpeakingTranslation = false;
-        _isSpeakingArabic = false;
+        // _isSpeakingArabic = false;
       }),
     );
   }
@@ -61,12 +61,13 @@ class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
       _ttsService.stop(); // Stop any other playing
       setState(() {
         _isSpeakingTranslation = true;
-        _isSpeakingArabic = false;
+        // _isSpeakingArabic = false;
       });
       _ttsService.speak(widget.item.translationText, language: "en-US");
     }
   }
 
+/*
   void _toggleArabicTts() {
     if (_isSpeakingArabic) {
       _ttsService.stop();
@@ -80,6 +81,7 @@ class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
       _ttsService.speak(widget.item.arabicText, language: "ar", rate: 0.3);
     }
   }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +149,7 @@ class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      /*
                       GestureDetector(
                         onTap: _toggleArabicTts,
                         child: Container(
@@ -165,6 +168,8 @@ class _AdhkarDetailPageState extends State<AdhkarDetailPage> {
                           ),
                         ),
                       ),
+                      */
+                      const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
