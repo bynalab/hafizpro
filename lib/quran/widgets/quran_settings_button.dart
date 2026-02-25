@@ -173,11 +173,10 @@ class QuranSettingsButton extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                _FontOption(
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _FontOption(
                                   name: "Amiri",
                                   isSelected:
                                       prefs.arabicFontFamily.toLowerCase() ==
@@ -192,8 +191,10 @@ class QuranSettingsButton extends StatelessWidget {
                                   },
                                   fontStyle: GoogleFonts.amiri(),
                                 ),
-                                const SizedBox(width: 10),
-                                _FontOption(
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _FontOption(
                                   name: "Lateef",
                                   isSelected:
                                       prefs.arabicFontFamily.toLowerCase() ==
@@ -208,8 +209,10 @@ class QuranSettingsButton extends StatelessWidget {
                                   },
                                   fontStyle: GoogleFonts.lateef(),
                                 ),
-                                const SizedBox(width: 10),
-                                _FontOption(
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: _FontOption(
                                   name: "Scheherazade",
                                   isSelected:
                                       prefs.arabicFontFamily.toLowerCase() ==
@@ -224,8 +227,8 @@ class QuranSettingsButton extends StatelessWidget {
                                   },
                                   fontStyle: GoogleFonts.scheherazadeNew(),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -358,13 +361,15 @@ class _FontOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: borderColor, width: 2),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               "بسم الله",
