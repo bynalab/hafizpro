@@ -443,6 +443,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onTap: _showInAppRating,
                   ),
+                  const SizedBox(height: 10),
+                  if (controller.appVersion.isNotEmpty) ...[
+                    Text(
+                      'v${controller.appVersion}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

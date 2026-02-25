@@ -5,6 +5,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/notification_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsController extends ChangeNotifier {
   final IStorageService _storage;
@@ -28,8 +29,9 @@ class SettingsController extends ChangeNotifier {
   bool notificationsEnabled = false;
   TimeOfDay notificationTime = const TimeOfDay(hour: 20, minute: 0);
   String progressTrackingMode = 'smart';
+  String appVersion = '';
 
-  void load() {
+  Future<void> load() async {
     try {
       autoPlay = _storage.checkAutoPlay();
       reciter = _storage.getReciterId();
@@ -51,6 +53,9 @@ class SettingsController extends ChangeNotifier {
       }
 
       progressTrackingMode = _storage.getProgressTrackingMode();
+
+      final packageInfo = await PackageInfo.fromPlatform();
+      appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
     } finally {
       isLoading = false;
       notifyListeners();
