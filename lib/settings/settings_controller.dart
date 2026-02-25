@@ -27,6 +27,7 @@ class SettingsController extends ChangeNotifier {
 
   bool notificationsEnabled = false;
   TimeOfDay notificationTime = const TimeOfDay(hour: 20, minute: 0);
+  String progressTrackingMode = 'smart';
 
   void load() {
     try {
@@ -48,6 +49,8 @@ class SettingsController extends ChangeNotifier {
           }
         }
       }
+
+      progressTrackingMode = _storage.getProgressTrackingMode();
     } finally {
       isLoading = false;
       notifyListeners();
@@ -96,5 +99,15 @@ class SettingsController extends ChangeNotifier {
     } catch (_) {
       // Keep settings saved even if scheduling fails.
     }
+  }
+
+  Future<void> setProgressTrackingMode(String mode) async {
+    final oldValue = progressTrackingMode;
+    progressTrackingMode = mode;
+    notifyListeners();
+
+    AnalyticsService.trackSettingsChanged(
+        'progress_tracking_mode', oldValue, mode);
+    await _storage.setProgressTrackingMode(mode);
   }
 }

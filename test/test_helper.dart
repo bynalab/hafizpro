@@ -8,7 +8,7 @@ import 'package:hafiz_test/util/surah_picker.dart';
 
 class MockIStorageService extends Mock implements IStorageService {
   @override
-  bool hasViewedShowcase() => false;
+  Future<void> saveUserGuide() async {}
 }
 
 class MockNetworkServices extends Mock implements NetworkServices {}

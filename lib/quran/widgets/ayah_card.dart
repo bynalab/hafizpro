@@ -114,35 +114,37 @@ class AyahCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        GestureDetector(
-                          onTap: () => onMarkAsRead?.call(index),
-                          child: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isCompleted
-                                  ? const Color(0xFF78B7C6)
-                                      .withValues(alpha: 0.2)
-                                  : null,
-                              border: Border.all(
+                        if (prefs.trackingMode != 'off') ...[
+                          GestureDetector(
+                            onTap: () => onMarkAsRead?.call(index),
+                            child: Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
                                 color: isCompleted
                                     ? const Color(0xFF78B7C6)
-                                    : chipBorderColor,
+                                        .withValues(alpha: 0.2)
+                                    : null,
+                                border: Border.all(
+                                  color: isCompleted
+                                      ? const Color(0xFF78B7C6)
+                                      : chipBorderColor,
+                                ),
                               ),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                isCompleted ? Icons.check : Icons.done_all,
-                                size: 18,
-                                color: isCompleted
-                                    ? const Color(0xFF78B7C6)
-                                    : textColor.withValues(alpha: 0.5),
+                              child: Center(
+                                child: Icon(
+                                  isCompleted ? Icons.check : Icons.done_all,
+                                  size: 18,
+                                  color: isCompleted
+                                      ? const Color(0xFF78B7C6)
+                                      : textColor.withValues(alpha: 0.5),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
+                          const SizedBox(width: 8),
+                        ],
                         GestureDetector(
                           onTap: () => onBookmark?.call(index),
                           child: Container(

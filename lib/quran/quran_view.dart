@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
@@ -12,6 +14,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class QuranView extends StatefulWidget {
@@ -34,6 +37,9 @@ class _QuranViewState extends State<QuranView> {
 
   double _speed = 1.5;
   bool _isAutoSwitching = false;
+  ReadingProgressController? _progressController;
+  int? _resumeAyah;
+  String _trackingMode = 'smart';
 
   void _onPlayingIndexChanged() {
     final idx = viewModel.playingIndexNotifier.value;
@@ -65,6 +71,20 @@ class _QuranViewState extends State<QuranView> {
     viewModel.audioCenter.addListener(_onAudioCenterChanged);
     viewModel.initialize(widget.surah.number).then((_) {
       if (mounted) {
+        _trackingMode = _storage.getProgressTrackingMode();
+
+        _progressController = ReadingProgressController(
+          surahNumber: widget.surah.number,
+          totalVerses: widget.surah.ayahs.length,
+          storageService: _storage,
+          onProgressSaved: _onProgressSaved,
+          trackingMode: _trackingMode,
+        );
+
+        if (_trackingMode != 'off') {
+          _resumeAyah = _storage.getSurahGap(widget.surah.number);
+        }
+
         setState(() {});
         if (widget.initialAyahNumber != null) {
           final targetIdx = widget.initialAyahNumber! - 1;
@@ -75,6 +95,99 @@ class _QuranViewState extends State<QuranView> {
         }
       }
     });
+  }
+
+  void _onProgressSaved(int upToAyahNumber) {
+    if (!mounted) return;
+
+    // Use a short delay via microtask to ensure we aren't in the middle of a build
+    // but the context is still very much valid.
+    Future.microtask(() {
+      if (!mounted) return;
+      setState(() {});
+      _showPremiumToast(upToAyahNumber);
+    });
+  }
+
+  void _showPremiumToast(int ayahNumber) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF1D353B),
+                const Color(0xFF1D353B).withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFF78B7C6).withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF78B7C6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Success',
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF78B7C6),
+                        height: 1.2,
+                      ),
+                    ),
+                    Text(
+                      'Progress updated to Ayah $ayahNumber',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.fromLTRB(18, 0, 18, 40),
+      ),
+    );
   }
 
   void _onAudioCenterChanged() {
@@ -108,6 +221,7 @@ class _QuranViewState extends State<QuranView> {
 
   @override
   void dispose() {
+    _progressController?.dispose();
     viewModel.playingIndexNotifier.removeListener(_onPlayingIndexChanged);
     viewModel.audioCenter.removeListener(_onAudioCenterChanged);
     viewModel.dispose();
@@ -116,125 +230,8 @@ class _QuranViewState extends State<QuranView> {
   }
 
   Future<bool> _handlePop() async {
-    final positions = viewModel.itemPositionsListener.itemPositions.value;
-    if (positions.isEmpty) return true;
-
-    // Find the first (top-most) visible item
-    final topItem = positions.reduce((a, b) => a.index < b.index ? a : b);
-
-    // Adjust for Bismillah offset
-    final showBismillah =
-        viewModel.shouldShowBismillah(viewModel.surah?.number);
-    final offset = showBismillah ? 1 : 0;
-
-    final ayahIndex = topItem.index - offset;
-    if (ayahIndex < 0 || viewModel.surah == null) return true;
-
-    final ayah = viewModel.surah!.ayahs[ayahIndex];
-
-    // Check if this verse is already completed
-    if (_storage.isAyahCompleted(widget.surah.number, ayah.numberInSurah)) {
-      return true;
-    }
-
-    final shouldSave = await _showSaveProgressSheet(ayah.numberInSurah);
-    if (shouldSave == true) {
-      await _storage.markAyahsAsRead(widget.surah.number, ayah.numberInSurah);
-      return true;
-    }
-
-    if (shouldSave == false) {
-      return true; // Use chose not to save
-    }
-
-    return false; // User cancelled the pop (dismissed sheet without choice)
-  }
-
-  Future<bool?> _showSaveProgressSheet(int ayahNumber) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return showModalBottomSheet<bool>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1F2937) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              context.l10n.saveProgressTitle,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF111827),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.saveProgressPrompt(ayahNumber),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? Colors.white70 : const Color(0xFF4B5563),
-              ),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text(
-                      context.l10n.commonNo,
-                      style: TextStyle(
-                        color:
-                            isDark ? Colors.white60 : const Color(0xFF6B7280),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF78B7C6),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      context.l10n.commonYes,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+    _progressController?.saveProgress();
+    return true; // Simple pop now, controller handles save
   }
 
   @override
@@ -348,7 +345,20 @@ class _QuranViewState extends State<QuranView> {
                           storage: _storage,
                           isDark: isDark,
                           onChanged: () {
-                            if (mounted) setState(() {});
+                            if (mounted) {
+                              final nextMode =
+                                  _storage.getProgressTrackingMode();
+                              if (nextMode != _trackingMode) {
+                                // Reload surah to refresh the controller with new mode
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (_) {
+                                    return QuranView(surah: widget.surah);
+                                  }),
+                                );
+                                return;
+                              }
+                              setState(() {});
+                            }
                           },
                         ),
                       ),
@@ -362,6 +372,7 @@ class _QuranViewState extends State<QuranView> {
                 children: [
                   Column(
                     children: [
+                      if (_resumeAyah != null) _buildResumeBanner(),
                       Expanded(
                         child: viewModel.surah == null
                             ? const SizedBox.shrink()
@@ -379,8 +390,8 @@ class _QuranViewState extends State<QuranView> {
                                     viewModel.itemPositionsListener,
                                 onControlPressed:
                                     viewModel.onAyahControlPressed,
-                                onProgressUpdated: () => setState(() {}),
                                 onBookmarkUpdated: () => setState(() {}),
+                                readingProgressController: _progressController,
                               ),
                       ),
                       const SizedBox(height: 150),
@@ -430,6 +441,56 @@ class _QuranViewState extends State<QuranView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildResumeBanner() {
+    final cardBg = DashboardPalette.cardTeal(context);
+    final primaryText = DashboardPalette.primaryText(context);
+
+    return Container(
+      width: double.infinity,
+      color: cardBg,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      child: Row(
+        children: [
+          Icon(Icons.history_edu_rounded,
+              size: 20, color: primaryText.withValues(alpha: 0.7)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'You skipped some verses. Continue from Ayah $_resumeAyah?',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: primaryText,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final targetIdx = _resumeAyah! - 1;
+              _scrollWithRetry(targetIdx, animated: true);
+              _storage.setSurahGap(widget.surah.number, null);
+              setState(() => _resumeAyah = null);
+            },
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              foregroundColor: const Color(0xFF78B7C6),
+            ),
+            child: const Text('Continue'),
+          ),
+          IconButton(
+            onPressed: () {
+              _storage.setSurahGap(widget.surah.number, null);
+              setState(() => _resumeAyah = null);
+            },
+            icon: Icon(Icons.close_rounded,
+                size: 18, color: primaryText.withValues(alpha: 0.4)),
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
       ),
     );
   }

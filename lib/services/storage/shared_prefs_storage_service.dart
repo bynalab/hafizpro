@@ -11,6 +11,7 @@ import 'abstract_storage_service.dart';
 
 class SharedPrefsStorageService implements IStorageService {
   static const String _keyProgress = 'quran_progress_v2';
+  static const _keyReadingMode = 'reading_mode';
   static const String _keyBookmark = 'quran_bookmark';
   static const String _keySurahUpdates = 'quran_surah_updates';
   static const int _totalVerses = 6236;
@@ -114,7 +115,6 @@ class SharedPrefsStorageService implements IStorageService {
     }
   }
 
-  @override
   bool hasViewedShowcase() {
     return prefs.getBool('has_view_showcase') ?? false;
   }
@@ -178,6 +178,20 @@ class SharedPrefsStorageService implements IStorageService {
 
   Future<void> _saveProgress(VerseProgress progress) async {
     await prefs.setString(_keyProgress, progress.toJson());
+  }
+
+  @override
+  Future<void> markSpecificAyahsAsRead(
+      int surahNumber, Set<int> ayahNumbers) async {
+    final progress = _loadProgress();
+
+    for (int ayahNumber in ayahNumbers) {
+      final globalIndex = _getGlobalIndex(surahNumber, ayahNumber);
+      progress.markRead(globalIndex + 1);
+    }
+
+    await _saveProgress(progress);
+    await _updateSurahTimestamp(surahNumber);
   }
 
   @override
@@ -272,6 +286,31 @@ class SharedPrefsStorageService implements IStorageService {
     } catch (_) {
       return null;
     }
+  }
+
+  @override
+  String getProgressTrackingMode() {
+    return prefs.getString(_keyReadingMode) ?? 'smart';
+  }
+
+  @override
+  Future<void> setProgressTrackingMode(String mode) async {
+    await prefs.setString(_keyReadingMode, mode);
+  }
+
+  @override
+  Future<void> setSurahGap(int surahNumber, int? firstUnreadAyah) async {
+    final key = 'surah_gap_$surahNumber';
+    if (firstUnreadAyah == null) {
+      await prefs.remove(key);
+    } else {
+      await prefs.setInt(key, firstUnreadAyah);
+    }
+  }
+
+  @override
+  int? getSurahGap(int surahNumber) {
+    return prefs.getInt('surah_gap_$surahNumber');
   }
 
   @override

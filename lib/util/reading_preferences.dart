@@ -5,12 +5,14 @@ class ReadingPreferences {
   final bool showTransliteration;
   final double arabicFontSize;
   final String arabicFontFamily;
+  final String trackingMode;
 
   const ReadingPreferences({
     required this.showTranslation,
     required this.showTransliteration,
     required this.arabicFontSize,
     required this.arabicFontFamily,
+    required this.trackingMode,
   });
 
   ReadingPreferences copyWith({
@@ -18,12 +20,14 @@ class ReadingPreferences {
     bool? showTransliteration,
     double? arabicFontSize,
     String? arabicFontFamily,
+    String? trackingMode,
   }) {
     return ReadingPreferences(
       showTranslation: showTranslation ?? this.showTranslation,
       showTransliteration: showTransliteration ?? this.showTransliteration,
       arabicFontSize: arabicFontSize ?? this.arabicFontSize,
       arabicFontFamily: arabicFontFamily ?? this.arabicFontFamily,
+      trackingMode: trackingMode ?? this.trackingMode,
     );
   }
 
@@ -37,12 +41,14 @@ class ReadingPreferences {
         ) ??
         24.0;
     final arabicFontFamily = storage.getString(arabicFontFamilyKey) ?? 'Amiri';
+    final trackingMode = storage.getProgressTrackingMode();
 
     return ReadingPreferences(
       showTranslation: showTranslation,
       showTransliteration: showTransliteration,
       arabicFontSize: arabicFontSize,
       arabicFontFamily: arabicFontFamily,
+      trackingMode: trackingMode,
     );
   }
 }

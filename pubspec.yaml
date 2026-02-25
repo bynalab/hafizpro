@@ -39,6 +39,7 @@ dependencies:
   adhkar: ^0.0.1
   flutter_tts: ^4.2.5
   android_intent_plus: ^6.0.0
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:

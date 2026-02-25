@@ -26,8 +26,10 @@ abstract class IStorageService {
   Future<void> saveBookmark(Bookmark bookmark);
   Bookmark? getBookmark();
 
+  /// Marks specific ayahs in a Surah as completed.
+  Future<void> markSpecificAyahsAsRead(int surahNumber, Set<int> ayahNumbers);
+
   /// Marks all ayahs in a Surah from 1 up to [upToAyahNumber] as completed.
-  /// This is used for the "Mark up to here" feature and auto-saving progress.
   Future<void> markAyahsAsRead(int surahNumber, int upToAyahNumber);
 
   /// Checks if a specific ayah has been marked as completed.
@@ -56,8 +58,15 @@ abstract class IStorageService {
   /// Clears the entire reading history for the whole Quran.
   Future<void> clearAllProgress();
 
-  bool hasViewedShowcase();
   Future<void> saveUserGuide();
+
+  /// Progress Tracking persistence: 'smart', 'manual', 'off'
+  String getProgressTrackingMode();
+  Future<void> setProgressTrackingMode(String mode);
+
+  /// Gap Persistence for Smart Auto-Save
+  Future<void> setSurahGap(int surahNumber, int? firstUnreadAyah);
+  int? getSurahGap(int surahNumber);
 
   /// Theme mode persistence
   Future<bool> setThemeMode(String mode);
