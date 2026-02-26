@@ -800,21 +800,21 @@ class BottomPillNav extends StatelessWidget {
               onTap: () => onChanged(1),
             ),
           ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: PillNavItem(
-              active: index == 2,
-              label: 'Adhkar',
-              icon: Icon(
-                Icons.spa_outlined,
-                size: 18,
-                color: index == 2
-                    ? Colors.white
-                    : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
-              ),
-              onTap: () => onChanged(2),
-            ),
-          ),
+          // const SizedBox(width: 4),
+          // Expanded(
+          //   child: PillNavItem(
+          //     active: index == 2,
+          //     label: 'Adhkar',
+          //     icon: Icon(
+          //       Icons.spa_outlined,
+          //       size: 18,
+          //       color: index == 2
+          //           ? Colors.white
+          //           : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+          //     ),
+          //     onTap: () => onChanged(2),
+          //   ),
+          // ),
         ],
       ),
     );
