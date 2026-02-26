@@ -450,86 +450,105 @@ class _JuzQuranViewState extends State<JuzQuranView> {
           Expanded(
             child: Stack(
               children: [
-                ScrollablePositionedList.separated(
-                  padding: const EdgeInsets.only(top: 54, bottom: 180),
-                  itemCount: _entries.length,
-                  itemScrollController: _itemScrollController,
-                  itemPositionsListener: _itemPositionsListener,
-                  itemBuilder: (context, index) {
-                    final entry = _entries[index];
-
-                    switch (entry.type) {
-                      case _JuzEntryType.header:
-                        return _SurahMarker(title: entry.surahTitle ?? '');
-                      case _JuzEntryType.bismillah:
-                        return Padding(
-                          key: const ValueKey('bismillah'),
-                          padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
-                          child: Text(
-                            Bismillah.glyph,
-                            textAlign: TextAlign.center,
-                            textDirection: TextDirection.rtl,
-                            style: GoogleFonts.amiri(
-                              fontSize: 24,
-                              height: 2,
-                              color: isDark
-                                  ? Colors.white
-                                  : const Color(0xFF111827),
-                            ),
-                          ),
-                        );
-                      case _JuzEntryType.ayah:
-                        final globalIndex = entry.globalAyahIndex ?? 0;
-                        final isEven = globalIndex % 2 == 0;
-                        final ayah = entry.ayah;
-
-                        if (ayah == null) {
-                          return const SizedBox.shrink();
-                        }
-
-                        return AyahCard(
-                          key: ValueKey(
-                              'ayah_${ayah.surah?.number}_${ayah.numberInSurah}_${prefs.arabicFontSize}_${prefs.arabicFontFamily}'),
-                          index: globalIndex,
-                          ayah: ayah.copyWith(
-                            text: entry.displayText ?? ayah.text,
-                          ),
-                          playingIndexNotifier: _playingIndexNotifier,
-                          isPlayingNotifier: _isPlayingNotifier,
-                          prefs: prefs,
-                          backgroundColor: isDark
-                              ? (isEven
-                                  ? const Color(0xFF101010)
-                                  : const Color(0xFF0E0E0E))
-                              : (isEven
-                                  ? const Color(0xFFFCFCFC)
-                                  : const Color(0xFFF2F2F2)),
-                          onPlayPressed: _onPlayPressed,
-                          isBookmarked: bookmark != null &&
-                              bookmark.surah.number == ayah.surah?.number &&
-                              bookmark.ayah.numberInSurah ==
-                                  ayah.numberInSurah &&
-                              bookmark.viewContext == BookmarkViewContext.juz &&
-                              bookmark.juzNumber == widget.juz.number,
-                          onBookmark: (idx) async {
-                            final entry =
-                                _entries[_globalAyahIndexToEntryIndex[idx]];
-                            final selectedAyah = entry.ayah!;
-                            final selectedSurah = entry.surah!;
-
-                            await _storage.saveBookmark(Bookmark(
-                              surah: selectedSurah,
-                              ayah: selectedAyah,
-                              juzNumber: widget.juz.number,
-                              viewContext: BookmarkViewContext.juz,
-                              timestamp: DateTime.now(),
-                            ));
-                            if (mounted) setState(() {});
-                          },
-                        );
+                ListenableBuilder(
+                  listenable: _audioCenter,
+                  builder: (context, _) {
+                    final state = _audioCenter.uiState;
+                    double bottomPadding = 20;
+                    if (state == AudioPlayerUiState.collapsed) {
+                      bottomPadding = 72;
+                    } else if (state == AudioPlayerUiState.expanded) {
+                      bottomPadding = 200;
                     }
+                    return ScrollablePositionedList.separated(
+                      padding: EdgeInsets.only(top: 54, bottom: bottomPadding),
+                      itemCount: _entries.length,
+                      itemScrollController: _itemScrollController,
+                      itemPositionsListener: _itemPositionsListener,
+                      itemBuilder: (context, index) {
+                        final entry = _entries[index];
+
+                        switch (entry.type) {
+                          case _JuzEntryType.header:
+                            return _SurahMarker(title: entry.surahTitle ?? '');
+                          case _JuzEntryType.bismillah:
+                            return Padding(
+                              key: const ValueKey('bismillah'),
+                              padding: const EdgeInsets.fromLTRB(18, 6, 18, 12),
+                              child: Text(
+                                Bismillah.glyph,
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
+                                style: GoogleFonts.amiri(
+                                  fontSize: 24,
+                                  height: 2,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF111827),
+                                ),
+                              ),
+                            );
+                          case _JuzEntryType.ayah:
+                            final globalIndex = entry.globalAyahIndex ?? 0;
+                            final isEven = globalIndex % 2 == 0;
+                            final ayah = entry.ayah;
+
+                            if (ayah == null) {
+                              return const SizedBox.shrink();
+                            }
+
+                            final isBookmarked = bookmark != null &&
+                                bookmark.surah.number == ayah.surah?.number &&
+                                bookmark.ayah.numberInSurah ==
+                                    ayah.numberInSurah &&
+                                bookmark.viewContext ==
+                                    BookmarkViewContext.juz &&
+                                bookmark.juzNumber == widget.juz.number;
+
+                            return AyahCard(
+                              key: ValueKey(
+                                  'ayah_${ayah.surah?.number}_${ayah.numberInSurah}_${prefs.arabicFontSize}_${prefs.arabicFontFamily}'),
+                              index: globalIndex,
+                              ayah: ayah.copyWith(
+                                text: entry.displayText ?? ayah.text,
+                              ),
+                              playingIndexNotifier: _playingIndexNotifier,
+                              isPlayingNotifier: _isPlayingNotifier,
+                              prefs: prefs,
+                              backgroundColor: isDark
+                                  ? (isEven
+                                      ? const Color(0xFF101010)
+                                      : const Color(0xFF0E0E0E))
+                                  : (isEven
+                                      ? const Color(0xFFFCFCFC)
+                                      : const Color(0xFFF2F2F2)),
+                              onPlayPressed: _onPlayPressed,
+                              isBookmarked: isBookmarked,
+                              onBookmark: (idx) async {
+                                if (isBookmarked) {
+                                  await _storage.deleteBookmark();
+                                } else {
+                                  final entry = _entries[
+                                      _globalAyahIndexToEntryIndex[idx]];
+                                  final selectedAyah = entry.ayah!;
+                                  final selectedSurah = entry.surah!;
+
+                                  await _storage.saveBookmark(Bookmark(
+                                    surah: selectedSurah,
+                                    ayah: selectedAyah,
+                                    juzNumber: widget.juz.number,
+                                    viewContext: BookmarkViewContext.juz,
+                                    timestamp: DateTime.now(),
+                                  ));
+                                }
+                                if (mounted) setState(() {});
+                              },
+                            );
+                        }
+                      },
+                      separatorBuilder: (_, __) => const SizedBox(height: 2),
+                    );
                   },
-                  separatorBuilder: (_, __) => const SizedBox(height: 2),
                 ),
                 _PinnedHeader(title: _currentStickySurahTitle),
                 Align(

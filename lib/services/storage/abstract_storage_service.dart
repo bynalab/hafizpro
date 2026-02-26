@@ -24,6 +24,7 @@ abstract class IStorageService {
   (Surah, Ayah)? getLastRead();
 
   Future<void> saveBookmark(Bookmark bookmark);
+  Future<void> deleteBookmark();
   Bookmark? getBookmark();
 
   /// Marks specific ayahs in a Surah as completed.

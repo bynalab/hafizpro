@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/extension/quran_extension.dart';
@@ -15,6 +16,8 @@ import 'package:just_audio/just_audio.dart';
 
 enum PlaybackOwner { reading, test, juz }
 
+enum AudioPlayerUiState { hidden, collapsed, expanded }
+
 class AudioCenter extends ChangeNotifier {
   final AudioServices _audioServices;
   final SurahServices _surahServices;
@@ -25,11 +28,19 @@ class AudioCenter extends ChangeNotifier {
   int _readingPlaylistIndexOffset = 0;
   AudioSource? _bismillahAudioSource;
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
+  AudioPlayerUiState _uiState = AudioPlayerUiState.hidden;
   PlaybackSnapshot? _readingSnapshot;
 
   final ValueNotifier<int?> juzPlayingIndexNotifier = ValueNotifier<int?>(null);
 
   PlaybackOwner get playbackOwner => _playbackOwner;
+  AudioPlayerUiState get uiState => _uiState;
+
+  void setUiState(AudioPlayerUiState next) {
+    if (_uiState == next) return;
+    _uiState = next;
+    notifyListeners();
+  }
 
   bool _tryAutoAdvanceToNextSurah() {
     if (_playbackOwner != PlaybackOwner.reading) return false;
@@ -342,6 +353,10 @@ class AudioCenter extends ChangeNotifier {
     setCurrentSurah(surah);
 
     try {
+      if (_uiState == AudioPlayerUiState.hidden) {
+        _uiState = AudioPlayerUiState.expanded;
+      }
+
       await _audioServices.setAudioSource(source);
       isPlaying = true;
       unawaited(_audioServices.play(audioName: currentSurahName));
@@ -421,6 +436,10 @@ class AudioCenter extends ChangeNotifier {
         _readingPlaylistIndexOffset = bismillah == null ? 0 : 1;
 
         final playlist = fullSurah.audioSources.prependBismillah(bismillah);
+
+        if (_uiState == AudioPlayerUiState.hidden) {
+          _uiState = AudioPlayerUiState.expanded;
+        }
 
         await _audioServices.setPlaylistAudio(playlist);
         // If we prepended a Bismillah track, it must play first.
@@ -582,6 +601,7 @@ class AudioCenter extends ChangeNotifier {
     _indexSub?.cancel();
     _indexSub = null;
     juzPlayingIndexNotifier.value = null;
+    _uiState = AudioPlayerUiState.hidden;
     notifyListeners();
     await _audioServices.stop(audioName: currentSurahName);
   }

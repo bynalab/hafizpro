@@ -105,6 +105,11 @@ class SharedPrefsStorageService implements IStorageService {
   }
 
   @override
+  Future<void> deleteBookmark() async {
+    await prefs.remove(_keyBookmark);
+  }
+
+  @override
   Bookmark? getBookmark() {
     final raw = prefs.getString(_keyBookmark);
     if (raw == null) return null;

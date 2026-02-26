@@ -397,25 +397,42 @@ class _QuranViewState extends State<QuranView> {
                       Expanded(
                         child: viewModel.surah == null
                             ? const SizedBox.shrink()
-                            : QuranAyahList(
-                                surah: viewModel.surah!,
-                                showBismillah: viewModel.shouldShowBismillah(
-                                  viewModel.surah?.number,
-                                ),
-                                playingIndexNotifier:
-                                    viewModel.playingIndexNotifier,
-                                isPlayingNotifier: viewModel.isPlayingNotifier,
-                                scrollController:
-                                    viewModel.itemScrollController,
-                                itemPositionsListener:
-                                    viewModel.itemPositionsListener,
-                                onControlPressed:
-                                    viewModel.onAyahControlPressed,
-                                onBookmarkUpdated: () => setState(() {}),
-                                readingProgressController: _progressController,
+                            : ListenableBuilder(
+                                listenable: viewModel.audioCenter,
+                                builder: (context, _) {
+                                  final state = viewModel.audioCenter.uiState;
+                                  double bottomPadding = 20;
+                                  if (state == AudioPlayerUiState.collapsed) {
+                                    bottomPadding = 72;
+                                  } else if (state ==
+                                      AudioPlayerUiState.expanded) {
+                                    bottomPadding = 200;
+                                  }
+
+                                  return QuranAyahList(
+                                    surah: viewModel.surah!,
+                                    showBismillah:
+                                        viewModel.shouldShowBismillah(
+                                      viewModel.surah?.number,
+                                    ),
+                                    playingIndexNotifier:
+                                        viewModel.playingIndexNotifier,
+                                    isPlayingNotifier:
+                                        viewModel.isPlayingNotifier,
+                                    scrollController:
+                                        viewModel.itemScrollController,
+                                    itemPositionsListener:
+                                        viewModel.itemPositionsListener,
+                                    onControlPressed:
+                                        viewModel.onAyahControlPressed,
+                                    onBookmarkUpdated: () => setState(() {}),
+                                    readingProgressController:
+                                        _progressController,
+                                    bottomPadding: bottomPadding,
+                                  );
+                                },
                               ),
                       ),
-                      const SizedBox(height: 150),
                     ],
                   ),
                   Align(

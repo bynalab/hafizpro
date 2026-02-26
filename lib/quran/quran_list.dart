@@ -24,6 +24,7 @@ class QuranAyahList extends StatelessWidget {
   final VoidCallback? onBookmarkUpdated;
   final int? juzNumber;
   final ReadingProgressController? readingProgressController;
+  final double bottomPadding;
 
   const QuranAyahList({
     super.key,
@@ -38,6 +39,7 @@ class QuranAyahList extends StatelessWidget {
     this.onBookmarkUpdated,
     this.juzNumber,
     this.readingProgressController,
+    this.bottomPadding = 30,
   });
 
   int get _offset => showBismillah ? 1 : 0;
@@ -51,7 +53,7 @@ class QuranAyahList extends StatelessWidget {
     final bookmark = storage.getBookmark();
 
     return ScrollablePositionedList.separated(
-      padding: const EdgeInsets.symmetric(vertical: 30),
+      padding: EdgeInsets.only(top: 30, bottom: bottomPadding),
       itemCount: surah.ayahs.length + _offset,
       itemScrollController: scrollController,
       itemPositionsListener: itemPositionsListener,
@@ -115,13 +117,17 @@ class QuranAyahList extends StatelessWidget {
             },
             isBookmarked: isBookmarked,
             onBookmark: (idx) async {
-              final selectedAyah = surah.ayahs[idx];
-              await storage.saveBookmark(Bookmark(
-                surah: surah,
-                ayah: selectedAyah,
-                viewContext: BookmarkViewContext.surah,
-                timestamp: DateTime.now(),
-              ));
+              if (isBookmarked) {
+                await storage.deleteBookmark();
+              } else {
+                final selectedAyah = surah.ayahs[idx];
+                await storage.saveBookmark(Bookmark(
+                  surah: surah,
+                  ayah: selectedAyah,
+                  viewContext: BookmarkViewContext.surah,
+                  timestamp: DateTime.now(),
+                ));
+              }
               onBookmarkUpdated?.call();
             },
           ),
