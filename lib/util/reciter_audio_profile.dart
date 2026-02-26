@@ -192,6 +192,14 @@ class ReciterAudioProfiles {
         ),
       ],
     ),
+    'ar.zarami': ReciterAudioProfile(
+      sources: [
+        ReciterAudioSource(
+          surahBase: 'https://podcasts.qurancentral.com/muhammad-zarami',
+          surahTemplate: 'qurancentral.com-{surah:000}.mp3',
+        ),
+      ],
+    ),
     'ur.khan': ReciterAudioProfile(
       sources: [
         ReciterAudioSource(

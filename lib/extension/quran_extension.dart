@@ -1,4 +1,5 @@
 import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/util/constants.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -36,6 +37,7 @@ extension AyahAudioExtension on Ayah {
 
     return AudioSource.uri(
       Uri.parse(audio),
+      headers: {'User-Agent': AppConstants.userAgent},
       tag: MediaItem(
         id: number.toString(),
         title: title,

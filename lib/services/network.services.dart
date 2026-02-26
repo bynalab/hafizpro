@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hafiz_test/util/constants.dart';
 
 class NetworkServices {
   late final Dio _dio;
@@ -15,6 +16,7 @@ class NetworkServices {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'User-Agent': AppConstants.userAgent,
         },
         connectTimeout: const Duration(seconds: 45),
         receiveTimeout: const Duration(seconds: 45),
