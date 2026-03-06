@@ -215,5 +215,10 @@
       }
     }
   },
-  "markAsRead": "Mark as Read"
+  "markAsRead": "Mark as Read",
+  "bookmarksTitle": "Bookmarks",
+  "noBookmarksMessage": "No bookmarks found. Start bookmarking verses to see them here!",
+  "seeAllBookmarks": "See All",
+  "deleteBookmarkTitle": "Delete Bookmark",
+  "deleteBookmarkMessage": "Are you sure you want to delete this bookmark?"
 }

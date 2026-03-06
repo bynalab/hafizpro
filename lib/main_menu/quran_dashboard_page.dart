@@ -22,6 +22,7 @@ import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 // import 'package:hafiz_test/widget/cumulative_playlist_progress_bar.dart';
+import 'package:hafiz_test/bookmark/bookmarks_page.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/main_menu/widgets/quran_progress_card.dart';
@@ -67,7 +68,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
 
     final storage = getIt<IStorageService>();
     final lastRead = storage.getLastRead();
-    final bookmark = storage.getBookmark();
+    final bookmarks = storage.getBookmarks();
+    final bookmark = bookmarks.isNotEmpty ? bookmarks.first : null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -493,7 +495,24 @@ class _ContinueReadingCard extends StatelessWidget {
 
     return DashboardFeatureCard(
       background: DashboardPalette.cardPeach(context),
-      title: 'Continue Reading',
+      title: context.l10n.lastReadTitle,
+      trailingTitle: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const BookmarksPage()),
+          );
+        },
+        child: Text(
+          context.l10n.seeAllBookmarks,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: DashboardPalette.primaryText(context).withValues(alpha: 0.7),
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
       onTap: () {
         if (isJuzContext) {
           final juz = findJuzByNumber(bookmark!.juzNumber!);

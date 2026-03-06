@@ -321,8 +321,6 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final prefs = ReadingPreferences.fromStorage(_storage);
 
-    final bookmark = _storage.getBookmark();
-
     if (_isLoading) {
       return Scaffold(
         body: SurahLoader(
@@ -497,13 +495,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                               return const SizedBox.shrink();
                             }
 
-                            final isBookmarked = bookmark != null &&
-                                bookmark.surah.number == ayah.surah?.number &&
-                                bookmark.ayah.numberInSurah ==
-                                    ayah.numberInSurah &&
-                                bookmark.viewContext ==
-                                    BookmarkViewContext.juz &&
-                                bookmark.juzNumber == widget.juz.number;
+                            final isBookmarked = _storage.isBookmarked(
+                                ayah.surah?.number ?? 0, ayah.numberInSurah);
 
                             return AyahCard(
                               key: ValueKey(
@@ -526,14 +519,16 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                               isBookmarked: isBookmarked,
                               onBookmark: (idx) async {
                                 if (isBookmarked) {
-                                  await _storage.deleteBookmark();
+                                  await _storage.removeBookmark(
+                                      ayah.surah?.number ?? 0,
+                                      ayah.numberInSurah);
                                 } else {
                                   final entry = _entries[
                                       _globalAyahIndexToEntryIndex[idx]];
                                   final selectedAyah = entry.ayah!;
                                   final selectedSurah = entry.surah!;
 
-                                  await _storage.saveBookmark(Bookmark(
+                                  await _storage.addBookmark(Bookmark(
                                     surah: selectedSurah,
                                     ayah: selectedAyah,
                                     juzNumber: widget.juz.number,

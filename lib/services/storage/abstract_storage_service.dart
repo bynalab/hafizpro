@@ -23,9 +23,10 @@ abstract class IStorageService {
   Future<bool> saveLastRead(Surah surah, Ayah ayah);
   (Surah, Ayah)? getLastRead();
 
-  Future<void> saveBookmark(Bookmark bookmark);
-  Future<void> deleteBookmark();
-  Bookmark? getBookmark();
+  Future<void> addBookmark(Bookmark bookmark);
+  Future<void> removeBookmark(int surahNumber, int ayahNumber);
+  List<Bookmark> getBookmarks();
+  bool isBookmarked(int surahNumber, int ayahNumber);
 
   /// Marks specific ayahs in a Surah as completed.
   Future<void> markSpecificAyahsAsRead(int surahNumber, Set<int> ayahNumbers);

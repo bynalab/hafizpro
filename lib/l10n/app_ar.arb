@@ -215,5 +215,10 @@
       }
     }
   },
-  "markAsRead": "تحديد كمقروء"
+  "markAsRead": "تحديد كمقروء",
+  "bookmarksTitle": "الإشارات المرجعية",
+  "noBookmarksMessage": "لا توجد إشارات مرجعية. ابدأ بحفظ الآيات لتراها هنا!",
+  "seeAllBookmarks": "عرض الكل",
+  "deleteBookmarkTitle": "حذف الإشارة المرجعية",
+  "deleteBookmarkMessage": "هل أنت متأكد من حذف هذه الإشارة المرجعية؟"
 }

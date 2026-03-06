@@ -100,24 +100,37 @@ class SharedPrefsStorageService implements IStorageService {
   }
 
   @override
-  Future<void> saveBookmark(Bookmark bookmark) async {
-    await prefs.setString(_keyBookmark, jsonEncode(bookmark.toJson()));
+  Future<void> addBookmark(Bookmark bookmark) async {
+    final bookmarks = getBookmarks();
+    bookmarks.add(bookmark);
+    await prefs.setStringList(
+      _keyBookmark,
+      bookmarks.map((b) => jsonEncode(b.toJson())).toList(),
+    );
   }
 
   @override
-  Future<void> deleteBookmark() async {
-    await prefs.remove(_keyBookmark);
+  Future<void> removeBookmark(int surahNumber, int ayahNumber) async {
+    final bookmarks = getBookmarks();
+    bookmarks.removeWhere((b) =>
+        b.surah.number == surahNumber && b.ayah.numberInSurah == ayahNumber);
+    await prefs.setStringList(
+      _keyBookmark,
+      bookmarks.map((b) => jsonEncode(b.toJson())).toList(),
+    );
   }
 
   @override
-  Bookmark? getBookmark() {
-    final raw = prefs.getString(_keyBookmark);
-    if (raw == null) return null;
-    try {
-      return Bookmark.fromJson(jsonDecode(raw));
-    } catch (e) {
-      return null;
-    }
+  List<Bookmark> getBookmarks() {
+    final list = prefs.getStringList(_keyBookmark) ?? [];
+    return list.map((s) => Bookmark.fromJson(jsonDecode(s))).toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
+  @override
+  bool isBookmarked(int surahNumber, int ayahNumber) {
+    return getBookmarks().any((b) =>
+        b.surah.number == surahNumber && b.ayah.numberInSurah == ayahNumber);
   }
 
   bool hasViewedShowcase() {

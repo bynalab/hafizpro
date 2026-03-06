@@ -50,8 +50,6 @@ class QuranAyahList extends StatelessWidget {
     final storage = getIt<IStorageService>();
     final prefs = ReadingPreferences.fromStorage(storage);
 
-    final bookmark = storage.getBookmark();
-
     return ScrollablePositionedList.separated(
       padding: EdgeInsets.only(top: 30, bottom: bottomPadding),
       itemCount: surah.ayahs.length + _offset,
@@ -86,10 +84,8 @@ class QuranAyahList extends StatelessWidget {
         final isCompleted =
             storage.isAyahCompleted(surah.number, ayah.numberInSurah);
 
-        final isBookmarked = bookmark != null &&
-            bookmark.surah.number == surah.number &&
-            bookmark.ayah.numberInSurah == ayah.numberInSurah &&
-            bookmark.viewContext == BookmarkViewContext.surah;
+        final isBookmarked =
+            storage.isBookmarked(surah.number, ayah.numberInSurah);
 
         return VisibilityDetector(
           key: ValueKey('ayah_vis_${ayah.numberInSurah}'),
@@ -118,10 +114,10 @@ class QuranAyahList extends StatelessWidget {
             isBookmarked: isBookmarked,
             onBookmark: (idx) async {
               if (isBookmarked) {
-                await storage.deleteBookmark();
+                await storage.removeBookmark(surah.number, ayah.numberInSurah);
               } else {
                 final selectedAyah = surah.ayahs[idx];
-                await storage.saveBookmark(Bookmark(
+                await storage.addBookmark(Bookmark(
                   surah: surah,
                   ayah: selectedAyah,
                   viewContext: BookmarkViewContext.surah,

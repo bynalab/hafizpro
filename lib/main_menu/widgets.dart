@@ -126,6 +126,7 @@ class SearchField extends StatelessWidget {
 class DashboardFeatureCard extends StatelessWidget {
   final Color background;
   final String title;
+  final Widget? trailingTitle;
   final Widget right;
   final Widget child;
   final VoidCallback? onTap;
@@ -134,6 +135,7 @@ class DashboardFeatureCard extends StatelessWidget {
     super.key,
     required this.background,
     required this.title,
+    this.trailingTitle,
     required this.right,
     required this.child,
     this.onTap,
@@ -152,13 +154,19 @@ class DashboardFeatureCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: GoogleFonts.cairo(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: DashboardPalette.primaryText(context),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.cairo(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: DashboardPalette.primaryText(context),
+                  ),
+                ),
+                if (trailingTitle != null) trailingTitle!,
+              ],
             ),
             const SizedBox(height: 10),
             Row(

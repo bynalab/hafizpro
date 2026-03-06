@@ -7,7 +7,7 @@ import 'package:hafiz_test/services/notification_service.dart';
 import 'package:hafiz_test/services/quran_sources_factory.dart';
 import 'package:hafiz_test/services/surah_source.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
-import 'package:hafiz_test/services/storage/shared_prefs_storage_service.dart';
+import 'package:hafiz_test/services/storage/hive_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
@@ -50,10 +50,12 @@ Future<void> _restoreNotificationScheduleIfEnabled() async {
 
 Future<void> setupLocator() async {
   final prefs = await SharedPreferences.getInstance();
-
   getIt.registerSingleton<SharedPreferences>(prefs);
 
-  getIt.registerSingleton<IStorageService>(SharedPrefsStorageService(prefs));
+  final hiveService = HiveStorageService();
+  await hiveService.init(prefs);
+  getIt.registerSingleton<IStorageService>(hiveService);
+
   getIt.registerSingleton<NetworkServices>(NetworkServices());
   getIt.registerSingleton<SurahPicker>(SurahPicker());
   getIt.registerSingleton<AudioServices>(AudioServices());

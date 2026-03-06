@@ -57,72 +57,94 @@ class BottomAudioControls extends StatelessWidget {
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: GestureDetector(
-        onTap: () => audioCenter.setUiState(AudioPlayerUiState.expanded),
-        child: Container(
-          width: double.infinity,
-          color: barBg,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              StreamBuilder<Duration>(
-                stream: isContextActive
-                    ? audioPlayer.positionStream
-                    : const Stream<Duration>.empty(),
-                builder: (context, snap) {
-                  final pos = isContextActive
-                      ? (snap.data ?? Duration.zero)
-                      : Duration.zero;
-                  final total = isContextActive
-                      ? (audioPlayer.duration ?? Duration.zero)
-                      : Duration.zero;
-                  final totalMs = total.inMilliseconds;
-                  final value = totalMs == 0
-                      ? 0.0
-                      : (pos.inMilliseconds / totalMs).clamp(0.0, 1.0);
-
-                  return LinearProgressIndicator(
-                    value: value,
-                    minHeight: 3,
-                    backgroundColor: onBar.withValues(alpha: 0.1),
-                    valueColor: AlwaysStoppedAnimation<Color>(onBar),
-                  );
-                },
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-                child: SafeArea(
-                  top: false,
-                  child: ValueListenableBuilder<int?>(
-                    valueListenable: playingIndexListenable,
-                    builder: (context, index, _) {
-                      final title = titleBuilder(index);
-
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: onBar,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          _buildPlayPauseButton(context, onBar,
-                              isCollapsed: true),
-                        ],
-                      );
-                    },
+      child: Tooltip(
+        message: 'Tap to expand',
+        child: GestureDetector(
+          onTap: () {
+            audioCenter.setUiState(AudioPlayerUiState.expanded);
+          },
+          child: Container(
+            width: double.infinity,
+            color: barBg,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: onBar.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                StreamBuilder<Duration>(
+                  stream: isContextActive
+                      ? audioPlayer.positionStream
+                      : const Stream<Duration>.empty(),
+                  builder: (context, snap) {
+                    final pos = isContextActive
+                        ? (snap.data ?? Duration.zero)
+                        : Duration.zero;
+                    final total = isContextActive
+                        ? (audioPlayer.duration ?? Duration.zero)
+                        : Duration.zero;
+                    final totalMs = total.inMilliseconds;
+                    final value = totalMs == 0
+                        ? 0.0
+                        : (pos.inMilliseconds / totalMs).clamp(0.0, 1.0);
+
+                    return LinearProgressIndicator(
+                      value: value,
+                      minHeight: 3,
+                      backgroundColor: onBar.withValues(alpha: 0.1),
+                      valueColor: AlwaysStoppedAnimation<Color>(onBar),
+                    );
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 2, 18, 10),
+                  child: SafeArea(
+                    top: false,
+                    child: ValueListenableBuilder<int?>(
+                      valueListenable: playingIndexListenable,
+                      builder: (context, index, _) {
+                        final title = titleBuilder(index);
+
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.arrow_circle_up_sharp,
+                              color: onBar.withValues(alpha: 0.5),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: onBar,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildPlayPauseButton(context, onBar,
+                                isCollapsed: true),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -153,13 +175,18 @@ class BottomAudioControls extends StatelessWidget {
                   onTap: () {
                     audioCenter.setUiState(AudioPlayerUiState.collapsed);
                   },
+                  behavior: HitTestBehavior.opaque,
                   child: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: onBar.withValues(alpha: 0.2),
                     ),
-                    child: Icon(Icons.close_rounded, color: onBar, size: 22),
+                    child: Icon(
+                      Icons.arrow_circle_down_sharp,
+                      color: onBar,
+                      size: 22,
+                    ),
                   ),
                 ),
               ),
