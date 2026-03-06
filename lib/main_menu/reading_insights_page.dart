@@ -6,6 +6,8 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/main_menu/widgets.dart';
+import 'package:hafiz_test/widget/star_burst_icon.dart';
 
 class ReadingInsightsPage extends StatefulWidget {
   const ReadingInsightsPage({super.key});
@@ -76,7 +78,6 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final totalRead = _storage.getTotalReadCount();
     final totalVerses = 6236;
     final remaining = totalVerses - totalRead;
@@ -84,14 +85,14 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
     final percentage = _storage.getCompletionPercentage();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0B0B) : Colors.white,
+      backgroundColor: DashboardPalette.pinnedHeaderBg(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: isDark ? Colors.white : const Color(0xFF111827),
+            color: DashboardPalette.primaryText(context),
             size: 20,
           ),
           onPressed: () => Navigator.pop(context),
@@ -99,9 +100,9 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
         title: Text(
           'Reading Insights',
           style: GoogleFonts.cairo(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF111827),
+            color: DashboardPalette.primaryText(context),
           ),
         ),
         centerTitle: true,
@@ -110,7 +111,7 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
             IconButton(
               icon: Icon(
                 Icons.delete_sweep_rounded,
-                color: isDark ? Colors.white70 : const Color(0xFF4B5563),
+                color: DashboardPalette.secondaryText(context),
               ),
               onPressed: () => _confirmResetAll(context),
               tooltip: 'Reset All Progress',
@@ -128,7 +129,6 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
                 remaining: remaining,
                 completedSurahs: completedSurahs,
                 percentage: percentage,
-                isDark: isDark,
               ),
             ),
           ),
@@ -138,9 +138,9 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
               child: Text(
                 'Surah Breakdown',
                 style: GoogleFonts.cairo(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF111827),
+                  color: DashboardPalette.primaryText(context),
                 ),
               ),
             ),
@@ -155,7 +155,6 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
                   surah: surah,
                   readCount: readCount,
                   lastUpdated: lastUpdated,
-                  isDark: isDark,
                   onReset: () => _confirmResetSurah(context, surah),
                 );
               },
@@ -177,26 +176,38 @@ class _OverviewStatsCard extends StatelessWidget {
   final int remaining;
   final int completedSurahs;
   final double percentage;
-  final bool isDark;
 
   const _OverviewStatsCard({
     required this.totalRead,
     required this.remaining,
     required this.completedSurahs,
     required this.percentage,
-    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1F2937) : const Color(0xFFF9FAFB),
+        color: isDark
+            ? DashboardPalette.segmentedBg(context)
+            : DashboardPalette.cardTeal(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+          color: isDark
+              ? DashboardPalette.listTileBorder(context)
+              : Colors.transparent,
         ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [
@@ -208,21 +219,18 @@ class _OverviewStatsCard extends StatelessWidget {
                 value: formatNumber(totalRead),
                 icon: Icons.check_circle_rounded,
                 color: AppColors.green500,
-                isDark: isDark,
               ),
               _StatItem(
                 label: 'Remaining',
                 value: formatNumber(remaining),
                 icon: Icons.hourglass_empty_rounded,
                 color: const Color(0xFF78B7C6),
-                isDark: isDark,
               ),
               _StatItem(
                 label: 'Completed',
                 value: formatNumber(completedSurahs),
                 icon: Icons.flag_rounded,
                 color: const Color(0xFFFBBF24),
-                isDark: isDark,
               ),
             ],
           ),
@@ -236,17 +244,18 @@ class _OverviewStatsCard extends StatelessWidget {
                   Text(
                     'Overall Progress',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white70 : const Color(0xFF4B5563),
+                      color: DashboardPalette.secondaryText(context),
                     ),
                   ),
                   Text(
                     formatPercentage(percentage),
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF78B7C6),
+                      color:
+                          isDark ? AppColors.green500 : const Color(0xFF205B5F),
                     ),
                   ),
                 ],
@@ -257,10 +266,12 @@ class _OverviewStatsCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: percentage,
                   minHeight: 10,
-                  backgroundColor:
-                      isDark ? Colors.white10 : const Color(0xFFE5E7EB),
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(Color(0xFF78B7C6)),
+                  backgroundColor: isDark
+                      ? DashboardPalette.listTileBg(context)
+                      : Colors.white.withValues(alpha: 0.5),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? AppColors.green500 : const Color(0xFF205B5F),
+                  ),
                 ),
               ),
             ],
@@ -276,35 +287,34 @@ class _StatItem extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
-  final bool isDark;
 
   const _StatItem({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
-    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
+        Icon(icon, color: color, size: 22),
+        const SizedBox(height: 6),
         Text(
           value,
           style: GoogleFonts.inter(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF111827),
+            color: DashboardPalette.primaryText(context),
           ),
         ),
         Text(
           label,
           style: GoogleFonts.inter(
-            fontSize: 12,
-            color: isDark ? Colors.white60 : const Color(0xFF6B7280),
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: DashboardPalette.secondaryText(context),
           ),
         ),
       ],
@@ -316,19 +326,18 @@ class _SurahProgressTile extends StatelessWidget {
   final Surah surah; // Data/Surah type
   final int readCount;
   final DateTime? lastUpdated;
-  final bool isDark;
   final VoidCallback onReset;
 
   const _SurahProgressTile({
     required this.surah,
     required this.readCount,
     this.lastUpdated,
-    required this.isDark,
     required this.onReset,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final percentage = readCount / surah.numberOfAyahs;
     final isCompleted = readCount == surah.numberOfAyahs;
 
@@ -337,36 +346,15 @@ class _SurahProgressTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF111111) : Colors.white,
+          color: DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDark ? const Color(0xFF242424) : const Color(0xFFE5E7EB),
+            color: DashboardPalette.listTileBorder(context),
           ),
         ),
         child: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isCompleted
-                    ? AppColors.green500.withValues(alpha: 0.1)
-                    : const Color(0xFF78B7C6).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  '${surah.number}',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isCompleted
-                        ? AppColors.green500
-                        : const Color(0xFF78B7C6),
-                  ),
-                ),
-              ),
-            ),
+            StarburstIcon(text: '${surah.number}'),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -380,8 +368,7 @@ class _SurahProgressTile extends StatelessWidget {
                         style: GoogleFonts.cairo(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color:
-                              isDark ? Colors.white : const Color(0xFF111827),
+                          color: DashboardPalette.primaryText(context),
                         ),
                       ),
                       Text(
@@ -389,8 +376,7 @@ class _SurahProgressTile extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color:
-                              isDark ? Colors.white60 : const Color(0xFF6B7280),
+                          color: DashboardPalette.secondaryText(context),
                         ),
                       ),
                     ],
@@ -401,8 +387,9 @@ class _SurahProgressTile extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: percentage,
                       minHeight: 5,
-                      backgroundColor:
-                          isDark ? Colors.white10 : const Color(0xFFF3F4F6),
+                      backgroundColor: isDark
+                          ? DashboardPalette.segmentedBg(context)
+                          : AppColors.green50,
                       valueColor: AlwaysStoppedAnimation<Color>(isCompleted
                           ? AppColors.green500
                           : const Color(0xFF78B7C6)),
@@ -414,7 +401,7 @@ class _SurahProgressTile extends StatelessWidget {
                       'Last updated: ${formatDateTime(lastUpdated!)}',
                       style: GoogleFonts.inter(
                         fontSize: 10,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: isDark ? Colors.white38 : Colors.black54,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -428,7 +415,8 @@ class _SurahProgressTile extends StatelessWidget {
                 icon: Icon(
                   Icons.restart_alt_rounded,
                   size: 20,
-                  color: isDark ? Colors.white38 : Colors.grey,
+                  color: DashboardPalette.secondaryText(context)
+                      .withValues(alpha: 0.5),
                 ),
                 onPressed: onReset,
                 padding: EdgeInsets.zero,

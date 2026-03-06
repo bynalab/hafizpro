@@ -34,7 +34,7 @@ class DashboardPalette {
   }
 
   static Color secondaryText(BuildContext context) {
-    return isDark(context) ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+    return isDark(context) ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
   }
 
   static Color segmentedBg(BuildContext context) {
