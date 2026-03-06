@@ -364,4 +364,14 @@ class AnalyticsService {
       'timestamp': DateTime.now().toIso8601String(),
     });
   }
+
+  // ===== 7. MOTIVATION NOTIFICATIONS =====
+
+  /// Track when a motivational notification is scheduled/sent
+  static void trackMotivationNotification(String message) {
+    trackEvent('Motivation Notification Sent', properties: {
+      'message': message,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
 }

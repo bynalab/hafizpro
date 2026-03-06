@@ -66,6 +66,7 @@ flutter:
     - assets/icons/
     - assets/img/onboarding/
     - assets/surah_meta/
+    - assets/json/
     - assets/quran-offline.sqlite
     - shorebird.yaml
 

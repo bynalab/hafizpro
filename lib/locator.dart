@@ -60,7 +60,8 @@ Future<void> setupLocator() async {
   getIt.registerSingleton<SurahPicker>(SurahPicker());
   getIt.registerSingleton<AudioServices>(AudioServices());
   getIt.registerSingleton<ThemeController>(ThemeController());
-  getIt.registerSingleton<NotificationService>(NotificationService());
+  getIt.registerSingleton<NotificationService>(
+      NotificationService(storage: getIt<IStorageService>()));
   getIt.registerSingleton<TtsService>(TtsService());
 
   final surahSource = await createQuranSources(

@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:hafiz_test/util/asset_util.dart';
 
 abstract interface class AyahTextSource {
   Future<Map<int, ({String? translation, String? transliteration})>>
@@ -20,9 +18,10 @@ class SurahMetaAssetAyahTextSource implements AyahTextSource {
     required String transliterationId,
   }) async {
     try {
-      final raw =
-          await rootBundle.loadString('assets/surah_meta/$surahNumber.json');
-      final decoded = json.decode(raw) as Map;
+      final Map? decoded =
+          await AssetUtil.loadJson('assets/surah_meta/$surahNumber.json');
+
+      if (decoded == null) return const {};
 
       return {
         for (final entry in decoded.entries)
