@@ -168,6 +168,26 @@ class SharedPrefsStorageService implements IStorageService {
     return prefs.getString(key);
   }
 
+  @override
+  Future<bool> setBool(String key, bool value) async {
+    return prefs.setBool(key, value);
+  }
+
+  @override
+  bool? getBool(String key) {
+    return prefs.getBool(key);
+  }
+
+  @override
+  Future<bool> setInt(String key, int value) async {
+    return prefs.setInt(key, value);
+  }
+
+  @override
+  int? getInt(String key) {
+    return prefs.getInt(key);
+  }
+
   // --- Progress Tracking Implementation ---
 
   /// Converts a Surah and Ayah number into a single continuous index (0-6235).

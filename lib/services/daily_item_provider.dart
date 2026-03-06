@@ -28,10 +28,10 @@ class DailyItemProvider<T> {
     final targetDate = date ?? DateTime.now();
     final n = items.length;
 
-    int? offset = _loadInt(_offsetKey);
+    int? offset = _storage.getInt(_offsetKey);
     if (offset == null) {
       offset = _random.nextInt(n);
-      await _saveInt(_offsetKey, offset);
+      await _storage.setInt(_offsetKey, offset);
     }
 
     final days =
@@ -39,14 +39,5 @@ class DailyItemProvider<T> {
     final index = (days + offset) % n;
 
     return items[index];
-  }
-
-  int? _loadInt(String key) {
-    final s = _storage.getString(key);
-    return s == null || s.isEmpty ? null : int.tryParse(s);
-  }
-
-  Future<void> _saveInt(String key, int val) async {
-    await _storage.setString(key, val.toString());
   }
 }

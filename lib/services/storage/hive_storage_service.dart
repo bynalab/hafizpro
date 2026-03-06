@@ -35,6 +35,13 @@ class HiveStorageService implements IStorageService {
 
   Future<void> _migrateIfNeeded(SharedPreferences prefs) async {
     if (_settingsBox.get('migration_completed', defaultValue: false)) {
+      // One-time fix for missing onboarding/rating keys in previous migration
+      if (!_settingsBox.containsKey('onboarding_completed')) {
+        final onboardingValue = prefs.get('onboarding_completed');
+        if (onboardingValue != null) {
+          await _settingsBox.put('onboarding_completed', onboardingValue);
+        }
+      }
       return;
     }
 
@@ -48,6 +55,15 @@ class HiveStorageService implements IStorageService {
       'language',
       'notifications_enabled',
       'notification_time',
+      'onboarding_completed',
+      // Rating service keys (just in case they were already used)
+      'has_rated_app',
+      'rating_request_count',
+      'last_rating_request',
+      'test_sessions_completed',
+      'surahs_listened',
+      'app_first_launch',
+      'days_since_first_launch',
     ];
 
     for (var key in settingsKeys) {
@@ -312,6 +328,28 @@ class HiveStorageService implements IStorageService {
 
   @override
   String? getString(String key) {
+    return _settingsBox.get(key);
+  }
+
+  @override
+  Future<bool> setBool(String key, bool value) async {
+    await _settingsBox.put(key, value);
+    return true;
+  }
+
+  @override
+  bool? getBool(String key) {
+    return _settingsBox.get(key);
+  }
+
+  @override
+  Future<bool> setInt(String key, int value) async {
+    await _settingsBox.put(key, value);
+    return true;
+  }
+
+  @override
+  int? getInt(String key) {
     return _settingsBox.get(key);
   }
 
