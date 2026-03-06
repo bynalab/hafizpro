@@ -422,6 +422,10 @@ class SurahCard extends StatelessWidget {
   final bool isPlaying;
   final bool isLoading;
 
+  final bool isSelectionMode;
+  final bool isSelected;
+  final ValueChanged<bool?>? onSelectChanged;
+
   const SurahCard({
     super.key,
     required this.surah,
@@ -430,19 +434,30 @@ class SurahCard extends StatelessWidget {
     this.onPlay,
     this.isPlaying = false,
     this.isLoading = false,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onSelectChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = DashboardPalette.isDark(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: DashboardPalette.listTileBg(context),
+          color: isSelected && !isDark
+              ? const Color(0xFFF3E8EA) // Muted light pink background
+              : DashboardPalette.listTileBg(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: DashboardPalette.listTileBorder(context)),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF4A2A34) // Deep maroon border
+                : DashboardPalette.listTileBorder(context),
+            width: isSelected ? 1.6 : 1.0,
+          ),
         ),
         child: Row(
           children: [
@@ -472,7 +487,16 @@ class SurahCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (showPlayButton)
+            if (isSelectionMode)
+              Checkbox(
+                value: isSelected,
+                onChanged: onSelectChanged,
+                activeColor: const Color(0xFF4A2A34), // Deep maroon
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              )
+            else if (showPlayButton)
               GestureDetector(
                 onTap: isLoading ? null : (onPlay ?? onTap),
                 child: Container(

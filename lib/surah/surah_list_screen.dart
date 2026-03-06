@@ -20,6 +20,7 @@ class SurahListScreen extends StatefulWidget {
 
 class _SurahListScreenState extends State<SurahListScreen> {
   final _searchController = TextEditingController();
+  final Set<int> _selectedSurahs = {};
   String _query = '';
   Surah? selectedSurah;
 
@@ -43,27 +44,47 @@ class _SurahListScreenState extends State<SurahListScreen> {
     super.dispose();
   }
 
+  void _toggleSurah(int number) {
+    setState(() {
+      if (_selectedSurahs.contains(number)) {
+        _selectedSurahs.remove(number);
+      } else {
+        _selectedSurahs.add(number);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isWideScreen = MediaQuery.of(context).size.width >= 600;
+    final isTestMode = widget.actionType == SurahSelectionAction.test;
 
     final displaySurahs =
         _query.trim().isEmpty ? surahList : searchSurah(_query);
 
     final list = ListView.separated(
-      padding: const EdgeInsets.fromLTRB(18, 14, 18, 24),
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 100),
       itemCount: displaySurahs.length,
       separatorBuilder: (_, __) => const SizedBox(height: 14),
       itemBuilder: (_, index) {
         final surah = displaySurahs[index];
         final surahNumber = surah.number;
+        final isSelected = _selectedSurahs.contains(surahNumber);
 
         return SurahCard(
           surah: surah,
           showPlayButton: false,
+          isSelectionMode: isTestMode,
+          isSelected: isSelected,
+          onSelectChanged: (_) => _toggleSurah(surahNumber),
           onTap: () {
             AnalyticsService.trackSurahSelected(surah.englishName, surahNumber);
+
+            if (isTestMode) {
+              _toggleSurah(surahNumber);
+              return;
+            }
 
             if (isWideScreen) {
               setState(() => selectedSurah = surah);
@@ -91,6 +112,56 @@ class _SurahListScreenState extends State<SurahListScreen> {
       },
     );
 
+    final scaffoldContent = _SelectListScaffold(
+      headerBackground:
+          isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
+      title: context.l10n.surahListTitle,
+      descriptionTitle: context.l10n.surahListDesktopPlaceholder,
+      descriptionBody: context.l10n.surahListTestDescription,
+      headerImageAsset: 'assets/img/star_crecent.png',
+      searchHint: context.l10n.searchBySurahHint,
+      searchController: _searchController,
+      list: Stack(
+        children: [
+          list,
+          if (isTestMode && _selectedSurahs.isNotEmpty)
+            Positioned(
+              bottom: 24,
+              left: 18,
+              right: 18,
+              child: SizedBox(
+                height: 54,
+                child: FloatingActionButton.extended(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TestBySurah(
+                          surahNumbers: _selectedSurahs.toList()..sort(),
+                        ),
+                      ),
+                    );
+                  },
+                  backgroundColor: const Color(0xFF4A2A34),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  label: Text(
+                    context.l10n.customSurahSelectContinue,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+      onBack: () => Navigator.pop(context),
+    );
+
     if (isWideScreen) {
       return Scaffold(
         backgroundColor: isDark
@@ -101,18 +172,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
             // Left: List
             Expanded(
               flex: 2,
-              child: _SelectListScaffold(
-                headerBackground:
-                    isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
-                title: context.l10n.surahListTitle,
-                descriptionTitle: context.l10n.surahListDesktopPlaceholder,
-                descriptionBody: context.l10n.surahListTestDescription,
-                headerImageAsset: 'assets/img/star_crecent.png',
-                searchHint: context.l10n.searchBySurahHint,
-                searchController: _searchController,
-                list: list,
-                onBack: () => Navigator.pop(context),
-              ),
+              child: scaffoldContent,
             ),
             // Right: Details
             Expanded(
@@ -151,18 +211,7 @@ class _SurahListScreenState extends State<SurahListScreen> {
         backgroundColor: isDark
             ? Theme.of(context).colorScheme.surface
             : const Color(0xFFF9FAFB),
-        body: _SelectListScaffold(
-          headerBackground:
-              isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
-          title: context.l10n.surahListTitle,
-          descriptionTitle: context.l10n.surahListDesktopPlaceholder,
-          descriptionBody: context.l10n.surahListTestDescription,
-          headerImageAsset: 'assets/img/star_crecent.png',
-          searchHint: context.l10n.searchBySurahHint,
-          searchController: _searchController,
-          list: list,
-          onBack: () => Navigator.pop(context),
-        ),
+        body: scaffoldContent,
       );
     }
   }
