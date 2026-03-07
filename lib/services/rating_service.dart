@@ -7,7 +7,6 @@ import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RatingService {
   static const String _keyHasRated = 'has_rated_app';
@@ -24,23 +23,23 @@ class RatingService {
   static const int _maxRatingRequests = 3;
   static const int _daysBetweenRequests = 7;
 
+  static IStorageService get _storage => getIt<IStorageService>();
+
   /// Initialize the rating service and check if we should show rating dialog
   static Future<bool> shouldShowRatingDialog() async {
-    final prefs = await SharedPreferences.getInstance();
-
     // Don't show if user has already rated
-    if (prefs.getBool(_keyHasRated) == true) {
+    if (_storage.getBool(_keyHasRated) == true) {
       return false;
     }
 
     // Don't show if we've exceeded max requests
-    final requestCount = prefs.getInt(_keyRatingRequestCount) ?? 0;
+    final requestCount = _storage.getInt(_keyRatingRequestCount) ?? 0;
     if (requestCount >= _maxRatingRequests) {
       return false;
     }
 
     // Check if enough time has passed since last request
-    final lastRequest = prefs.getInt(_keyLastRatingRequest) ?? 0;
+    final lastRequest = _storage.getInt(_keyLastRatingRequest) ?? 0;
     final now = DateTime.now().millisecondsSinceEpoch;
     final daysSinceLastRequest = (now - lastRequest) / (1000 * 60 * 60 * 24);
 
@@ -49,9 +48,9 @@ class RatingService {
     }
 
     // Check engagement criteria
-    final testSessions = prefs.getInt(_keyTestSessionsCompleted) ?? 0;
-    final surahsListened = prefs.getInt(_keySurahsListened) ?? 0;
-    final daysSinceLaunch = prefs.getInt(_keyDaysSinceFirstLaunch) ?? 0;
+    final testSessions = _storage.getInt(_keyTestSessionsCompleted) ?? 0;
+    final surahsListened = _storage.getInt(_keySurahsListened) ?? 0;
+    final daysSinceLaunch = _storage.getInt(_keyDaysSinceFirstLaunch) ?? 0;
 
     // Show rating dialog if user meets engagement criteria
     return (testSessions >= _minTestSessions ||
@@ -61,45 +60,39 @@ class RatingService {
 
   /// Track when user completes a test session
   static Future<void> trackTestSessionCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_keyTestSessionsCompleted) ?? 0;
-    await prefs.setInt(_keyTestSessionsCompleted, current + 1);
+    final current = _storage.getInt(_keyTestSessionsCompleted) ?? 0;
+    await _storage.setInt(_keyTestSessionsCompleted, current + 1);
   }
 
   /// Track when user listens to a surah
   static Future<void> trackSurahListened() async {
-    final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getInt(_keySurahsListened) ?? 0;
-    await prefs.setInt(_keySurahsListened, current + 1);
+    final current = _storage.getInt(_keySurahsListened) ?? 0;
+    await _storage.setInt(_keySurahsListened, current + 1);
   }
 
   /// Initialize app launch tracking
   static Future<void> initializeAppLaunch() async {
-    final prefs = await SharedPreferences.getInstance();
-
     // Set first launch date if not set
-    if (prefs.getString(_keyAppFirstLaunch) == null) {
-      await prefs.setString(
+    if (_storage.getString(_keyAppFirstLaunch) == null) {
+      await _storage.setString(
           _keyAppFirstLaunch, DateTime.now().toIso8601String());
     }
 
     // Update days since first launch
-    final firstLaunchStr = prefs.getString(_keyAppFirstLaunch);
+    final firstLaunchStr = _storage.getString(_keyAppFirstLaunch);
     if (firstLaunchStr != null) {
       final firstLaunch = DateTime.parse(firstLaunchStr);
       final daysSinceLaunch = DateTime.now().difference(firstLaunch).inDays;
-      await prefs.setInt(_keyDaysSinceFirstLaunch, daysSinceLaunch);
+      await _storage.setInt(_keyDaysSinceFirstLaunch, daysSinceLaunch);
     }
   }
 
   /// Show rating dialog
   static Future<void> showRatingDialog(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-
     // Update request count and timestamp
-    final requestCount = prefs.getInt(_keyRatingRequestCount) ?? 0;
-    await prefs.setInt(_keyRatingRequestCount, requestCount + 1);
-    await prefs.setInt(
+    final requestCount = _storage.getInt(_keyRatingRequestCount) ?? 0;
+    await _storage.setInt(_keyRatingRequestCount, requestCount + 1);
+    await _storage.setInt(
         _keyLastRatingRequest, DateTime.now().millisecondsSinceEpoch);
 
     if (!context.mounted) return;
@@ -114,8 +107,7 @@ class RatingService {
 
   /// Mark that user has rated the app
   static Future<void> markAsRated() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyHasRated, true);
+    await _storage.setBool(_keyHasRated, true);
   }
 
   /// Open app store for rating
@@ -142,13 +134,12 @@ class RatingService {
 
   /// Get user engagement stats (for debugging)
   static Future<Map<String, int>> getEngagementStats() async {
-    final prefs = await SharedPreferences.getInstance();
     return {
-      'testSessions': prefs.getInt(_keyTestSessionsCompleted) ?? 0,
-      'surahsListened': prefs.getInt(_keySurahsListened) ?? 0,
-      'daysSinceLaunch': prefs.getInt(_keyDaysSinceFirstLaunch) ?? 0,
-      'ratingRequests': prefs.getInt(_keyRatingRequestCount) ?? 0,
-      'hasRated': prefs.getBool(_keyHasRated) == true ? 1 : 0,
+      'testSessions': _storage.getInt(_keyTestSessionsCompleted) ?? 0,
+      'surahsListened': _storage.getInt(_keySurahsListened) ?? 0,
+      'daysSinceLaunch': _storage.getInt(_keyDaysSinceFirstLaunch) ?? 0,
+      'ratingRequests': _storage.getInt(_keyRatingRequestCount) ?? 0,
+      'hasRated': _storage.getBool(_keyHasRated) == true ? 1 : 0,
     };
   }
 }

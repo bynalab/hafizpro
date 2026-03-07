@@ -1,42 +1,25 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:hafiz_test/services/daily_item_provider.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/asset_util.dart';
+import 'package:hafiz_test/services/analytics_service.dart';
 
 class NotificationService {
+  final IStorageService _storage;
+
+  NotificationService({required IStorageService storage}) : _storage = storage;
+
   static const int dailyNotificationId = 1001;
 
   static const String _channelId = 'daily_motivation';
   static const String _channelName = 'Daily Motivation';
   static const String _channelDescription =
       'Daily motivational reminders for Quran memorization.';
-
-  static const List<String> _motivationalMessages = [
-    '🌟 Every moment spent with the Quran is a moment of blessing. Continue your journey!',
-    '⭐ The Prophet (PBUH) said: "Whoever recites a letter from the Book of Allah will have a reward."',
-    '🕌 The Quran is a source of peace and guidance. Your memorization journey is blessed!',
-    "🕊️ The Quran is healing for the heart and soul. Let today's session bring you peace!",
-    '📚 Consistency is key in memorization. Your daily practice is building a strong foundation!',
-    '📖 The Quran is the word of Allah. What a privilege to memorize His divine words!',
-    '📚 The Quran is a companion for life. Each verse you memorize is a friend for eternity!',
-    "⭐ Every verse you memorize is a step towards becoming a Hafiz. You're on a blessed path!",
-    '🌙 The Prophet (PBUH) said: "The one who is proficient in the Quran will be with the noble angels."',
-    "🌅 Begin your day with Allah's words. Your memorization journey is a blessed one!",
-    '🕊️ Your dedication to memorizing the Quran is inspiring. Keep up the excellent work!',
-    '💎 Your effort to memorize the Quran is a form of worship that brings you closer to Allah!',
-    "✨ The Quran is a treasure, and you're collecting its gems. Today is another opportunity!",
-    '🕌 Your effort to memorize the Quran is a form of Ibadah. May Allah reward you abundantly!',
-    '🎯 Consistency in memorization leads to mastery. Your daily practice is building excellence!',
-    '🌙 The Prophet (PBUH) said: "The best of you are those who learn the Quran and teach it."',
-    '📖 Each day of practice is an investment in your spiritual growth. Keep going!',
-    "⭐ Every verse you learn is a step closer to becoming a Hafiz. You're on the right path!",
-    '🎯 Small consistent steps lead to great achievements. Keep memorizing, keep growing!',
-    '📚 The Quran is a companion for life. Each verse you memorize is a friend for eternity!',
-  ];
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -60,9 +43,7 @@ class NotificationService {
     try {
       final localTz = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(localTz.identifier));
-    } catch (_) {
-      // If timezone resolution fails, tz.local still works but may default.
-    }
+    } catch (_) {}
 
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -114,13 +95,9 @@ class NotificationService {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-      // Android 12+ may require explicit user approval for exact alarms
-      // (especially on Pixel devices). This is a best-effort request.
       try {
         await android?.requestExactAlarmsPermission();
-      } catch (_) {
-        // Ignore; some Android versions/devices don't expose this API.
-      }
+      } catch (_) {}
       final ok = await android?.requestNotificationsPermission() ?? true;
       return ok;
     }
@@ -150,9 +127,24 @@ class NotificationService {
     return true;
   }
 
-  String _pickRandomMessage() {
-    final r = Random();
-    return _motivationalMessages[r.nextInt(_motivationalMessages.length)];
+  Future<String> _pickMessage(DateTime date) async {
+    try {
+      final List<dynamic> messages =
+          await AssetUtil.loadJson('assets/json/motivation.json');
+
+      if (messages.isEmpty) return '🌟 Keep up the great work!';
+
+      final provider = DailyItemProvider<String>(
+        items: messages.cast<String>(),
+        storage: _storage,
+        key: 'motivation',
+      );
+
+      return await provider.getItem(date: date);
+    } catch (e) {
+      _log('Error loading motivational messages from assets: $e');
+      return '🌟 Keep up the great work!';
+    }
   }
 
   tz.TZDateTime _nextInstanceOfTime(TimeOfDay time) {
@@ -166,9 +158,6 @@ class NotificationService {
       time.minute,
     );
 
-    // If the chosen time is "now" or already passed, schedule it for tomorrow.
-    // However, if the user is trying to test by selecting the current minute
-    // (common UX), schedule it slightly in the future so it can still fire.
     if (!scheduled.isAfter(now)) {
       if (scheduled.isSameMinuteAs(now)) {
         scheduled = now.add(const Duration(minutes: 1));
@@ -185,7 +174,6 @@ class NotificationService {
 
     if (kIsWeb) return;
 
-    // Ensure we're not stacking schedules.
     await cancelDailyMotivation();
 
     final granted = await requestPermissions();
@@ -199,7 +187,7 @@ class NotificationService {
     }
 
     final scheduled = _nextInstanceOfTime(time);
-    final message = _pickRandomMessage();
+    final message = await _pickMessage(scheduled);
 
     _log(
         'Scheduling daily notification at: $scheduled (local tz: ${tz.local.name})');
@@ -253,6 +241,9 @@ class NotificationService {
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+
+    // Log to Mixpanel
+    AnalyticsService.trackMotivationNotification(message);
 
     final pending = await _plugin.pendingNotificationRequests();
     _log(

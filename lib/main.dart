@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/locator.dart';
+import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/splash_screen.dart';
-import 'package:hafiz_test/main_menu.dart';
+import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/app_theme.dart';
 import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:hafiz_test/util/locale_notifier.dart';
@@ -167,6 +168,9 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
             GlobalCupertinoLocalizations.delegate,
           ],
           home: kIsWeb ? const MainMenu() : const SplashScreen(),
+          builder: kIsWeb
+              ? (context, child) => _WebResponsiveWrapper(child: child!)
+              : null,
         );
       },
     );
@@ -174,5 +178,30 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
 
   void setLocale(Locale locale) {
     appLocale.value = locale;
+  }
+}
+
+/// Web-specific wrapper that constrains app width for better desktop experience
+class _WebResponsiveWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _WebResponsiveWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      color: isDark ? Color(0xFF0B0B0B) : AppColors.gray100,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 800.0, // Maximum width for web
+          ),
+          child: child,
+        ),
+      ),
+    );
   }
 }

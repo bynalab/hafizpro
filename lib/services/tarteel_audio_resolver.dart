@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/util/reciter_audio_profile.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
@@ -73,14 +72,6 @@ class TarteelAudioResolver {
     required String reciterId,
     required int surahNumber,
   }) async {
-    if (kIsWeb) {
-      return const TarteelSelection._(
-        mode: TarteelMode.none,
-        ayahBase: null,
-        surahBase: null,
-      );
-    }
-
     final reciterType = TarteelAudio.reciterType(reciterId);
 
     final surahBase = TarteelAudio.surahBaseForReciter(reciterId);

@@ -113,6 +113,12 @@ class _MainMenuShellState extends State<MainMenuShell> {
                     onOpenSettings: _openSettings,
                     onToggleTheme: _toggleTheme,
                   ),
+                  // AdhkarHomePage(
+                  //   onOpenSettings: () {
+                  //     const AdhkarSettingsSheet().openBottomSheet(context);
+                  //   },
+                  //   onToggleTheme: _toggleTheme,
+                  // ),
                 ],
               ),
               Align(

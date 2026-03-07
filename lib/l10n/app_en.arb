@@ -150,8 +150,6 @@
   "testMenuOptionByJuzSubtitle": "Test how well you know each\nJuz.",
   "testMenuOptionRandomTitle": "Random Verses",
   "testMenuOptionRandomSubtitle": "Get verses from anywhere in\nthe Qur’an.",
-  "testMenuOptionCustomTitle": "Custom",
-  "testMenuOptionCustomSubtitle": "Test your knowledge on selected surahs",
   "customSurahSelectTitle": "Select Surahs",
   "customSurahSelectContinue": "Continue",
   "bottomNavQuran": "Quran",
@@ -205,5 +203,20 @@
   "transliterationLabel": "Transliteration",
   "transliterationSubtitle": "Show pronunciation in Latin letters",
   "surahLoadingTitle": "Loading Surah...",
-  "surahLoadingSubtitle": "جارٍ التحميل"
+  "surahLoadingSubtitle": "جارٍ التحميل",
+  "saveProgressTitle": "Save Progress",
+  "saveProgressPrompt": "Mark up to Verse {number} as read?",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "Mark as Read",
+  "bookmarksTitle": "Bookmarks",
+  "noBookmarksMessage": "No bookmarks found. Start bookmarking verses to see them here!",
+  "seeAllBookmarks": "See All",
+  "deleteBookmarkTitle": "Delete Bookmark",
+  "deleteBookmarkMessage": "Are you sure you want to delete this bookmark?"
 }

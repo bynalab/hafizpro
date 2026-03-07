@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -15,6 +16,7 @@ class QuranViewModel {
   final SurahServices surahService;
 
   final itemScrollController = ItemScrollController();
+  final itemPositionsListener = ItemPositionsListener.create();
 
   QuranViewModel({required this.audioCenter, required this.surahService});
 
@@ -126,6 +128,13 @@ class QuranViewModel {
 
         // Track surah listening completion for rating system
         RatingService.trackSurahListened();
+
+        // Mark current ayah as read in playlist
+        final idx = playingIndexNotifier.value;
+        if (idx != null && surah != null) {
+          getIt<IStorageService>()
+              .markAyahsAsRead(surah!.number, surah!.ayahs[idx].numberInSurah);
+        }
       }
     });
 
@@ -198,15 +207,26 @@ class QuranViewModel {
     await audioCenter.toggleSurah(currentSurah, startIndex: 0);
   }
 
-  void scrollToVerse(int? index) {
+  void scrollToVerse(int? index, {bool isAnimated = true}) {
     if (index == null) return;
 
     if (!itemScrollController.isAttached) return;
 
-    itemScrollController.scrollTo(
-      index: index + _bismillahListOffset,
-      duration: const Duration(milliseconds: 250),
-    );
+    final targetIndex = index + _bismillahListOffset;
+
+    if (isAnimated) {
+      itemScrollController.scrollTo(
+        index: targetIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        alignment: 0.10,
+      );
+    } else {
+      itemScrollController.jumpTo(
+        index: targetIndex,
+        alignment: 0.10,
+      );
+    }
   }
 
   void onAyahControlPressed(int index) async {

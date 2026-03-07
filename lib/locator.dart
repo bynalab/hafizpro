@@ -4,12 +4,15 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/notification_service.dart';
-import 'package:hafiz_test/services/quran_db.dart';
+import 'package:hafiz_test/services/quran_sources_factory.dart';
+import 'package:hafiz_test/services/surah_source.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
-import 'package:hafiz_test/services/storage/shared_prefs_storage_service.dart';
+import 'package:hafiz_test/services/storage/hive_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
+
+import 'package:hafiz_test/services/tts_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
 import 'package:hafiz_test/util/theme_controller.dart';
 
@@ -47,26 +50,33 @@ Future<void> _restoreNotificationScheduleIfEnabled() async {
 
 Future<void> setupLocator() async {
   final prefs = await SharedPreferences.getInstance();
-
   getIt.registerSingleton<SharedPreferences>(prefs);
 
-  getIt.registerSingleton<IStorageService>(SharedPrefsStorageService(prefs));
+  final hiveService = HiveStorageService();
+  await hiveService.init(prefs);
+  getIt.registerSingleton<IStorageService>(hiveService);
+
   getIt.registerSingleton<NetworkServices>(NetworkServices());
   getIt.registerSingleton<SurahPicker>(SurahPicker());
   getIt.registerSingleton<AudioServices>(AudioServices());
   getIt.registerSingleton<ThemeController>(ThemeController());
-  getIt.registerSingleton<NotificationService>(NotificationService());
+  getIt.registerSingleton<NotificationService>(
+      NotificationService(storage: getIt<IStorageService>()));
+  getIt.registerSingleton<TtsService>(TtsService());
 
-  final quranDb = QuranDb();
-  await quranDb.init();
-  getIt.registerSingleton<QuranDb>(quranDb);
+  final surahSource = await createQuranSources(
+    networkServices: getIt<NetworkServices>(),
+    storageServices: getIt<IStorageService>(),
+  );
+
+  getIt.registerSingleton(surahSource);
 
   getIt.registerSingleton<SurahServices>(
     SurahServices(
       networkServices: getIt<NetworkServices>(),
       storageServices: getIt<IStorageService>(),
       surahPicker: getIt<SurahPicker>(),
-      quranDb: getIt<QuranDb>(),
+      surahSource: getIt<SurahSource>(),
     ),
   );
 

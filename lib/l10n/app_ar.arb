@@ -150,8 +150,6 @@
   "testMenuOptionByJuzSubtitle": "اختبر مدى معرفتك بكل\nجزء.",
   "testMenuOptionRandomTitle": "آيات عشوائية",
   "testMenuOptionRandomSubtitle": "احصل على آيات من أي مكان\nفي القرآن.",
-  "testMenuOptionCustomTitle": "مخصص",
-  "testMenuOptionCustomSubtitle": "اختبر معرفتك في سور مختارة",
   "customSurahSelectTitle": "اختر السور",
   "customSurahSelectContinue": "متابعة",
   "bottomNavQuran": "القرآن",
@@ -205,5 +203,20 @@
   "transliterationLabel": "النقل الحرفي",
   "transliterationSubtitle": "إظهار النطق بالحروف اللاتينية",
   "surahLoadingTitle": "جارٍ تحميل السورة...",
-  "surahLoadingSubtitle": "جارٍ التحميل"
+  "surahLoadingSubtitle": "جارٍ التحميل",
+  "saveProgressTitle": "حفظ التقدم",
+  "saveProgressPrompt": "تحديد حتى الآية {number} كمقروء؟",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "تحديد كمقروء",
+  "bookmarksTitle": "الإشارات المرجعية",
+  "noBookmarksMessage": "لا توجد إشارات مرجعية. ابدأ بحفظ الآيات لتراها هنا!",
+  "seeAllBookmarks": "عرض الكل",
+  "deleteBookmarkTitle": "حذف الإشارة المرجعية",
+  "deleteBookmarkMessage": "هل أنت متأكد من حذف هذه الإشارة المرجعية؟"
 }

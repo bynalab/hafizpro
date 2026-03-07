@@ -51,3 +51,4 @@ lib/l10n/app_localizations*.dart
 /android/app/profile
 /android/app/release
 .vercel
+build_app.sh

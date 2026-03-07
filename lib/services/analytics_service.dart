@@ -30,14 +30,14 @@ class AnalyticsService {
       }
 
       // Skip Mixpanel initialization on web for now due to compatibility issues
-      if (kIsWeb) {
-        if (AnalyticsConfig.debugMode) {
-          print('⚠️ Skipping Mixpanel initialization on web platform');
-        }
-        _isInitialized = true;
-        _sessionStartTime = DateTime.now();
-        return;
-      }
+      // if (kIsWeb) {
+      //   if (AnalyticsConfig.debugMode) {
+      //     print('⚠️ Skipping Mixpanel initialization on web platform');
+      //   }
+      //   _isInitialized = true;
+      //   _sessionStartTime = DateTime.now();
+      //   return;
+      // }
 
       _mixpanel =
           await Mixpanel.init(_projectToken, trackAutomaticEvents: true);
@@ -361,6 +361,16 @@ class AnalyticsService {
     trackEvent('Speed Changed', properties: {
       'new_speed': newSpeed,
       'audio_name': audioName,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
+
+  // ===== 7. MOTIVATION NOTIFICATIONS =====
+
+  /// Track when a motivational notification is scheduled/sent
+  static void trackMotivationNotification(String message) {
+    trackEvent('Motivation Notification Sent', properties: {
+      'message': message,
       'timestamp': DateTime.now().toIso8601String(),
     });
   }

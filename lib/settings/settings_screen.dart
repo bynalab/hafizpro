@@ -8,6 +8,7 @@ import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/settings/settings_controller.dart';
 import 'package:hafiz_test/settings/sheets/notifications_sheet.dart';
+import 'package:hafiz_test/settings/sheets/progress_tracking_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
@@ -329,6 +330,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(
+                    leading: const LeadingCircle(Icons.track_changes_rounded),
+                    title: "Reading Progress Tracking",
+                    subtitle: controller.progressTrackingMode[0].toUpperCase() +
+                        controller.progressTrackingMode.substring(1),
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
+                    onTap: () async {
+                      final selected = await ProgressTrackingSheet(
+                        initialMode: controller.progressTrackingMode,
+                        isDark: isDark,
+                      ).openBottomSheet(context);
+                      if (selected != null) {
+                        await controller.setProgressTrackingMode(selected);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  SettingsTile(
                     leading: const LeadingCircle.asset(
                       'assets/icons/notification_bell.png',
                     ),
@@ -422,6 +443,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onTap: _showInAppRating,
                   ),
+                  const SizedBox(height: 10),
+                  if (controller.appVersion.isNotEmpty) ...[
+                    Text(
+                      'v${controller.appVersion}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

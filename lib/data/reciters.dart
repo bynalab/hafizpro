@@ -184,6 +184,14 @@ final _reciters = [
     type: "versebyverse",
   ),
   Reciter(
+    identifier: "ar.zarami",
+    language: "ar",
+    name: "محمد زرامی",
+    englishName: "Muhammad Zarami",
+    format: "audio",
+    type: "surahbysurah",
+  ),
+  Reciter(
     identifier: "ur.khan",
     language: "ur",
     name: "Shamshad Ali Khan",

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Mixpanel Events &lpar;Hafiz Pro&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="mixpanel-events-hafiz-pro">Mixpanel Events (Hafiz Pro)</h1>
+<p>This document lists the Mixpanel events fired by the app, what they mean, and what triggers them.</p>
+<h2 id="quick-notes-non-technical">Quick notes (non-technical)</h2>
+<ul>
+<li>Events are recorded in the production app. (They may not appear when running a developer/test build.)</li>
+<li>The current Web version does not send Mixpanel events.</li>
+<li>Many events include a time field called <code>timestamp</code>.</li>
+</ul>
+<hr>
+<h2 id="1-app--session-events">1) App + session events</h2>
+<h3 id="app-launched"><code>App Launched</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track cold start / app open.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the app is opened (app start).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="app-lifecycle"><code>App Lifecycle</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track lifecycle state changes (foreground/background/etc.).</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the app changes state (for example: opened, sent to background, hidden, or terminated).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>lifecycle_state</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="session-started"><code>Session Started</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Basic session tracking.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the app is opened.</li>
+<li>When the app returns to the foreground after being in the background.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="session-ended"><code>Session Ended</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Measure session length.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the app is sent to the background.</li>
+<li>When the app is closed/terminated.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>session_duration_seconds</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-navigation--screen-events">2) Navigation / screen events</h2>
+<h3 id="screen-view"><code>Screen View</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track page/screen visits.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When a user opens a screen in the app.</li>
+<li>Examples:
+<ul>
+<li>Main Menu</li>
+<li>Splash Screen</li>
+<li>Settings</li>
+<li>Surah List</li>
+<li>Juz List</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>screen_name</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="time-spent-on-screen"><code>Time Spent on Screen</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Measure time spent on the <em>previous</em> screen.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user moves from one screen to another (the app logs how long the previous screen was open).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>screen_name</code> (previous screen)</li>
+<li><code>time_spent_seconds</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="back-pressed"><code>Back Pressed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Understand navigation/back behavior (especially exits).</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user presses the device back button (or back navigation).</li>
+<li>Includes the case where the user double-presses back to exit from the main menu.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>from_screen</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-content-selection-events">3) Content selection events</h2>
+<h3 id="surah-selected"><code>Surah Selected</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track what users open/listen to.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user selects a Surah (from any Surah list/card in the app).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>surah_name</code></li>
+<li><code>surah_number</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="juz-selected"><code>Juz Selected</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track what Juz users open/listen to.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user selects a Juz (from any Juz list/card in the app).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>juz_number</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="last-read-continued"><code>Last Read Continued</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track use of “continue last session/last read” entry point.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps “Continue” on the “Last Read” card.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>surah_name</code></li>
+<li><code>surah_number</code></li>
+<li><code>ayah_number</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-buttons--ui-actions">4) Buttons / UI actions</h2>
+<h3 id="button-clicked"><code>Button Clicked</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Generic CTA/button tracking.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps certain key buttons/CTAs.</li>
+<li>Examples:
+<ul>
+<li>“Challenge Yourself”</li>
+<li>“Settings” (opened from the Main Menu)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>button_name</code></li>
+<li><code>screen</code></li>
+<li><code>timestamp</code></li>
+<li>(optional) <code>context</code> extra fields</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-audio-events">5) Audio events</h2>
+<h3 id="audio-control"><code>Audio Control</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track play/pause/stop usage.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user plays, pauses, or stops audio.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>action</code> (<code>play</code> | <code>pause</code> | <code>stop</code>)</li>
+<li><code>audio_name</code></li>
+<li><code>audio_type</code> (usually <code>recitation</code>)</li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="audio-started"><code>Audio Started</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track when a recitation actually begins.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When audio actually starts playing.</li>
+<li>This can happen in:
+<ul>
+<li>Reading mode</li>
+<li>Test mode</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>audio_name</code></li>
+<li><code>audio_type</code> (default <code>recitation</code>)</li>
+<li><code>surah_name</code> (if provided)</li>
+<li><code>ayah_number</code> (if provided)</li>
+<li><code>is_playlist</code> (if provided)</li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="audio-completed"><code>Audio Completed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track when a recitation finishes.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When audio finishes playing.</li>
+<li>This can happen in:
+<ul>
+<li>Reading mode</li>
+<li>Test mode</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>audio_name</code></li>
+<li><code>audio_type</code> (default <code>recitation</code>)</li>
+<li><code>surah_name</code> (if provided)</li>
+<li><code>ayah_number</code> (if provided)</li>
+<li><code>is_playlist</code> (sent as <code>wasPlaylist</code> in reading flow)</li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="speed-changed"><code>Speed Changed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track playback speed usage.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user changes playback speed.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>new_speed</code></li>
+<li><code>audio_name</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="repeat-switch-toggled"><code>Repeat Switch Toggled</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track looping usage.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user turns repeat/loop on or off.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>repeat_enabled</code></li>
+<li><code>audio_name</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="audio-navigation"><code>Audio Navigation</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track moving between ayahs during test playback.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps next/previous while listening during a test.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>action</code> (<code>next</code> | <code>previous</code>)</li>
+<li><code>from_ayah</code></li>
+<li><code>to_ayah</code></li>
+<li><code>surah_name</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-test-events">6) Test events</h2>
+<h3 id="test-refreshed"><code>Test Refreshed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track generating a new random ayah (refresh in test).</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps refresh during a test to get a new ayah.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>test_type</code> (e.g. <code>surah</code>)</li>
+<li><code>timestamp</code></li>
+<li>optional context (e.g. <code>surah_name</code>, <code>ayah_number</code>)</li>
+</ul>
+</li>
+</ul>
+<h3 id="test-started"><code>Test Started</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track when a test begins.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When a test begins.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>test_type</code></li>
+<li><code>timestamp</code></li>
+<li><code>testDetails</code> (varies by caller)</li>
+</ul>
+</li>
+</ul>
+<h3 id="test-completed"><code>Test Completed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track test completion and results.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When a test finishes.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>test_type</code></li>
+<li><code>timestamp</code></li>
+<li><code>testResults</code> (varies by caller)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="7-settings--external-links">7) Settings + external links</h2>
+<h3 id="settings-changed"><code>Settings Changed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track preference changes.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user changes a setting (for example: autoplay or reciter).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>setting_name</code></li>
+<li><code>old_value</code></li>
+<li><code>new_value</code></li>
+<li><code>timestamp</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="website-link-clicked"><code>Website Link Clicked</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track outbound link usage.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps an external link from Settings (opens in the browser).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>link_name</code></li>
+<li><code>link_url</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="reciter-whatsapp-prompt-shown"><code>Reciter WhatsApp Prompt Shown</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track showing the “Want more reciters?” prompt.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the app shows the “Want more reciters?” prompt after changing reciter (only under certain conditions).</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>previous_reciter_id</code></li>
+<li><code>selected_reciter_id</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="reciter-whatsapp-prompt-dismissed"><code>Reciter WhatsApp Prompt Dismissed</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track prompt dismissal.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps “Not now” on the prompt.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li>(none)</li>
+</ul>
+</li>
+</ul>
+<h3 id="reciter-whatsapp-prompt-join-clicked"><code>Reciter WhatsApp Prompt Join Clicked</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track CTA click to join the WhatsApp group.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps “Join group” on the prompt.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li>(none)</li>
+</ul>
+</li>
+</ul>
+<h3 id="settings-rating-clicked"><code>Settings Rating Clicked</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Track opening the in-app rating flow from Settings.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user taps “Rate us” in Settings.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li>(none)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-rating-feedback">8) Rating feedback</h2>
+<h3 id="rating-feedback-submitted"><code>Rating Feedback Submitted</code></h3>
+<ul>
+<li><strong>Why</strong>
+<ul>
+<li>Capture user sentiment + optional comment.</li>
+</ul>
+</li>
+<li><strong>Triggered when</strong>
+<ul>
+<li>When the user submits the in-app rating dialog.</li>
+</ul>
+</li>
+<li><strong>Properties</strong>
+<ul>
+<li><code>stars</code></li>
+<li><code>comment</code></li>
+<li><code>user_id</code> (from storage)</li>
+<li><code>platform</code> (<code>web</code> or OS)</li>
+</ul>
+</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

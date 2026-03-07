@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
+import 'package:hafiz_test/util/constants.dart';
 
 class AudioServices {
   AudioServices._internal();
@@ -9,7 +10,7 @@ class AudioServices {
 
   factory AudioServices() => _instance;
 
-  final audioPlayer = AudioPlayer();
+  final audioPlayer = AudioPlayer(userAgent: AppConstants.userAgent);
 
   Future<void> setAudioSource(AudioSource audioSource,
       {bool preload = true}) async {

@@ -6,7 +6,6 @@ import 'package:hafiz_test/enum/surah_select_action.dart';
 import 'package:hafiz_test/juz/juz_list_screen.dart';
 import 'package:hafiz_test/surah/surah_list_screen.dart';
 import 'package:hafiz_test/surah/test_by_surah.dart';
-import 'package:hafiz_test/surah/custom_surah_select_screen.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
@@ -105,7 +104,8 @@ class TestMenuPage extends StatelessWidget {
             background:
                 isDark ? const Color(0xFF4A2A34) : const Color(0xFFFADDE5),
             title: context.l10n.mainMenuSurahCardTitle,
-            subtitle: context.l10n.testMenuOptionBySurahSubtitle,
+            subtitle:
+                '${context.l10n.testMenuOptionBySurahSubtitle} (${context.l10n.customSurahSelectTitle})',
             icon:
                 const Icon(Icons.nights_stay_rounded, color: Color(0xFF9C2A5B)),
             onTap: () {
@@ -145,22 +145,6 @@ class TestMenuPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const TestBySurah()),
-              );
-            },
-          ),
-          const SizedBox(height: 14),
-          TestOptionContainer(
-            background:
-                isDark ? const Color(0xFF1E3A5F) : const Color(0xFFD1E8FF),
-            title: context.l10n.testMenuOptionCustomTitle,
-            subtitle: context.l10n.testMenuOptionCustomSubtitle,
-            icon: const Icon(Icons.dashboard_customize_rounded,
-                color: Color(0xFF1E40AF)),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const CustomSurahSelectScreen()),
               );
             },
           ),
