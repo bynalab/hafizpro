@@ -128,8 +128,10 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   ),
                   const SizedBox(height: 10),
                   if (!_isSearching) ...[
-                    const QuranProgressCard(),
-                    const SizedBox(height: 10),
+                    if (storage.getProgressTrackingMode() != 'off') ...[
+                      const QuranProgressCard(),
+                      const SizedBox(height: 10),
+                    ],
                     if (lastRead == null)
                       DashboardFeatureCard(
                         background: DashboardPalette.cardTeal(context),
