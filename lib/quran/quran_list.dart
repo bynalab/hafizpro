@@ -4,6 +4,7 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
+import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -149,6 +150,13 @@ class QuranAyahList extends StatelessWidget {
                 }
                 onBookmarkUpdated?.call();
               },
+              onShare: () => VerseShareController.shareVerse(
+                context: context,
+                surah: surah,
+                ayah: ayah,
+                displayArabic: displayText,
+              ),
+              verseShareTooltip: context.l10n.verseShareTooltip,
             ),
           );
         },

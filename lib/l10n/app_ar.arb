@@ -1,6 +1,8 @@
 {
   "@@locale": "ar",
   "appTitle": "حافظ القرآن",
+  "verseShareTooltip": "مشاركة الآية كصورة",
+  "verseShareWebUnsupported": "مشاركة الصورة غير متاحة في المتصفح. استخدم تطبيق الهاتف أو الحاسوب للمشاركة.",
   "hello": "مرحبا",
   "start": "ابدأ",
   "settings": "الإعدادات",

@@ -1,6 +1,8 @@
 {
   "@@locale": "de",
-  "appTitle": "Quran Hafiz",
+  "appTitle": "Hafiz Pro",
+  "verseShareTooltip": "Vers als Bild teilen",
+  "verseShareWebUnsupported": "Bildfreigabe ist im Browser nicht verfügbar. Nutzen Sie die App auf dem Handy oder Desktop.",
   "hello": "Hallo",
   "start": "Start",
   "settings": "Einstellungen",

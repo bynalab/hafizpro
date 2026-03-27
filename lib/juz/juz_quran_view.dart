@@ -7,6 +7,7 @@ import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
+import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
@@ -552,6 +553,18 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                 }
                                 if (mounted) setState(() {});
                               },
+                              onShare: () {
+                                final s = entry.surah;
+                                if (s == null) return;
+                                VerseShareController.shareVerse(
+                                  context: context,
+                                  surah: s,
+                                  ayah: ayah,
+                                  displayArabic:
+                                      entry.displayText ?? ayah.text,
+                                );
+                              },
+                              verseShareTooltip: context.l10n.verseShareTooltip,
                             );
                         }
                       },

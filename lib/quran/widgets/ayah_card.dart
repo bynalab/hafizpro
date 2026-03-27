@@ -3,7 +3,7 @@ import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/util/app_colors.dart';
-import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/util/quran_arabic_display.dart';
 
 class AyahCard extends StatelessWidget {
   final Ayah ayah;
@@ -17,31 +17,18 @@ class AyahCard extends StatelessWidget {
   final void Function(int)? onMarkAsRead;
   final bool showPlayButton;
 
+  final VoidCallback? onShare;
+  final String? verseShareTooltip;
+
+  final bool isBookmarked;
+  final void Function(int)? onBookmark;
+
   // We derive contrast from the actual card background color (not Theme.brightness)
   // because some screens may intentionally render light cards in dark mode (or vice
   // versa). Using luminance keeps text/icon/border colors readable regardless.
   bool _isDarkColor(Color c) {
     final luminance = c.computeLuminance();
     return luminance < 0.45;
-  }
-
-  static final RegExp _arabicIndicDigits =
-      RegExp(r'[\u0660-\u0669\u06F0-\u06F9]');
-  static final RegExp _quranMarkers = RegExp(
-    r'[\u06DD\u06DE\u06E9\u06D7\u06D8\u06D9\u06DA\u06DB\u06DC\u06DF\u06E0\u06E1\u06E2\u06E3\u06E4\u06E5\u06E6\u06E7\u06E8\u06EA\u06EB\u06EC\u06ED\u0640]'
-    r'|[﴿﴾]'
-    r'|\(\d+\)'
-    r'|\[\d+\]',
-  );
-
-  String _arabicDisplayText(String input) {
-    final trimmed = input.trim();
-    if (trimmed.isEmpty) return trimmed;
-    return trimmed
-        .replaceAll(_quranMarkers, '')
-        .replaceAll(_arabicIndicDigits, '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
   }
 
   const AyahCard({
@@ -58,10 +45,9 @@ class AyahCard extends StatelessWidget {
     this.showPlayButton = true,
     this.isBookmarked = false,
     this.onBookmark,
+    this.onShare,
+    this.verseShareTooltip,
   });
-
-  final bool isBookmarked;
-  final void Function(int)? onBookmark;
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +163,34 @@ class AyahCard extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (onShare != null) ...[
+                          const SizedBox(width: 8),
+                          Builder(
+                            builder: (context) {
+                              final btn = GestureDetector(
+                                onTap: onShare,
+                                child: Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: chipBorderColor),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.share_rounded,
+                                      size: 18,
+                                      color: textColor.withValues(alpha: 0.65),
+                                    ),
+                                  ),
+                                ),
+                              );
+                              final tip = verseShareTooltip;
+                              if (tip == null || tip.isEmpty) return btn;
+                              return Tooltip(message: tip, child: btn);
+                            },
+                          ),
+                        ],
                         const Spacer(),
                         if (showPlayButton)
                           GestureDetector(
@@ -205,7 +219,7 @@ class AyahCard extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        '${_arabicDisplayText(ayah.text)} ﴿${toArabicIndicDigits(ayah.numberInSurah.toString())}﴾',
+                        '${QuranArabicDisplay.forCard(ayah.text)} ${QuranArabicDisplay.ayahNumberOrnament(ayah.numberInSurah)}',
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                         style: _getArabicStyle(),

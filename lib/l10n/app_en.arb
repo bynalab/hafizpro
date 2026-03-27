@@ -1,8 +1,16 @@
 {
   "@@locale": "en",
-  "appTitle": "Quran Hafiz",
+  "appTitle": "Hafiz Pro",
   "@appTitle": {
     "description": "Application title shown in the system UI."
+  },
+  "verseShareTooltip": "Share verse as image",
+  "@verseShareTooltip": {
+    "description": "Tooltip on the verse card share button."
+  },
+  "verseShareWebUnsupported": "Image sharing isn’t available in the browser. Use the mobile or desktop app to share.",
+  "@verseShareWebUnsupported": {
+    "description": "Shown when the user tries to share a verse image on web."
   },
   "hello": "Hello",
   "@hello": {
