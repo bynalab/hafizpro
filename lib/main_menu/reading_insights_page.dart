@@ -6,6 +6,8 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/widget/star_burst_icon.dart';
 
@@ -23,19 +25,18 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
   Future<void> _confirmResetAll(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset All Progress?'),
-        content: const Text(
-            'This will clear all your Quran reading progress. This action cannot be undone.'),
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.l10n.readingInsightsResetAllTitle),
+        content: Text(ctx.l10n.readingInsightsResetAllBody),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(ctx.l10n.commonCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Reset All'),
+            child: Text(ctx.l10n.readingInsightsResetAllConfirm),
           ),
         ],
       ),
@@ -52,19 +53,22 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
   Future<void> _confirmResetSurah(BuildContext context, Surah surah) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Reset Surah ${surah.englishName}?'),
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          ctx.l10n.readingInsightsResetSurahTitle(surah.englishName),
+        ),
         content: Text(
-            'This will clear all reading progress for Surah ${surah.englishName}.'),
+          ctx.l10n.readingInsightsResetSurahBody(surah.englishName),
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(ctx.l10n.commonCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Reset'),
+            child: Text(ctx.l10n.readingInsightsResetSurahConfirm),
           ),
         ],
       ),
@@ -98,7 +102,7 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Reading Insights',
+          context.l10n.readingInsightsPageTitle,
           style: GoogleFonts.cairo(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -114,7 +118,7 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
                 color: DashboardPalette.secondaryText(context),
               ),
               onPressed: () => _confirmResetAll(context),
-              tooltip: 'Reset All Progress',
+              tooltip: context.l10n.readingInsightsTooltipResetAll,
             ),
           const SizedBox(width: 8),
         ],
@@ -136,7 +140,7 @@ class _ReadingInsightsPageState extends State<ReadingInsightsPage> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
               child: Text(
-                'Surah Breakdown',
+                context.l10n.readingInsightsSurahBreakdown,
                 style: GoogleFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -215,19 +219,19 @@ class _OverviewStatsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _StatItem(
-                label: 'Read',
+                label: context.l10n.readingInsightsStatRead,
                 value: formatNumber(totalRead),
                 icon: Icons.check_circle_rounded,
                 color: AppColors.green500,
               ),
               _StatItem(
-                label: 'Remaining',
+                label: context.l10n.readingInsightsStatRemaining,
                 value: formatNumber(remaining),
                 icon: Icons.hourglass_empty_rounded,
                 color: const Color(0xFF78B7C6),
               ),
               _StatItem(
-                label: 'Completed',
+                label: context.l10n.readingInsightsStatCompleted,
                 value: formatNumber(completedSurahs),
                 icon: Icons.flag_rounded,
                 color: const Color(0xFFFBBF24),
@@ -242,7 +246,7 @@ class _OverviewStatsCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Overall Progress',
+                    context.l10n.readingInsightsOverallProgress,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -337,6 +341,7 @@ class _SurahProgressTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final percentage = readCount / surah.numberOfAyahs;
     final isCompleted = readCount == surah.numberOfAyahs;
@@ -398,7 +403,9 @@ class _SurahProgressTile extends StatelessWidget {
                   if (lastUpdated != null) ...[
                     const SizedBox(height: 6),
                     Text(
-                      'Last updated: ${formatDateTime(lastUpdated!)}',
+                      l10n.readingInsightsLastUpdated(
+                        formatDateTime(context, lastUpdated!),
+                      ),
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         color: isDark ? Colors.white38 : Colors.black54,
@@ -421,7 +428,7 @@ class _SurahProgressTile extends StatelessWidget {
                 onPressed: onReset,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                tooltip: 'Reset Surah Progress',
+                tooltip: l10n.readingInsightsTooltipResetSurah,
               ),
             ],
             if (isCompleted) ...[

@@ -1,0 +1,368 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Хафиз Корана",
+  "hello": "Привет",
+  "start": "Начать",
+  "settings": "Настройки",
+  "autoplayVerse": "Автовоспроизведение аята",
+  "theme": "Тема",
+  "themeSystem": "Как в системе",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+  "language": "Язык",
+  "languageEnglish": "Английский",
+  "languageArabic": "Арабский",
+  "languageRussian": "Русский",
+  "languageGerman": "Немецкий",
+  "languageSelectTitle": "Выберите язык",
+  "selectFavoriteReciter": "Выберите любимого чтеца",
+  "searchReciters": "Поиск чтецов...",
+  "visitWebsite": "Посетить сайт",
+  "joinWhatsappChannel": "Канал в WhatsApp",
+  "whatsappFeedbackGroup": "Группа обратной связи в WhatsApp",
+  "rateThisApp": "Оценить приложение",
+  "debugRatingSystem": "Отладка системы оценок",
+  "save": "Сохранить",
+  "disable": "Отключить",
+  "ok": "ОК",
+  "notifications": "Уведомления",
+  "enableNotifications": "Включить уведомления",
+  "notificationsDailyMotivationSubtitle": "Ежедневные мотивационные сообщения",
+  "notificationTime": "Время уведомления",
+  "changesSaved": "Изменения сохранены!",
+  "settingsLoadingTitle": "Загрузка настроек...",
+  "notificationSubtitleEnabled": "Время уведомления: {time}",
+  "@notificationSubtitleEnabled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSubtitleDisabled": "Настройте уведомления",
+  "settingsAutoPlayTitle": "Автовоспроизведение аята",
+  "settingsAutoPlaySubtitle": "Аяты воспроизводятся автоматически при начале теста",
+  "settingsSelectReciterTitle": "Выбор чтеца",
+  "settingsReportBugTitle": "Сообщить об ошибке или идее",
+  "settingsReportBugSubtitle": "Напишите нам",
+  "settingsOfficialWebsiteTitle": "Официальный сайт",
+  "settingsOfficialWebsiteSubtitle": "Загляните на наш сайт",
+  "settingsJoinCommunityTitle": "Сообщество",
+  "settingsJoinCommunitySubtitle": "Обсуждения и помощь",
+  "settingsRateUsTitle": "Оцените нас",
+  "settingsRateUsSubtitle": "Оставьте 5 звёзд в магазине приложений",
+  "ratingDialogTitle": "Оцените приложение",
+  "ratingDialogPrompt": "Как бы вы оценили Hafiz Pro?",
+  "ratingDialogMaybeLater": "Позже",
+  "ratingDialogSubmit": "Отправить",
+  "ratingDialogHintPositive": "Необязательно: что вам нравится",
+  "ratingDialogHintNegative": "Что мы можем улучшить",
+  "ratingMessage1": "Жаль это слышать. Расскажите, как нам стать лучше.",
+  "ratingMessage2": "Спасибо за отзыв. Мы работаем над улучшениями.",
+  "ratingMessage3": "Благодарим за отзыв. Продолжим совершенствовать приложение.",
+  "ratingMessage4": "Отлично! Рады, что вам нравится приложение.",
+  "ratingMessage5": "Превосходно! Спасибо за высокую оценку.",
+  "errorLaunchingUrl": "Не удалось открыть ссылку: {url}. Ошибка: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "Не удалось открыть окно оценки: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "Освойте Коран — аят за аятом",
+  "splashAyahTranslation": "«И Мы облегчили Коран для поминания, но есть ли поминающие?» (Камар, 17)",
+  "onboardingPage1Title": "Погрузитесь в\nслова Аллаха",
+  "onboardingPage1Subtitle": "Читайте, слушайте и размышляйте\nо Коране — где и когда угодно.",
+  "onboardingPage1Cta": "Начать чтение",
+  "onboardingPage2Title": "Слушайте прекрасные\nтилаваты и следуйте\nза текстом",
+  "onboardingPage2Subtitle": "Выберите чтеца и почувствуйте,\nкак оживают аяты.",
+  "onboardingPage2Cta": "Начать прослушивание",
+  "onboardingPage3Title": "Проверьте знание\nКорана",
+  "onboardingPage3Subtitle": "Угадайте суру или аят по\nзвучанию — по джузу, суре\nили случайно.",
+  "onboardingPage3Cta": "Играть",
+  "mainMenuSettingsShowcaseTitle": "Настройки",
+  "mainMenuSettingsShowcaseDescription": "Автовоспроизведение и выбор чтеца",
+  "mainMenuLastReadShowcaseTitle": "Последнее чтение",
+  "mainMenuLastReadShowcaseDescription": "Здесь отображаются последняя сура и аят.",
+  "mainMenuQuranCardTitle": "Читать Коран",
+  "mainMenuQuranCardDescription": "Начните с чтения и прослушивания каждой суры.",
+  "mainMenuSurahCardTitle": "По суре",
+  "mainMenuSurahCardDescription": "Проверьте память, выбрав конкретную суру.",
+  "mainMenuJuzCardTitle": "По джузу",
+  "mainMenuJuzCardDescription": "Выберите джуз Корана для теста.",
+  "mainMenuRandomCardTitle": "Случайно",
+  "mainMenuRandomCardDescription": "Случайные аяты со всего Корана.",
+  "mainMenuTestsHeader": "Тесты",
+  "mainMenuExitHint": "Нажмите «Назад» ещё раз в течение двух секунд, чтобы выйти",
+  "mainMenuExitSnack": "Нажмите «Назад» ещё раз для выхода",
+  "mainMenuExitDialogTitle": "Вы уверены?",
+  "mainMenuExitDialogContent": "Выйти из приложения?",
+  "commonNo": "Нет",
+  "commonYes": "Да",
+  "commonLoadingSubtitle": "Загрузка...",
+  "surahListTitle": "Список сур",
+  "surahListSearchHint": "Поиск суры",
+  "surahListDesktopPlaceholder": "Выберите суру",
+  "surahListTestDescription": "Послушайте аят из суры и\nугадайте следующий.",
+  "juzListTitle": "Список джузов",
+  "juzListSearchHint": "Поиск джуза",
+  "juzListSelectTitle": "Выберите джуз",
+  "juzListTestDescription": "Послушайте аят из джуза и\nугадайте следующий.",
+  "juzListTypeNumberHint": "Введите номер джуза",
+  "testReadEntireSurah": "Читать всю суру",
+  "testReadEntireJuz": "Читать весь джуз",
+  "testErrorTitle": "Не удалось загрузить тест",
+  "testErrorMessage": "Не удалось загрузить суру. Проверьте подключение и попробуйте снова.",
+  "juzTestErrorTitle": "Не удалось загрузить тест джуза",
+  "juzTestErrorMessage": "Не удалось загрузить джуз. Проверьте подключение и попробуйте снова.",
+  "juzLoadingTitle": "Загрузка джуза...",
+  "juzLoadingSubtitle": "Идёт загрузка джуза",
+  "juzErrorTitle": "Не удалось загрузить джуз",
+  "juzErrorMessage": "Проверьте интернет или попробуйте позже.",
+  "changeReciter": "Сменить чтеца",
+  "errorRetryButton": "Повторить",
+  "testRefreshAyah": "Обновить аят",
+  "testLoadingAyahTitle": "Загрузка аята",
+  "testGuessNextAyah": "Угадайте следующий аят",
+  "testBeginningOfSurah": "Начало суры",
+  "testEndOfSurah": "Конец суры",
+  "testVersesCount": "{count} аятов",
+  "@testVersesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "testMenuTitle": "Проверьте знание Корана",
+  "testMenuSubtitle": "Послушайте аят и попробуйте назвать следующий.",
+  "testMenuOptionBySurahSubtitle": "Тест по\nразным сурам",
+  "testMenuOptionByJuzSubtitle": "Насколько хорошо вы знаете\nкаждый джуз.",
+  "testMenuOptionRandomTitle": "Случайные аяты",
+  "testMenuOptionRandomSubtitle": "Аяты из любой части\nКорана.",
+  "customSurahSelectTitle": "Выбор сур",
+  "customSurahSelectContinue": "Продолжить",
+  "bottomNavQuran": "Коран",
+  "bottomNavTest": "Тест",
+  "segmentSurah": "Сура",
+  "segmentJuz": "Джуз",
+  "searchBySurahHint": "Поиск по суре",
+  "searchByJuzHint": "Поиск по джузу",
+  "dashboardChallengeTitle": "Бросьте себе вызов",
+  "dashboardChallengeDescription": "Послушайте аят\nКорана и угадайте\nследующий.",
+  "dashboardListenReadHeader": "Слушать / Читать",
+  "dashboardContinueLastTestTitle": "Продолжить последний тест",
+  "dashboardNowPlayingTitle": "Сейчас играет",
+  "juzNumberLabel": "Джуз {number}",
+  "@juzNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "versePickerTitle": "Перейти к аяту",
+  "versePickerSubtitleTest": "Выберите аят для начала теста",
+  "versePickerSubtitleRead": "Выберите аят для прокрутки",
+  "verseNumberLabel": "Аят {number}",
+  "@verseNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadTitle": "Последнее чтение",
+  "lastReadDescription": "Показаны последняя сура и аят.",
+  "lastReadContinue": "Продолжить",
+  "lastReadNone": "Нет сохранённого места",
+  "lastReadAyahNumber": "Аят № {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "Не удалось загрузить суру",
+  "quranViewErrorMessage": "Проверьте интернет или попробуйте позже.",
+  "quranViewPlayFullSurah": "Воспроизвести всю суру",
+  "quranViewPlayingFullSurah": "Воспроизводится вся сура",
+  "lastReadNoData": "Нет сохранённого места",
+  "lastReadContinueButton": "Продолжить",
+  "readingPreferencesTitle": "Настройки чтения",
+  "translationLabel": "Перевод",
+  "translationSubtitle": "Показывать смысл под каждым аятом",
+  "transliterationLabel": "Транслитерация",
+  "transliterationSubtitle": "Произношение латиницей",
+  "surahLoadingTitle": "Загрузка суры...",
+  "surahLoadingSubtitle": "Идёт загрузка",
+  "saveProgressTitle": "Сохранить прогресс",
+  "saveProgressPrompt": "Отметить прочитанными до аята {number}?",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "Отметить прочитанным",
+  "bookmarksTitle": "Закладки",
+  "noBookmarksMessage": "Закладок пока нет. Добавляйте аяты, чтобы видеть их здесь.",
+  "seeAllBookmarks": "Показать все",
+  "deleteBookmarkTitle": "Удалить закладку",
+  "deleteBookmarkMessage": "Удалить эту закладку?",
+  "quranReadPreviousSurah": "Предыдущая сура",
+  "quranReadNextSurah": "Следующая сура",
+  "commonCancel": "Отмена",
+  "undo": "Отменить",
+  "markReadSuccessTitle": "Готово",
+  "markReadProgressUpdated": "Прогресс обновлён до аята {number}",
+  "@markReadProgressUpdated": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "audioNeedsInternet": "Нет подключения к интернету. Для аудио нужен интернет.",
+  "reciterCompatibilityTitle": "Совместимость чтеца",
+  "reciterCompatibilityBody1": "Выбранный чтец отдаёт аудио целой сурой, а не аят за аятом.",
+  "reciterCompatibilityBody2": "Для тестов и отслеживания прогресса выберите чтеца с воспроизведением по аятам.",
+  "chooseCompatibleReciter": "Выбрать совместимого чтеца",
+  "quranShazamTitle": "Quran Shazam",
+  "testMenuShazamSubtitle": "Узнайте аяты по тиляве (эксперимент)",
+  "shazamListeningStatus": "Слушаем тилаву...",
+  "shazamTapToIdentifySurah": "Нажмите, чтобы определить суру",
+  "shazamMatchesPlaceholder": "Здесь появятся совпадения",
+  "shazamNoMatchesYet": "Пока нет совпадений",
+  "shazamMatchScoreLabel": "{percent}% совпадение",
+  "@shazamMatchScoreLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "progressTrackingTitle": "Отслеживание прогресса чтения",
+  "progressTrackingSmartTitle": "Умный",
+  "progressTrackingSmartDescription": "Прогресс обновляется автоматически по вашей активности.",
+  "progressTrackingManualTitle": "Вручную",
+  "progressTrackingManualDescription": "Нажмите значок двойной галочки на последнем прочитанном аяте, чтобы отметить его и всё до него.",
+  "progressTrackingOffTitle": "Выкл.",
+  "progressTrackingOffDescription": "Прогресс не отслеживается.",
+  "reciterWhatsAppPromptTitle": "Нужны другие чтецы?",
+  "reciterWhatsAppPromptBody": "Если вашего любимого чтеца ещё нет, запросите его в группе WhatsApp.\n\nТам мы собираем пожелания по чтецам, ошибки и идеи.",
+  "reciterWhatsAppNotNow": "Не сейчас",
+  "reciterWhatsAppJoinGroup": "Вступить в группу",
+  "readingInsightsPageTitle": "Статистика чтения",
+  "readingInsightsResetAllTitle": "Сбросить весь прогресс?",
+  "readingInsightsResetAllBody": "Весь прогресс чтения Корана будет очищен. Это нельзя отменить.",
+  "readingInsightsResetAllConfirm": "Сбросить всё",
+  "readingInsightsResetSurahTitle": "Сбросить суру {surahName}?",
+  "@readingInsightsResetSurahTitle": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahBody": "Будет очищен прогресс чтения суры {surahName}.",
+  "@readingInsightsResetSurahBody": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahConfirm": "Сбросить",
+  "readingInsightsTooltipResetAll": "Сбросить весь прогресс",
+  "readingInsightsTooltipResetSurah": "Сбросить прогресс суры",
+  "readingInsightsStatRead": "Прочитано",
+  "readingInsightsStatRemaining": "Осталось",
+  "readingInsightsStatCompleted": "Завершено сур",
+  "readingInsightsSurahBreakdown": "По сурам",
+  "readingInsightsOverallProgress": "Общий прогресс",
+  "readingInsightsLastUpdated": "Обновлено: {dateTime}",
+  "@readingInsightsLastUpdated": {
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "testNoNextVerseInSurah": "В этой суре нет следующего аята",
+  "recitationReadyListenHint": "Готово к прослушиванию. Нажмите микрофон ниже.",
+  "recitationReciteVerse": "Произнесите аят {number}...",
+  "@recitationReciteVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationAnalyzingVerse": "Анализ аята {number}...",
+  "@recitationAnalyzingVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationVerseResult": "Результат: аят {number}",
+  "@recitationVerseResult": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationStartNow": "Начните читать...",
+  "recitationSimilarityScore": "Схожесть",
+  "recitationYourRecitation": "Ваше произнесение:",
+  "recitationResultPerfect": "МашаАллах! Отлично",
+  "recitationResultAlmost": "Хорошая попытка! Почти",
+  "recitationResultIncorrect": "Неверно. Попробуйте снова",
+  "versePickerSearchVerseHint": "Поиск по номеру аята...",
+  "verseSearchNoResults": "Аятов не найдено",
+  "audioPlayerTapToExpandSemantics": "Нажмите, чтобы развернуть",
+  "dateRelativeToday": "Сегодня",
+  "dateRelativeYesterday": "Вчера",
+  "dateRelativeTomorrow": "Завтра",
+  "adhkarHomeTitle": "Азкар",
+  "adhkarHomeSubtitle": "Сборник поминаний, чтобы укрепить сердце и оберегать вас",
+  "adhkarCategoryMorning": "Утро",
+  "adhkarCategoryEvening": "Вечер",
+  "adhkarCategoryBeforeSleeping": "Перед сном",
+  "adhkarCategoryWakingUp": "Пробуждение",
+  "notificationsUpdateError": "Не удалось обновить уведомления: {message}",
+  "@notificationsUpdateError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLinkWebsite": "Сайт",
+  "settingsLinkWhatsAppChannel": "Канал WhatsApp",
+  "quranResumeReadingPrompt": "Вы пропустили аяты. Продолжить с аята {ayah}?",
+  "@quranResumeReadingPrompt": {
+    "placeholders": {
+      "ayah": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -1,0 +1,368 @@
+{
+  "@@locale": "de",
+  "appTitle": "Quran Hafiz",
+  "hello": "Hallo",
+  "start": "Start",
+  "settings": "Einstellungen",
+  "autoplayVerse": "Vers automatisch abspielen",
+  "theme": "Design",
+  "themeSystem": "System",
+  "themeLight": "Hell",
+  "themeDark": "Dunkel",
+  "language": "Sprache",
+  "languageEnglish": "Englisch",
+  "languageArabic": "Arabisch",
+  "languageRussian": "Russisch",
+  "languageGerman": "Deutsch",
+  "languageSelectTitle": "Sprache wählen",
+  "selectFavoriteReciter": "Lieblingsrezitanten wählen",
+  "searchReciters": "Rezitanten suchen...",
+  "visitWebsite": "Website besuchen",
+  "joinWhatsappChannel": "WhatsApp-Kanal beitreten",
+  "whatsappFeedbackGroup": "WhatsApp-Feedbackgruppe",
+  "rateThisApp": "App bewerten",
+  "debugRatingSystem": "Bewertungssystem debuggen",
+  "save": "Speichern",
+  "disable": "Deaktivieren",
+  "ok": "OK",
+  "notifications": "Benachrichtigungen",
+  "enableNotifications": "Benachrichtigungen aktivieren",
+  "notificationsDailyMotivationSubtitle": "Tägliche Motivationsnachrichten erhalten",
+  "notificationTime": "Uhrzeit der Benachrichtigung",
+  "changesSaved": "Änderungen gespeichert!",
+  "settingsLoadingTitle": "Einstellungen werden geladen...",
+  "notificationSubtitleEnabled": "Benachrichtigungszeit: {time}",
+  "@notificationSubtitleEnabled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSubtitleDisabled": "Benachrichtigungen einstellen",
+  "settingsAutoPlayTitle": "Vers automatisch abspielen",
+  "settingsAutoPlaySubtitle": "Verse werden beim Start des Tests automatisch abgespielt",
+  "settingsSelectReciterTitle": "Rezitant wählen",
+  "settingsReportBugTitle": "Fehler melden oder Wunsch äußern",
+  "settingsReportBugSubtitle": "Schreiben Sie uns",
+  "settingsOfficialWebsiteTitle": "Offizielle Website",
+  "settingsOfficialWebsiteSubtitle": "Besuchen Sie unsere Website",
+  "settingsJoinCommunityTitle": "Community beitreten",
+  "settingsJoinCommunitySubtitle": "Diskutieren und Hilfe erhalten",
+  "settingsRateUsTitle": "Bewerten Sie uns",
+  "settingsRateUsSubtitle": "Hinterlassen Sie eine 5-Sterne-Bewertung im Store",
+  "ratingDialogTitle": "App bewerten",
+  "ratingDialogPrompt": "Wie bewerten Sie Ihre Erfahrung mit Hafiz Pro?",
+  "ratingDialogMaybeLater": "Später",
+  "ratingDialogSubmit": "Senden",
+  "ratingDialogHintPositive": "Optional: Was gefällt Ihnen?",
+  "ratingDialogHintNegative": "Was können wir verbessern?",
+  "ratingMessage1": "Das tut uns leid. Sagen Sie uns, wie wir uns verbessern können.",
+  "ratingMessage2": "Vielen Dank für Ihr Feedback. Wir arbeiten daran.",
+  "ratingMessage3": "Danke für Ihr Feedback. Wir werden weiter verbessern.",
+  "ratingMessage4": "Super! Schön, dass Ihnen die App gefällt.",
+  "ratingMessage5": "Ausgezeichnet! Vielen Dank für die tolle Bewertung.",
+  "errorLaunchingUrl": "Link konnte nicht geöffnet werden: {url}. Fehler: {error}",
+  "@errorLaunchingUrl": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpeningRatingDialog": "Bewertungsdialog konnte nicht geöffnet werden: {error}",
+  "@errorOpeningRatingDialog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "splashTagline": "Meistern Sie den Quran — Vers für Vers",
+  "splashAyahTranslation": "„Wir haben den Quran leicht gemacht zur Ermahnung — will denn jemand ermahnt werden?“ (Q54:17)",
+  "onboardingPage1Title": "Tauchen Sie ein in\ndie Worte Allahs",
+  "onboardingPage1Subtitle": "Lesen, hören und nachsinnen über\nden Quran — jederzeit, überall.",
+  "onboardingPage1Cta": "Lesen beginnen",
+  "onboardingPage2Title": "Hören Sie schöne\nRezitationen und folgen\nSie dem Text",
+  "onboardingPage2Subtitle": "Wählen Sie Ihren Rezitanten und erleben Sie,\nwie die Verse lebendig werden.",
+  "onboardingPage2Cta": "Hören beginnen",
+  "onboardingPage3Title": "Testen Sie Ihr Wissen\nüber den Quran",
+  "onboardingPage3Subtitle": "Erraten Sie Sure oder Vers, was Sie\nhören — nach Dschuz, Sure oder\nzufällig.",
+  "onboardingPage3Cta": "Spielen",
+  "mainMenuSettingsShowcaseTitle": "Einstellungen",
+  "mainMenuSettingsShowcaseDescription": "Autoplay anpassen und Rezitanten wählen",
+  "mainMenuLastReadShowcaseTitle": "Zuletzt gelesen",
+  "mainMenuLastReadShowcaseDescription": "Zeigt Ihre zuletzt gelesene Sure und den Vers.",
+  "mainMenuQuranCardTitle": "Quran lesen",
+  "mainMenuQuranCardDescription": "Beginnen Sie mit Lesen und Hören jeder Sure.",
+  "mainMenuSurahCardTitle": "Nach Sure",
+  "mainMenuSurahCardDescription": "Testen Sie Ihre Auswendiglernen mit einer bestimmten Sure.",
+  "mainMenuJuzCardTitle": "Nach Dschuz",
+  "mainMenuJuzCardDescription": "Wählen Sie einen Dschuz des Quran für den Test.",
+  "mainMenuRandomCardTitle": "Zufällig",
+  "mainMenuRandomCardDescription": "Versuche aus dem gesamten Quran, zufällig ausgewählt.",
+  "mainMenuTestsHeader": "Tests",
+  "mainMenuExitHint": "Drücken Sie innerhalb von zwei Sekunden erneut Zurück, um zu beenden",
+  "mainMenuExitSnack": "Erneut Zurück drücken zum Beenden",
+  "mainMenuExitDialogTitle": "Sind Sie sicher?",
+  "mainMenuExitDialogContent": "Möchten Sie die App beenden?",
+  "commonNo": "Nein",
+  "commonYes": "Ja",
+  "commonLoadingSubtitle": "Wird geladen...",
+  "surahListTitle": "Surenliste",
+  "surahListSearchHint": "Sure suchen",
+  "surahListDesktopPlaceholder": "Sure auswählen",
+  "surahListTestDescription": "Hören Sie einen Vers aus einer Sure und\nerraten Sie den nächsten.",
+  "juzListTitle": "Dschuz-Liste",
+  "juzListSearchHint": "Dschuz suchen",
+  "juzListSelectTitle": "Dschuz auswählen",
+  "juzListTestDescription": "Hören Sie einen Vers aus einem Dschuz und\nerraten Sie den nächsten.",
+  "juzListTypeNumberHint": "Dschuz-Nummer eingeben",
+  "testReadEntireSurah": "Ganze Sure lesen",
+  "testReadEntireJuz": "Ganzen Dschuz lesen",
+  "testErrorTitle": "Test konnte nicht geladen werden",
+  "testErrorMessage": "Sure konnte nicht geladen werden. Prüfen Sie Ihre Verbindung.",
+  "juzTestErrorTitle": "Dschuz-Test konnte nicht geladen werden",
+  "juzTestErrorMessage": "Dschuz konnte nicht geladen werden. Prüfen Sie Ihre Verbindung.",
+  "juzLoadingTitle": "Dschuz wird geladen...",
+  "juzLoadingSubtitle": "Dschuz wird geladen",
+  "juzErrorTitle": "Dschuz konnte nicht geladen werden",
+  "juzErrorMessage": "Prüfen Sie Ihre Internetverbindung oder versuchen Sie es später erneut.",
+  "changeReciter": "Rezitant wechseln",
+  "errorRetryButton": "Erneut versuchen",
+  "testRefreshAyah": "Vers aktualisieren",
+  "testLoadingAyahTitle": "Vers wird geladen",
+  "testGuessNextAyah": "Erraten Sie den nächsten Vers",
+  "testBeginningOfSurah": "Anfang der Sure",
+  "testEndOfSurah": "Ende der Sure",
+  "testVersesCount": "{count} Verse",
+  "@testVersesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "testMenuTitle": "Testen Sie Ihr Quran-Wissen",
+  "testMenuSubtitle": "Hören Sie einen Vers und erraten Sie den nächsten.",
+  "testMenuOptionBySurahSubtitle": "Wissen nach\nverschiedenen Suren testen",
+  "testMenuOptionByJuzSubtitle": "Wie gut kennen Sie\njeden Dschuz?",
+  "testMenuOptionRandomTitle": "Zufällige Verse",
+  "testMenuOptionRandomSubtitle": "Verse aus dem\ngesamten Quran.",
+  "customSurahSelectTitle": "Suren auswählen",
+  "customSurahSelectContinue": "Weiter",
+  "bottomNavQuran": "Quran",
+  "bottomNavTest": "Test",
+  "segmentSurah": "Sure",
+  "segmentJuz": "Dschuz",
+  "searchBySurahHint": "Nach Sure suchen",
+  "searchByJuzHint": "Nach Dschuz suchen",
+  "dashboardChallengeTitle": "Fordern Sie sich heraus",
+  "dashboardChallengeDescription": "Hören Sie einen Vers\ndes Quran und erraten\nSie den nächsten.",
+  "dashboardListenReadHeader": "Hören / Lesen",
+  "dashboardContinueLastTestTitle": "Letzten Test fortsetzen",
+  "dashboardNowPlayingTitle": "Wird gerade wiedergegeben",
+  "juzNumberLabel": "Dschuz {number}",
+  "@juzNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "versePickerTitle": "Zu Vers springen",
+  "versePickerSubtitleTest": "Vers zum Start des Tests wählen",
+  "versePickerSubtitleRead": "Vers zum Scrollen wählen",
+  "verseNumberLabel": "Vers {number}",
+  "@verseNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadTitle": "Zuletzt gelesen",
+  "lastReadDescription": "Zeigt Ihre zuletzt gelesene Sure und den Vers.",
+  "lastReadContinue": "Fortsetzen",
+  "lastReadNone": "Kein Lesefortschritt",
+  "lastReadAyahNumber": "Vers Nr. {number}",
+  "@lastReadAyahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "quranViewErrorTitle": "Sure konnte nicht geladen werden",
+  "quranViewErrorMessage": "Prüfen Sie Ihre Internetverbindung oder versuchen Sie es später erneut.",
+  "quranViewPlayFullSurah": "Ganze Sure abspielen",
+  "quranViewPlayingFullSurah": "Ganze Sure wird abgespielt",
+  "lastReadNoData": "Kein Lesefortschritt",
+  "lastReadContinueButton": "Fortsetzen",
+  "readingPreferencesTitle": "Lese-Einstellungen",
+  "translationLabel": "Übersetzung",
+  "translationSubtitle": "Bedeutung unter jedem Vers anzeigen",
+  "transliterationLabel": "Umschrift",
+  "transliterationSubtitle": "Aussprache in lateinischen Buchstaben",
+  "surahLoadingTitle": "Sure wird geladen...",
+  "surahLoadingSubtitle": "Wird geladen",
+  "saveProgressTitle": "Fortschritt speichern",
+  "saveProgressPrompt": "Bis einschließlich Vers {number} als gelesen markieren?",
+  "@saveProgressPrompt": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "Als gelesen markieren",
+  "bookmarksTitle": "Lesezeichen",
+  "noBookmarksMessage": "Keine Lesezeichen. Markieren Sie Verse, um sie hier zu sehen.",
+  "seeAllBookmarks": "Alle anzeigen",
+  "deleteBookmarkTitle": "Lesezeichen löschen",
+  "deleteBookmarkMessage": "Dieses Lesezeichen wirklich löschen?",
+  "quranReadPreviousSurah": "Vorherige Sure",
+  "quranReadNextSurah": "Nächste Sure",
+  "commonCancel": "Abbrechen",
+  "undo": "Rückgängig",
+  "markReadSuccessTitle": "Erfolg",
+  "markReadProgressUpdated": "Fortschritt bis Vers {number} aktualisiert",
+  "@markReadProgressUpdated": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "audioNeedsInternet": "Keine Internetverbindung. Audio benötigt Internet.",
+  "reciterCompatibilityTitle": "Rezitanten-Kompatibilität",
+  "reciterCompatibilityBody1": "Der gewählte Rezitant liefert Audio als ganze Sure statt Vers für Vers.",
+  "reciterCompatibilityBody2": "Für Tests und Fortschritt wählen Sie einen Rezitanten mit wiedergabe auf Vers-Ebene.",
+  "chooseCompatibleReciter": "Kompatible Rezitanten wählen",
+  "quranShazamTitle": "Quran Shazam",
+  "testMenuShazamSubtitle": "Verse durch Rezitation erkennen (Experimentell)",
+  "shazamListeningStatus": "Höre Rezitation...",
+  "shazamTapToIdentifySurah": "Tippen, um Sure zu erkennen",
+  "shazamMatchesPlaceholder": "Treffer erscheinen hier",
+  "shazamNoMatchesYet": "Noch keine Treffer",
+  "shazamMatchScoreLabel": "{percent} % Übereinstimmung",
+  "@shazamMatchScoreLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "progressTrackingTitle": "Lesefortschritt verfolgen",
+  "progressTrackingSmartTitle": "Smart",
+  "progressTrackingSmartDescription": "Aktualisiert Ihren Fortschritt automatisch nach Ihrer Leseaktivität.",
+  "progressTrackingManualTitle": "Manuell",
+  "progressTrackingManualDescription": "Tippen Sie auf das Doppel-Häkchen beim zuletzt gelesenen Vers, um ihn und alle davor als gelesen zu markieren.",
+  "progressTrackingOffTitle": "Aus",
+  "progressTrackingOffDescription": "Fortschritt wird nicht erfasst.",
+  "reciterWhatsAppPromptTitle": "Mehr Rezitanten?",
+  "reciterWhatsAppPromptBody": "Wenn Ihr Lieblingsrezitant fehlt, können Sie ihn über unsere WhatsApp-Feedbackgruppe anfragen.\n\nDort sammeln wir Wünsche, Fehler und Ideen.",
+  "reciterWhatsAppNotNow": "Später",
+  "reciterWhatsAppJoinGroup": "Gruppe beitreten",
+  "readingInsightsPageTitle": "Lese-Insights",
+  "readingInsightsResetAllTitle": "Gesamten Fortschritt zurücksetzen?",
+  "readingInsightsResetAllBody": "Ihr gesamter Quran-Lesefortschritt wird gelöscht. Das kann nicht rückgängig gemacht werden.",
+  "readingInsightsResetAllConfirm": "Alles zurücksetzen",
+  "readingInsightsResetSurahTitle": "Sure {surahName} zurücksetzen?",
+  "@readingInsightsResetSurahTitle": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahBody": "Der Lesefortschritt für Sure {surahName} wird gelöscht.",
+  "@readingInsightsResetSurahBody": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahConfirm": "Zurücksetzen",
+  "readingInsightsTooltipResetAll": "Gesamten Fortschritt zurücksetzen",
+  "readingInsightsTooltipResetSurah": "Sure-Fortschritt zurücksetzen",
+  "readingInsightsStatRead": "Gelesen",
+  "readingInsightsStatRemaining": "Verbleibend",
+  "readingInsightsStatCompleted": "Abgeschlossen",
+  "readingInsightsSurahBreakdown": "Suren-Übersicht",
+  "readingInsightsOverallProgress": "Gesamtfortschritt",
+  "readingInsightsLastUpdated": "Zuletzt aktualisiert: {dateTime}",
+  "@readingInsightsLastUpdated": {
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "testNoNextVerseInSurah": "Kein nächster Vers in dieser Sure",
+  "recitationReadyListenHint": "Bereit. Tippen Sie unten auf das Mikrofon.",
+  "recitationReciteVerse": "Rezitieren Sie Vers {number}...",
+  "@recitationReciteVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationAnalyzingVerse": "Vers {number} wird analysiert...",
+  "@recitationAnalyzingVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationVerseResult": "Ergebnis Vers {number}",
+  "@recitationVerseResult": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationStartNow": "Jetzt mit der Rezitation beginnen...",
+  "recitationSimilarityScore": "Ähnlichkeit",
+  "recitationYourRecitation": "Ihre Rezitation:",
+  "recitationResultPerfect": "Mascha Allah! Völlig richtig",
+  "recitationResultAlmost": "Guter Versuch! Fast richtig",
+  "recitationResultIncorrect": "Nicht richtig. Bitte erneut versuchen",
+  "versePickerSearchVerseHint": "Versnummer suchen...",
+  "verseSearchNoResults": "Keine Verse gefunden",
+  "audioPlayerTapToExpandSemantics": "Tippen zum Aufklappen",
+  "dateRelativeToday": "Heute",
+  "dateRelativeYesterday": "Gestern",
+  "dateRelativeTomorrow": "Morgen",
+  "adhkarHomeTitle": "Adhkar",
+  "adhkarHomeSubtitle": "Zeitlose Bittgebete, die das Herz stärken und dich bewahren",
+  "adhkarCategoryMorning": "Morgen",
+  "adhkarCategoryEvening": "Abend",
+  "adhkarCategoryBeforeSleeping": "Vor dem Schlaf",
+  "adhkarCategoryWakingUp": "Beim Aufwachen",
+  "notificationsUpdateError": "Benachrichtigungen konnten nicht aktualisiert werden: {message}",
+  "@notificationsUpdateError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLinkWebsite": "Website",
+  "settingsLinkWhatsAppChannel": "WhatsApp-Kanal",
+  "quranResumeReadingPrompt": "Sie haben Verse übersprungen. Bei Vers {ayah} weitermachen?",
+  "@quranResumeReadingPrompt": {
+    "placeholders": {
+      "ayah": {
+        "type": "int"
+      }
+    }
+  }
+}

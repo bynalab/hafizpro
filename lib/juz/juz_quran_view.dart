@@ -16,6 +16,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/bismillah.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
+import 'package:hafiz_test/util/tarteel_audio.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -140,6 +141,13 @@ class _JuzQuranViewState extends State<JuzQuranView> {
             entries.isEmpty ? '' : _firstHeaderTitle(entries);
         _isLoading = false;
       });
+
+      final reciterId = _storage.getReciterId();
+      final reciter = TarteelAudio.reciterForId(reciterId);
+      if (reciter?.isSurahBySurah == true &&
+          _audioCenter.uiState == AudioPlayerUiState.hidden) {
+        _audioCenter.setUiState(AudioPlayerUiState.expanded);
+      }
 
       _itemPositionsListener.itemPositions.addListener(_onPositionsChanged);
 
@@ -458,6 +466,11 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                     } else if (state == AudioPlayerUiState.expanded) {
                       bottomPadding = 200;
                     }
+
+                    final reciterId = _storage.getReciterId();
+                    final reciter = TarteelAudio.reciterForId(reciterId);
+                    final showPlayButton = reciter?.isVerseByVerse ?? true;
+
                     return ScrollablePositionedList.separated(
                       padding: EdgeInsets.only(top: 54, bottom: bottomPadding),
                       itemCount: _entries.length,
@@ -515,6 +528,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                   : (isEven
                                       ? const Color(0xFFFCFCFC)
                                       : const Color(0xFFF2F2F2)),
+                              showPlayButton: showPlayButton,
                               onPlayPressed: _onPlayPressed,
                               isBookmarked: isBookmarked,
                               onBookmark: (idx) async {

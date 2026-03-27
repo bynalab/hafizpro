@@ -99,13 +99,20 @@ class SearchField extends StatelessWidget {
         border: Border.all(color: DashboardPalette.searchBorder(context)),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.search, color: DashboardPalette.secondaryText(context)),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
-              style: TextStyle(color: DashboardPalette.primaryText(context)),
+              textAlignVertical: TextAlignVertical.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: DashboardPalette.primaryText(context),
+              ),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: GoogleFonts.inter(
@@ -114,6 +121,8 @@ class SearchField extends StatelessWidget {
                   color: DashboardPalette.secondaryText(context),
                 ),
                 border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ),

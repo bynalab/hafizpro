@@ -11,6 +11,8 @@ import 'package:hafiz_test/services/storage/hive_storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/surah.services.dart';
+import 'package:hafiz_test/services/quran_search_service.dart';
+import 'package:hafiz_test/services/recitation_verification_service.dart';
 
 import 'package:hafiz_test/services/tts_service.dart';
 import 'package:hafiz_test/util/surah_picker.dart';
@@ -64,12 +66,13 @@ Future<void> setupLocator() async {
       NotificationService(storage: getIt<IStorageService>()));
   getIt.registerSingleton<TtsService>(TtsService());
 
-  final surahSource = await createQuranSources(
+  final sources = await createQuranSources(
     networkServices: getIt<NetworkServices>(),
     storageServices: getIt<IStorageService>(),
   );
 
-  getIt.registerSingleton(surahSource);
+  getIt.registerSingleton<SurahSource>(sources.surahSource);
+  getIt.registerSingleton<QuranSearchService>(sources.searchService);
 
   getIt.registerSingleton<SurahServices>(
     SurahServices(
@@ -92,6 +95,10 @@ Future<void> setupLocator() async {
       networkServices: getIt<NetworkServices>(),
       storageServices: getIt<IStorageService>(),
     ),
+  );
+
+  getIt.registerLazySingleton<RecitationVerificationService>(
+    () => RecitationVerificationService(),
   );
 
   // Initialize notifications and restore schedule if user previously enabled it.

@@ -15,6 +15,7 @@ class AyahCard extends StatelessWidget {
   final ReadingPreferences prefs;
   final bool isCompleted;
   final void Function(int)? onMarkAsRead;
+  final bool showPlayButton;
 
   // We derive contrast from the actual card background color (not Theme.brightness)
   // because some screens may intentionally render light cards in dark mode (or vice
@@ -54,6 +55,7 @@ class AyahCard extends StatelessWidget {
     required this.prefs,
     this.isCompleted = false,
     this.onMarkAsRead,
+    this.showPlayButton = true,
     this.isBookmarked = false,
     this.onBookmark,
   });
@@ -176,26 +178,27 @@ class AyahCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        GestureDetector(
-                          onTap: () => onPlayPressed?.call(index),
-                          child: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: chipBorderColor),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                isActive
-                                    ? Icons.pause
-                                    : Icons.play_arrow_rounded,
-                                size: 20,
-                                color: textColor,
+                        if (showPlayButton)
+                          GestureDetector(
+                            onTap: () => onPlayPressed?.call(index),
+                            child: Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: chipBorderColor),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  isActive
+                                      ? Icons.pause
+                                      : Icons.play_arrow_rounded,
+                                  size: 20,
+                                  color: textColor,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 14),

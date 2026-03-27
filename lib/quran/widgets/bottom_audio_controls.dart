@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:just_audio/just_audio.dart';
@@ -58,7 +59,7 @@ class BottomAudioControls extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Tooltip(
-        message: 'Tap to expand',
+        message: AppLocalizations.of(context)!.audioPlayerTapToExpandSemantics,
         child: GestureDetector(
           onTap: () {
             audioCenter.setUiState(AudioPlayerUiState.expanded);

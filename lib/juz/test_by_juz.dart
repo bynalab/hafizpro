@@ -17,6 +17,7 @@ import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/test_screen.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
+import 'package:hafiz_test/widget/compatibility_error_view.dart';
 
 class TestByJuz extends StatefulWidget {
   final int juzNumber;
@@ -48,6 +49,7 @@ class _TestPage extends State<TestByJuz> {
   Future<void> _changeReciterAndRetry() async {
     final selected = await ReciterPickerSheet(
       selected: storageServices.getReciterId(),
+      showOnlyVerseByVerse: _isReciterModeError,
     ).openBottomSheet(context);
     if (selected == null) return;
 
@@ -171,7 +173,7 @@ class _TestPage extends State<TestByJuz> {
               ),
               const SizedBox(width: 14),
               Text(
-                context.l10n.juzNumberLabel(widget.juzNumber),
+                '${context.l10n.juzNumberLabel(widget.juzNumber)} • ${surah.englishName} (${surah.number.toString().padLeft(2, '0')})',
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -186,37 +188,41 @@ class _TestPage extends State<TestByJuz> {
         body: Stack(
           children: [
             if (hasError)
-              CustomErrorWidget(
-                title: context.l10n.juzTestErrorTitle,
-                message: errorMessage ?? context.l10n.juzTestErrorMessage,
-                icon: Icons.quiz_outlined,
-                color: Colors.purple.shade700,
-                onRetry: () async {
-                  await init();
-                },
-                secondaryActionLabel:
-                    _isReciterModeError ? context.l10n.changeReciter : null,
-                onSecondaryAction:
-                    _isReciterModeError ? _changeReciterAndRetry : null,
-              )
+              _isReciterModeError
+                  ? CompatibilityErrorView(
+                      onChooseReciter: _changeReciterAndRetry,
+                      onRetry: init,
+                    )
+                  : CustomErrorWidget(
+                      title: context.l10n.juzTestErrorTitle,
+                      message: errorMessage ?? context.l10n.juzTestErrorMessage,
+                      icon: Icons.quiz_outlined,
+                      color: Colors.purple.shade700,
+                      onRetry: () async {
+                        await init();
+                      },
+                      secondaryActionLabel: _isReciterModeError
+                          ? context.l10n.changeReciter
+                          : null,
+                      onSecondaryAction:
+                          _isReciterModeError ? _changeReciterAndRetry : null,
+                    )
             else
-              SingleChildScrollView(
-                child: TestScreen(
-                  surah: surah,
-                  currentAyah: isLoading ? Ayah() : currentAyah,
-                  isLoading: isLoading,
-                  readFullLabel: context.l10n.testReadEntireJuz,
-                  onReadFull: () async {
-                    final juz = findJuzByNumber(widget.juzNumber);
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => JuzQuranView(juz: juz),
-                      ),
-                    );
-                  },
-                  onRefresh: init,
-                ),
+              TestScreen(
+                surah: surah,
+                currentAyah: isLoading ? Ayah() : currentAyah,
+                isLoading: isLoading,
+                readFullLabel: context.l10n.testReadEntireJuz,
+                onReadFull: () async {
+                  final juz = findJuzByNumber(widget.juzNumber);
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => JuzQuranView(juz: juz),
+                    ),
+                  );
+                },
+                onRefresh: init,
               ),
           ],
         ),

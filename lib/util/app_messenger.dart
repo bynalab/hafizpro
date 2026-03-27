@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 
 final GlobalKey<ScaffoldMessengerState> appScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -16,5 +17,16 @@ class AppMessenger {
           behavior: SnackBarBehavior.floating,
         ),
       );
+  }
+
+  /// Resolves the message using [AppLocalizations] from the scaffold context.
+  static void showLocalizedSnackBar(
+    String Function(AppLocalizations l10n) message,
+  ) {
+    final ctx = appScaffoldMessengerKey.currentContext;
+    if (ctx == null) return;
+    final l10n = AppLocalizations.of(ctx);
+    if (l10n == null) return;
+    showSnackBar(message(l10n));
   }
 }

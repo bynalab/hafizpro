@@ -15,7 +15,7 @@ class AdhkarService {
     return AdhkarFactory.getAdhkar(adhkarId: idMorningEvening) as Adhkar;
   }
 
-  static Adhkar getBeforeSleeping() {
+  static Adhkar getBeforeSleeping({required String fallbackTitle}) {
     // Workaround for duplicate ID bug in package
     final all = AdhkarFactory.getAdhkar() as List<Adhkar>;
     try {
@@ -23,8 +23,7 @@ class AdhkarService {
           .firstWhere((a) => a.title.toLowerCase().contains('before sleeping'));
       // return AdhkarFactory.getAdhkar(adhkarId: idBeforeSleeping) as Adhkar;
     } catch (e) {
-      // Fallback if not found (unexpected)
-      return Adhkar(id: 'err', title: 'Before Sleeping', adhkars: []);
+      return Adhkar(id: 'err', title: fallbackTitle, adhkars: []);
     }
   }
 }

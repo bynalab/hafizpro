@@ -341,9 +341,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -375,9 +373,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -464,9 +460,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -506,9 +500,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }

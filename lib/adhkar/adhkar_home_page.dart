@@ -6,6 +6,7 @@ import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/adhkar/adhkar_list_page.dart';
 import 'package:adhkar/adhkar.dart';
 import 'package:hafiz_test/adhkar/adhkar_service.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class AdhkarHomePage extends StatelessWidget {
   final VoidCallback onOpenSettings;
@@ -73,7 +74,7 @@ class AdhkarHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Adhkar',
+                context.l10n.adhkarHomeTitle,
                 style: GoogleFonts.outfit(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -82,7 +83,7 @@ class AdhkarHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'A collection of timeless supplications to anchor the heart and protect you',
+                context.l10n.adhkarHomeSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 15,
                   height: 1.5,
@@ -100,7 +101,7 @@ class AdhkarHomePage extends StatelessWidget {
                   childAspectRatio: 0.85, // Adjust based on image
                   children: [
                     _AdhkarCard(
-                      title: 'Morning',
+                      title: context.l10n.adhkarCategoryMorning,
                       imagePath: 'assets/img/morning_adhkar.webp',
                       isDark: isDark,
                       onTap: () {
@@ -109,7 +110,7 @@ class AdhkarHomePage extends StatelessWidget {
                       },
                     ),
                     _AdhkarCard(
-                      title: 'Evening',
+                      title: context.l10n.adhkarCategoryEvening,
                       imagePath: 'assets/img/evening_adhkar.webp',
                       isDark: isDark,
                       onTap: () {
@@ -118,16 +119,19 @@ class AdhkarHomePage extends StatelessWidget {
                       },
                     ),
                     _AdhkarCard(
-                      title: 'Before sleeping',
+                      title: context.l10n.adhkarCategoryBeforeSleeping,
                       imagePath: 'assets/img/sleep_adhkar.webp',
                       isDark: isDark,
                       onTap: () {
-                        final adhkar = AdhkarService.getBeforeSleeping();
+                        final adhkar = AdhkarService.getBeforeSleeping(
+                          fallbackTitle:
+                              context.l10n.adhkarCategoryBeforeSleeping,
+                        );
                         _navToDetail(context, adhkar);
                       },
                     ),
                     _AdhkarCard(
-                      title: 'Waking up',
+                      title: context.l10n.adhkarCategoryWakingUp,
                       imagePath: 'assets/img/wake_adhkar.webp',
                       isDark: isDark,
                       onTap: () {

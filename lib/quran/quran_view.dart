@@ -14,8 +14,10 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/tarteel_audio.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
+import 'package:hafiz_test/widget/verse_picker_bottom_sheet.dart';
 
 class QuranView extends StatefulWidget {
   final Surah surah;
@@ -93,6 +95,13 @@ class _QuranViewState extends State<QuranView> {
         } else {
           _onPlayingIndexChanged();
         }
+
+        final reciterId = _storage.getReciterId();
+        final reciter = TarteelAudio.reciterForId(reciterId);
+        if (reciter?.isSurahBySurah == true &&
+            viewModel.audioCenter.uiState == AudioPlayerUiState.hidden) {
+          viewModel.audioCenter.setUiState(AudioPlayerUiState.expanded);
+        }
       }
     });
   }
@@ -159,7 +168,7 @@ class _QuranViewState extends State<QuranView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Success',
+                      context.l10n.markReadSuccessTitle,
                       style: GoogleFonts.cairo(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -168,7 +177,7 @@ class _QuranViewState extends State<QuranView> {
                       ),
                     ),
                     Text(
-                      'Progress updated to Ayah $ayahNumber',
+                      context.l10n.markReadProgressUpdated(ayahNumber),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -191,7 +200,7 @@ class _QuranViewState extends State<QuranView> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 ),
                 child: Text(
-                  'UNDO',
+                  context.l10n.undo,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -253,6 +262,51 @@ class _QuranViewState extends State<QuranView> {
   Future<bool> _handlePop() async {
     _progressController?.saveProgress();
     return true; // Simple pop now, controller handles save
+  }
+
+  void _openAdjacentSurah(int surahNumber) {
+    _progressController?.saveProgress();
+    final target = findSurahByNumber(surahNumber);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => QuranView(surah: target),
+      ),
+    );
+  }
+
+  void _showVersePicker() {
+    final surahVm = viewModel.surah;
+    if (surahVm == null) return;
+
+    final idx = viewModel.playingIndexNotifier.value;
+    final currentAyahNumber = (idx ?? 0) + 1;
+
+    VersePickerBottomSheet.show(
+      context,
+      ayahs: surahVm.ayahs,
+      currentAyahNumber: currentAyahNumber,
+      subtitle: context.l10n.versePickerSubtitleRead,
+      onVerseSelected: _jumpToVerse,
+    );
+  }
+
+  void _jumpToVerse(int ayahIndex) {
+    final surahVm = viewModel.surah;
+    if (surahVm == null) return;
+    if (ayahIndex < 0 || ayahIndex >= surahVm.ayahs.length) return;
+
+    final fromAyah = (viewModel.playingIndexNotifier.value ?? 0) + 1;
+    final toAyah = ayahIndex + 1;
+
+    viewModel.playingIndexNotifier.value = ayahIndex;
+    _scrollWithRetry(ayahIndex, animated: true);
+
+    AnalyticsService.trackEvent('Reading Navigation', properties: {
+      'action': 'jump',
+      'from_ayah': fromAyah,
+      'to_ayah': toAyah,
+      'surah_name': surahVm.englishName,
+    });
   }
 
   @override
@@ -318,70 +372,122 @@ class _QuranViewState extends State<QuranView> {
                 bottom: false,
                 child: SizedBox(
                   height: 70,
-                  child: Stack(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF1A1A1A)
+                                  : Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 18,
                                 color: isDark
-                                    ? const Color(0xFF1A1A1A)
-                                    : Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.arrow_back_ios_new_rounded,
-                                  size: 18,
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF111827),
-                                ),
+                                    ? Colors.white
+                                    : const Color(0xFF111827),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          viewModel.surah?.englishName ?? '',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                isDark ? Colors.white : const Color(0xFF111827),
-                          ),
-                        ),
+                      Expanded(
+                        child: viewModel.surah == null
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: InkWell(
+                                  onTap: _showVersePicker,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 6,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                viewModel.surah!.englishName,
+                                                textAlign: TextAlign.center,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: isDark
+                                                      ? Colors.white
+                                                      : const Color(0xFF111827),
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              size: 20,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF111827),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          context.l10n.testVersesCount(
+                                            viewModel.surah!.numberOfAyahs,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.75,
+                                                  )
+                                                : const Color(0xFF111827)
+                                                    .withValues(alpha: 0.65),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: QuranSettingsButton(
-                          storage: _storage,
-                          isDark: isDark,
-                          onChanged: () {
-                            if (mounted) {
-                              final nextMode =
-                                  _storage.getProgressTrackingMode();
-                              if (nextMode != _trackingMode) {
-                                // Reload surah to refresh the controller with new mode
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(builder: (_) {
-                                    return QuranView(surah: widget.surah);
-                                  }),
-                                );
-                                return;
-                              }
-                              setState(() {});
+                      QuranSettingsButton(
+                        storage: _storage,
+                        isDark: isDark,
+                        onChanged: () {
+                          if (mounted) {
+                            final nextMode = _storage.getProgressTrackingMode();
+                            if (nextMode != _trackingMode) {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (_) {
+                                  return QuranView(surah: widget.surah);
+                                }),
+                              );
+                              return;
                             }
-                          },
-                        ),
+                            setState(() {});
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -429,6 +535,20 @@ class _QuranViewState extends State<QuranView> {
                                     readingProgressController:
                                         _progressController,
                                     bottomPadding: bottomPadding,
+                                    onPreviousSurah: widget.surah.number > 1
+                                        ? () {
+                                            _openAdjacentSurah(
+                                              widget.surah.number - 1,
+                                            );
+                                          }
+                                        : null,
+                                    onNextSurah: widget.surah.number < 114
+                                        ? () {
+                                            _openAdjacentSurah(
+                                              widget.surah.number + 1,
+                                            );
+                                          }
+                                        : null,
                                   );
                                 },
                               ),
@@ -498,7 +618,7 @@ class _QuranViewState extends State<QuranView> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'You skipped some verses. Continue from Ayah $_resumeAyah?',
+              context.l10n.quranResumeReadingPrompt(_resumeAyah!),
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -517,7 +637,7 @@ class _QuranViewState extends State<QuranView> {
               visualDensity: VisualDensity.compact,
               foregroundColor: const Color(0xFF78B7C6),
             ),
-            child: const Text('Continue'),
+            child: Text(context.l10n.lastReadContinueButton),
           ),
           IconButton(
             onPressed: () {
