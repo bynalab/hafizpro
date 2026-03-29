@@ -7,14 +7,14 @@ import 'package:hafiz_test/util/arabic_text_normalizer.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
-class ShazamQuranPage extends StatefulWidget {
-  const ShazamQuranPage({super.key});
+class AyahFinderPage extends StatefulWidget {
+  const AyahFinderPage({super.key});
 
   @override
-  State<ShazamQuranPage> createState() => _ShazamQuranPageState();
+  State<AyahFinderPage> createState() => _AyahFinderPageState();
 }
 
-class _ShazamQuranPageState extends State<ShazamQuranPage>
+class _AyahFinderPageState extends State<AyahFinderPage>
     with SingleTickerProviderStateMixin {
   final _searchService = getIt<QuranSearchService>();
   final _sttService = getIt<RecitationVerificationService>();
@@ -75,7 +75,7 @@ class _ShazamQuranPageState extends State<ShazamQuranPage>
           isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
-          context.l10n.quranShazamTitle,
+          context.l10n.ayahFinderTitle,
           style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -85,7 +85,7 @@ class _ShazamQuranPageState extends State<ShazamQuranPage>
       body: Column(
         children: [
           const SizedBox(height: 40),
-          // Shazam Ripple Area
+          // Ayah Finder Ripple Area
           Center(
             child: Stack(
               alignment: Alignment.center,
@@ -142,8 +142,8 @@ class _ShazamQuranPageState extends State<ShazamQuranPage>
           const SizedBox(height: 40),
           Text(
             _isListening
-                ? context.l10n.shazamListeningStatus
-                : context.l10n.shazamTapToIdentifySurah,
+                ? context.l10n.ayahFinderListeningStatus
+                : context.l10n.ayahFinderTapToIdentify,
             style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -169,8 +169,8 @@ class _ShazamQuranPageState extends State<ShazamQuranPage>
                 ? Center(
                     child: Text(
                       _recognizedText.isEmpty
-                          ? context.l10n.shazamMatchesPlaceholder
-                          : context.l10n.shazamNoMatchesYet,
+                          ? context.l10n.ayahFinderMatchesPlaceholder
+                          : context.l10n.ayahFinderNoMatchesYet,
                       style: GoogleFonts.montserrat(
                         color: Colors.grey,
                         fontSize: 14,
@@ -222,7 +222,8 @@ class _ShazamQuranPageState extends State<ShazamQuranPage>
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          context.l10n.shazamMatchScoreLabel(
+                                          context.l10n
+                                              .ayahFinderMatchScoreLabel(
                                             (res.score * 100).toInt(),
                                           ),
                                           style: GoogleFonts.montserrat(

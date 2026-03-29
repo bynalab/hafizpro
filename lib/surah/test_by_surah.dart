@@ -186,13 +186,13 @@ class _TestPage extends State<TestBySurah> {
     }
   }
 
-  void _onRefresh() {
+  Future<void> _onRefresh() async {
     // For refresh, we want a new random surah (if multi-mode) or same surah random ayah
     if (widget.surahNumbers != null && widget.surahNumbers!.isNotEmpty) {
       _currentSurahNumber = null; // Forces picking a new random one in init()
     }
 
-    init();
+    await init();
   }
 
   Ayah _getAyahForSurah() {
@@ -201,7 +201,8 @@ class _TestPage extends State<TestBySurah> {
     }
     return widget.ayahNumber != null
         ? surah.getAyah(widget.ayahNumber)
-        : getIt<AyahServices>().getRandomAyahForSurah(surah.ayahs);
+        : getIt<AyahServices>()
+            .getRandomAyahForSurah(surah.ayahs, surahNumber: surah.number);
   }
 
   @override

@@ -244,14 +244,15 @@
   "reciterCompatibilityBody1": "Der gewählte Rezitant liefert Audio als ganze Sure statt Vers für Vers.",
   "reciterCompatibilityBody2": "Für Tests und Fortschritt wählen Sie einen Rezitanten mit wiedergabe auf Vers-Ebene.",
   "chooseCompatibleReciter": "Kompatible Rezitanten wählen",
-  "quranShazamTitle": "Quran Shazam",
-  "testMenuShazamSubtitle": "Verse durch Rezitation erkennen (Experimentell)",
-  "shazamListeningStatus": "Höre Rezitation...",
-  "shazamTapToIdentifySurah": "Tippen, um Sure zu erkennen",
-  "shazamMatchesPlaceholder": "Treffer erscheinen hier",
-  "shazamNoMatchesYet": "Noch keine Treffer",
-  "shazamMatchScoreLabel": "{percent} % Übereinstimmung",
-  "@shazamMatchScoreLabel": {
+  "ayahFinderTitle": "Ayah Finder",
+  "testMenuAyahFinderSubtitle": "Verse durch Rezitation erkennen",
+  "experimental": "Experimentell",
+  "ayahFinderListeningStatus": "Höre Rezitation...",
+  "ayahFinderTapToIdentify": "Tippen, um Ayah zu erkennen",
+  "ayahFinderMatchesPlaceholder": "Treffer erscheinen hier",
+  "ayahFinderNoMatchesYet": "Noch keine Treffer",
+  "ayahFinderMatchScoreLabel": "{percent} % Übereinstimmung",
+  "@ayahFinderMatchScoreLabel": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -306,7 +307,8 @@
     }
   },
   "testNoNextVerseInSurah": "Kein nächster Vers in dieser Sure",
-  "recitationReadyListenHint": "Bereit. Tippen Sie unten auf das Mikrofon.",
+  "recitationReadyListenHint": "Bereit. Tippen Sie hier, um zu starten.",
+  "recitationExperimentalLabel": "(Verifizierung ist experimentell)",
   "recitationReciteVerse": "Rezitieren Sie Vers {number}...",
   "@recitationReciteVerse": {
     "placeholders": {

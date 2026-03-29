@@ -760,33 +760,37 @@
   "@chooseCompatibleReciter": {
     "description": "Primary button on reciter compatibility card."
   },
-  "quranShazamTitle": "Quran Shazam",
-  "@quranShazamTitle": {
-    "description": "Title for Shazam-style verse identification feature."
+  "ayahFinderTitle": "Ayah Finder",
+  "@ayahFinderTitle": {
+    "description": "Title for verse identification feature."
   },
-  "testMenuShazamSubtitle": "Identify verses by reciting them (Experimental)",
-  "@testMenuShazamSubtitle": {
-    "description": "Subtitle on test menu card for Shazam feature."
+  "testMenuAyahFinderSubtitle": "Identify verses by reciting them",
+  "@testMenuAyahFinderSubtitle": {
+    "description": "Subtitle on test menu card for Ayah Finder feature."
   },
-  "shazamListeningStatus": "Listening for recitation...",
-  "@shazamListeningStatus": {
-    "description": "Status while microphone is active on Shazam page."
+  "experimental": "Experimental",
+  "@experimental": {
+    "description": "Standalone label for experimental features."
   },
-  "shazamTapToIdentifySurah": "Tap to identify Surah",
-  "@shazamTapToIdentifySurah": {
-    "description": "Hint when not listening on Shazam page."
+  "ayahFinderListeningStatus": "Listening for recitation...",
+  "@ayahFinderListeningStatus": {
+    "description": "Status while microphone is active on Ayah Finder page."
   },
-  "shazamMatchesPlaceholder": "Matches will appear here",
-  "@shazamMatchesPlaceholder": {
-    "description": "Empty state before any search input on Shazam page."
+  "ayahFinderTapToIdentify": "Tap to identify Ayah",
+  "@ayahFinderTapToIdentify": {
+    "description": "Hint when not listening on Ayah Finder page."
   },
-  "shazamNoMatchesYet": "No matches found yet",
-  "@shazamNoMatchesYet": {
+  "ayahFinderMatchesPlaceholder": "Matches will appear here",
+  "@ayahFinderMatchesPlaceholder": {
+    "description": "Empty state before any search input on Ayah Finder page."
+  },
+  "ayahFinderNoMatchesYet": "No matches found yet",
+  "@ayahFinderNoMatchesYet": {
     "description": "Empty state when recognition has no results."
   },
-  "shazamMatchScoreLabel": "{percent}% match",
-  "@shazamMatchScoreLabel": {
-    "description": "Similarity score label in Shazam results.",
+  "ayahFinderMatchScoreLabel": "{percent}% match",
+  "@ayahFinderMatchScoreLabel": {
+    "description": "Similarity score label in Ayah Finder results.",
     "placeholders": {
       "percent": {
         "type": "int"
@@ -916,9 +920,13 @@
   "@testNoNextVerseInSurah": {
     "description": "Snackbar when recitation test has no following verse."
   },
-  "recitationReadyListenHint": "Ready to listen. Tap the mic below to start.",
+  "recitationReadyListenHint": "Ready to listen. Tap here to start.",
   "@recitationReadyListenHint": {
     "description": "Hint under guess-next-ayah on test screen."
+  },
+  "recitationExperimentalLabel": "(Verification is experimental)",
+  "@recitationExperimentalLabel": {
+    "description": "Experimental label for recitation feature."
   },
   "recitationReciteVerse": "Recite Verse {number}...",
   "@recitationReciteVerse": {

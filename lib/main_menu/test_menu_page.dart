@@ -9,7 +9,7 @@ import 'package:hafiz_test/surah/test_by_surah.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
-import 'package:hafiz_test/main_menu/shazam_quran_page.dart';
+import 'package:hafiz_test/main_menu/ayah_finder_page.dart';
 import 'package:hafiz_test/main_menu/widgets.dart';
 
 class TestMenuPage extends StatelessWidget {
@@ -153,14 +153,15 @@ class TestMenuPage extends StatelessWidget {
           TestOptionContainer(
             background:
                 isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-            title: context.l10n.quranShazamTitle,
-            subtitle: context.l10n.testMenuShazamSubtitle,
+            title:
+                "${context.l10n.ayahFinderTitle} (${context.l10n.experimental})",
+            subtitle: context.l10n.testMenuAyahFinderSubtitle,
             icon: const Icon(Icons.auto_awesome_rounded,
                 color: Color(0xFF004B40)),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ShazamQuranPage()),
+                MaterialPageRoute(builder: (_) => const AyahFinderPage()),
               );
             },
           ),

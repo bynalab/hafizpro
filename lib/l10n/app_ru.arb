@@ -244,14 +244,15 @@
   "reciterCompatibilityBody1": "Выбранный чтец отдаёт аудио целой сурой, а не аят за аятом.",
   "reciterCompatibilityBody2": "Для тестов и отслеживания прогресса выберите чтеца с воспроизведением по аятам.",
   "chooseCompatibleReciter": "Выбрать совместимого чтеца",
-  "quranShazamTitle": "Quran Shazam",
-  "testMenuShazamSubtitle": "Узнайте аяты по тиляве (эксперимент)",
-  "shazamListeningStatus": "Слушаем тилаву...",
-  "shazamTapToIdentifySurah": "Нажмите, чтобы определить суру",
-  "shazamMatchesPlaceholder": "Здесь появятся совпадения",
-  "shazamNoMatchesYet": "Пока нет совпадений",
-  "shazamMatchScoreLabel": "{percent}% совпадение",
-  "@shazamMatchScoreLabel": {
+  "ayahFinderTitle": "Ayah Finder",
+  "testMenuAyahFinderSubtitle": "Узнайте аяты по тиляве",
+  "experimental": "Экспериментально",
+  "ayahFinderListeningStatus": "Слушаем тилаву...",
+  "ayahFinderTapToIdentify": "Нажмите, чтобы определить аят",
+  "ayahFinderMatchesPlaceholder": "Здесь появятся совпадения",
+  "ayahFinderNoMatchesYet": "Пока нет совпадений",
+  "ayahFinderMatchScoreLabel": "{percent}% совпадение",
+  "@ayahFinderMatchScoreLabel": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -306,7 +307,8 @@
     }
   },
   "testNoNextVerseInSurah": "В этой суре нет следующего аята",
-  "recitationReadyListenHint": "Готово к прослушиванию. Нажмите микрофон ниже.",
+  "recitationReadyListenHint": "Готово к прослушиванию. Нажмите здесь, чтобы начать.",
+  "recitationExperimentalLabel": "(Проверка в экспериментальном режиме)",
   "recitationReciteVerse": "Произнесите аят {number}...",
   "@recitationReciteVerse": {
     "placeholders": {

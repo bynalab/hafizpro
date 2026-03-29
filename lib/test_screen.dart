@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:hafiz_test/widget/verse_picker_bottom_sheet.dart';
+import 'package:hafiz_test/widget/button.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -27,7 +28,7 @@ class TestScreen extends StatefulWidget {
   final Ayah currentAyah;
 
   final bool isLoading;
-  final Function()? onRefresh;
+  final Future<void> Function()? onRefresh;
   final VoidCallback? onReadFull;
   final String readFullLabel;
   final VoidCallback? onNextBoundary;
@@ -94,7 +95,11 @@ class _TestPage extends State<TestScreen> {
   @override
   void didUpdateWidget(covariant TestScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentAyah.number == widget.currentAyah.number) return;
+    if (oldWidget.currentAyah.number == widget.currentAyah.number &&
+        oldWidget.surah.number == widget.surah.number) {
+      return;
+    }
+
     currentAyah = widget.currentAyah;
     unawaited(handleAudioPlay());
   }
@@ -163,7 +168,7 @@ class _TestPage extends State<TestScreen> {
 
   Future<void> handleAudioPlay() async {
     // PREVENT playback during/after recording
-    if (_isRecording || _isAnalyzing || _recitationResult != null) {
+    if (_isRecording || _isAnalyzing) {
       debugPrint('[TestScreen] handleAudioPlay blocked by active state');
       return;
     }
@@ -225,8 +230,7 @@ class _TestPage extends State<TestScreen> {
 
     _playerStateSub = audioPlayer.playerStateStream.listen((state) async {
       // FORCED PAUSE: If audio starts playing while we are recording/analyzing
-      if (state.playing &&
-          (_isRecording || _isAnalyzing || _recitationResult != null)) {
+      if (state.playing && (_isRecording || _isAnalyzing)) {
         debugPrint(
             '[TestScreen] FORCING PAUSE: Audio resumed during protected state');
         audioServices.pause(audioName: currentAudioName);
@@ -590,6 +594,8 @@ class _TestPage extends State<TestScreen> {
                             recognizedText: _recognizedText,
                             result: _recitationResult,
                             targetVerseNumber: currentAyah.numberInSurah + 1,
+                            onStop: _stopRecording,
+                            onRetry: _startRecording,
                             onClose: () {
                               setState(() {
                                 _recitationResult = null;
@@ -598,49 +604,77 @@ class _TestPage extends State<TestScreen> {
                             },
                           )
                         : // Subtle Placeholder
-                        Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 24, horizontal: 16),
-                            width: MediaQuery.sizeOf(context).width,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: primary.withValues(alpha: 0.1),
-                                width: 2,
-                                style: BorderStyle.solid,
+                        InkWell(
+                            onTap:
+                                _isRecording ? _stopRecording : _startRecording,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 24, horizontal: 16),
+                              width: MediaQuery.sizeOf(context).width,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: _isRecording
+                                      ? Colors.red.withValues(alpha: 0.5)
+                                      : primary.withValues(alpha: 0.1),
+                                  width: 2,
+                                  style: BorderStyle.solid,
+                                ),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.02)
+                                    : Colors.grey.withValues(alpha: 0.05),
                               ),
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.02)
-                                  : Colors.grey.withValues(alpha: 0.05),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.keyboard_voice_rounded,
-                                  color: primary,
-                                  size: 36,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  context.l10n.testGuessNextAyah,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : primary,
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    _isRecording
+                                        ? Icons.stop_rounded
+                                        : Icons.keyboard_voice_rounded,
+                                    color: _isRecording ? Colors.red : primary,
+                                    size: 36,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  context.l10n.recitationReadyListenHint,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: onSurface.withValues(alpha: 0.5),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    _isRecording
+                                        ? context.l10n.recitationReciteVerse(
+                                            currentAyah.numberInSurah + 1)
+                                        : context.l10n.testGuessNextAyah,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: _isRecording
+                                          ? Colors.red
+                                          : (isDark ? Colors.white : primary),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  if (!_isRecording) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      context.l10n.recitationExperimentalLabel,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 10,
+                                        color: onSurfaceMuted.withValues(
+                                            alpha: 0.6),
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _isRecording
+                                        ? context.l10n.ayahFinderListeningStatus
+                                        : context.l10n.ayahFinderTapToIdentify,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: onSurface.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                   ),
@@ -735,8 +769,8 @@ class _TestPage extends State<TestScreen> {
                     const SizedBox(height: 14),
                     Directionality(
                       textDirection: TextDirection.ltr,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -770,67 +804,33 @@ class _TestPage extends State<TestScreen> {
                                 ),
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 62,
-                                  height: 62,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: primary,
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(
-                                      isPlaying
-                                          ? Icons.pause_rounded
-                                          : Icons.play_arrow_rounded,
-                                      size: 30,
-                                      color: onPrimary,
-                                    ),
-                                    onPressed: () async {
-                                      if (isPlaying) {
-                                        await audioServices.pause(
-                                          audioName: currentAudioName,
-                                        );
-                                      } else {
-                                        await audioServices.play(
-                                          audioName: currentAudioName,
-                                        );
-                                      }
-                                    },
-                                  ),
+                            Container(
+                              width: 62,
+                              height: 62,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: primary,
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  isPlaying
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                  size: 30,
+                                  color: onPrimary,
                                 ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 62,
-                                  height: 62,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _isRecording
-                                        ? Colors.red.shade600
-                                        : primary.withValues(alpha: 0.1),
-                                    border: Border.all(
-                                      color: _isRecording
-                                          ? Colors.red.shade600
-                                          : primary,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: IconButton(
-                                    icon: Icon(
-                                      _isRecording
-                                          ? Icons.stop_rounded
-                                          : Icons.mic_rounded,
-                                      size: 30,
-                                      color:
-                                          _isRecording ? Colors.white : primary,
-                                    ),
-                                    onPressed: _isRecording
-                                        ? _stopRecording
-                                        : _startRecording,
-                                  ),
-                                ),
-                              ],
+                                onPressed: () async {
+                                  if (isPlaying) {
+                                    await audioServices.pause(
+                                      audioName: currentAudioName,
+                                    );
+                                  } else {
+                                    await audioServices.play(
+                                      audioName: currentAudioName,
+                                    );
+                                  }
+                                },
+                              ),
                             ),
                             IconButton(
                               onPressed: playNextAyah,
@@ -957,9 +957,9 @@ class _TestPage extends State<TestScreen> {
                           });
 
                           try {
+                            await audioServices.stop(trackEvent: false);
                             await widget.onRefresh?.call();
                           } finally {
-                            await init();
                             if (mounted) {
                               setState(() {
                                 _isRefreshing = false;
@@ -1028,6 +1028,8 @@ class _RecitationStatusCard extends StatelessWidget {
   final RecitationResult? result;
   final int targetVerseNumber;
   final VoidCallback onClose;
+  final VoidCallback? onStop;
+  final VoidCallback? onRetry;
 
   const _RecitationStatusCard({
     required this.isRecording,
@@ -1036,6 +1038,8 @@ class _RecitationStatusCard extends StatelessWidget {
     required this.result,
     required this.targetVerseNumber,
     required this.onClose,
+    this.onStop,
+    this.onRetry,
   });
 
   @override
@@ -1072,22 +1076,45 @@ class _RecitationStatusCard extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Text(
-                isRecording
-                    ? context.l10n.recitationReciteVerse(targetVerseNumber)
-                    : isAnalyzing
-                        ? context.l10n
-                            .recitationAnalyzingVerse(targetVerseNumber)
-                        : context.l10n
-                            .recitationVerseResult(targetVerseNumber),
-                style: GoogleFonts.montserrat(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isRecording
+                          ? context.l10n
+                              .recitationReciteVerse(targetVerseNumber)
+                          : isAnalyzing
+                              ? context.l10n
+                                  .recitationAnalyzingVerse(targetVerseNumber)
+                              : context.l10n
+                                  .recitationVerseResult(targetVerseNumber),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
-              if (!isRecording && !isAnalyzing)
+              if (isRecording)
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: onStop,
+                    icon: const Icon(Icons.stop_rounded,
+                        color: Colors.red, size: 28),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                )
+              else if (!isAnalyzing)
                 IconButton(
                   onPressed: onClose,
                   icon: const Icon(Icons.close, size: 18),
@@ -1130,8 +1157,7 @@ class _RecitationStatusCard extends StatelessWidget {
             const Divider(height: 24),
             Text(
               context.l10n.recitationYourRecitation,
-              style:
-                  const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
@@ -1141,7 +1167,6 @@ class _RecitationStatusCard extends StatelessWidget {
                 fontSize: 18,
               ),
             ),
-            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -1157,6 +1182,35 @@ class _RecitationStatusCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 16),
+              Center(
+                child: Button(
+                  onPressed: onRetry,
+                  height: 34,
+                  width: 140,
+                  color: _getResultColor(result!.type).withValues(alpha: 0.1),
+                  radius: BorderRadius.circular(10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.refresh_rounded,
+                          size: 16, color: _getResultColor(result!.type)),
+                      const SizedBox(width: 8),
+                      Text(
+                        context.l10n.errorRetryButton,
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: _getResultColor(result!.type),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ],
       ),

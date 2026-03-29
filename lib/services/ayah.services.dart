@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
@@ -8,6 +6,7 @@ import 'package:hafiz_test/services/quran_api_providers.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/tarteel_audio_resolver.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
+import 'package:hafiz_test/util/test_random_ayah.dart';
 
 class AyahServices {
   final NetworkServices networkServices;
@@ -97,13 +96,10 @@ class AyahServices {
     return Ayah();
   }
 
-  Ayah getRandomAyahForSurah(List<Ayah> ayahs) {
+  Ayah getRandomAyahForSurah(List<Ayah> ayahs, {int? surahNumber}) {
     try {
       if (ayahs.isEmpty) return Ayah();
-
-      final random = Random();
-      final ayah = ayahs[random.nextInt(ayahs.length)];
-      return ayah;
+      return TestRandomAyah.pick(ayahs, surahNumber: surahNumber);
     } catch (error) {
       if (kDebugMode) print('getRandomAyahForSurah error: $error');
     }

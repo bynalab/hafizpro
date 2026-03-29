@@ -244,14 +244,15 @@
   "reciterCompatibilityBody1": "يوفّر القارئ المحدد الصوت كسورة كاملة وليس آية بآية.",
   "reciterCompatibilityBody2": "لاستخدام الاختبار وتتبع التقدم، اختر قارئًا يدعم التشغيل على مستوى الآية.",
   "chooseCompatibleReciter": "اختر قارئًا متوافقًا",
-  "quranShazamTitle": "شازام القرآن",
-  "testMenuShazamSubtitle": "تعرّف على الآيات بالتلاوة (تجريبي)",
-  "shazamListeningStatus": "جارٍ الاستماع للتلاوة...",
-  "shazamTapToIdentifySurah": "اضغط لتعرّف السورة",
-  "shazamMatchesPlaceholder": "ستظهر النتائج هنا",
-  "shazamNoMatchesYet": "لا توجد نتائج بعد",
-  "shazamMatchScoreLabel": "{percent}٪ تطابق",
-  "@shazamMatchScoreLabel": {
+  "ayahFinderTitle": "مكتشف الآيات",
+  "testMenuAyahFinderSubtitle": "تعرّف على الآيات بالتلاوة",
+  "experimental": "تجريبي",
+  "ayahFinderListeningStatus": "جارٍ الاستماع للتلاوة...",
+  "ayahFinderTapToIdentify": "اضغط لتعرّف الآية",
+  "ayahFinderMatchesPlaceholder": "ستظهر النتائج هنا",
+  "ayahFinderNoMatchesYet": "لا توجد نتائج بعد",
+  "ayahFinderMatchScoreLabel": "{percent}٪ تطابق",
+  "@ayahFinderMatchScoreLabel": {
     "placeholders": {
       "percent": {
         "type": "int"
@@ -306,7 +307,8 @@
     }
   },
   "testNoNextVerseInSurah": "لا توجد آية تالية في هذه السورة",
-  "recitationReadyListenHint": "جاهز للاستماع. اضغط الميكروفون بالأسفل للبدء.",
+  "recitationReadyListenHint": "جاهز للاستماع. اضغط هنا للبدء.",
+  "recitationExperimentalLabel": "(التحقق ميزة تجريبية)",
   "recitationReciteVerse": "رتّل الآية {number}...",
   "@recitationReciteVerse": {
     "placeholders": {
