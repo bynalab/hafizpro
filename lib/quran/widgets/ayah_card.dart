@@ -167,7 +167,8 @@ class AyahCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Builder(
                             builder: (context) {
-                              final btn = GestureDetector(
+                              Widget btn = GestureDetector(
+                                behavior: HitTestBehavior.opaque,
                                 onTap: onShare,
                                 child: Container(
                                   width: 34,
@@ -186,8 +187,10 @@ class AyahCard extends StatelessWidget {
                                 ),
                               );
                               final tip = verseShareTooltip;
-                              if (tip == null || tip.isEmpty) return btn;
-                              return Tooltip(message: tip, child: btn);
+                              if (tip != null && tip.isNotEmpty) {
+                                btn = Tooltip(message: tip, child: btn);
+                              }
+                              return btn;
                             },
                           ),
                         ],
@@ -218,7 +221,7 @@ class AyahCard extends StatelessWidget {
                     const SizedBox(height: 14),
                     Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
+                      child: SelectableText(
                         '${QuranArabicDisplay.forCard(ayah.text)} ${QuranArabicDisplay.ayahNumberOrnament(ayah.numberInSurah)}',
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
@@ -230,7 +233,7 @@ class AyahCard extends StatelessWidget {
                       const SizedBox(height: 14),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
+                        child: SelectableText(
                           ayah.transliteration!.trim(),
                           textAlign: TextAlign.left,
                           style: GoogleFonts.inter(
@@ -245,7 +248,7 @@ class AyahCard extends StatelessWidget {
                         (ayah.translation ?? '').trim().isNotEmpty) ...[
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
+                        child: SelectableText(
                           ayah.translation!.trim(),
                           textAlign: TextAlign.left,
                           style: GoogleFonts.inter(

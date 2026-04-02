@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:ui' show ImageByteFormat;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +19,23 @@ class VerseShareController {
   static const double _logicalW = 360;
   static const double _pixelRatio = 3;
 
+  static void _shareFailed(BuildContext context, [String? debugDetail]) {
+    if (kDebugMode && debugDetail != null) {
+      debugPrint('VerseShareController: $debugDetail');
+    }
+
+    final l10n = AppLocalizations.of(context);
+    if (l10n != null) {
+      AppMessenger.showSnackBar(l10n.verseShareFailed);
+    }
+  }
+
+  static Rect? buildSharePositionOrigin(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
   static Future<void> shareVerse({
     required BuildContext context,
     required Surah surah,
@@ -26,18 +43,30 @@ class VerseShareController {
     required String displayArabic,
   }) async {
     final l10n = AppLocalizations.of(context);
-    if (l10n == null) return;
+    if (l10n == null) {
+      if (kDebugMode) {
+        debugPrint('VerseShareController: AppLocalizations is null');
+      }
+      return;
+    }
 
     if (kIsWeb) {
       AppMessenger.showSnackBar(l10n.verseShareWebUnsupported);
       return;
     }
 
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
-    if (overlay == null) return;
+    var overlay = Overlay.maybeOf(context, rootOverlay: true);
+    overlay ??= Navigator.maybeOf(context)?.overlay;
+    if (overlay == null) {
+      _shareFailed(context, 'no Overlay (root or Navigator)');
+      return;
+    }
 
     final arabic = QuranArabicDisplay.forCard(displayArabic);
-    if (arabic.isEmpty) return;
+    if (arabic.isEmpty) {
+      _shareFailed(context, 'empty Arabic after forCard');
+      return;
+    }
 
     final key = GlobalKey();
     late OverlayEntry entry;
@@ -71,10 +100,20 @@ class VerseShareController {
 
     try {
       final ro = key.currentContext?.findRenderObject();
-      if (ro is! RenderRepaintBoundary) return;
+      if (ro is! RenderRepaintBoundary) {
+        if (context.mounted) {
+          _shareFailed(context, 'render object is not RenderRepaintBoundary');
+        }
+        return;
+      }
       final image = await ro.toImage(pixelRatio: _pixelRatio);
       final bd = await image.toByteData(format: ImageByteFormat.png);
-      if (bd == null) return;
+      if (bd == null) {
+        if (context.mounted) {
+          _shareFailed(context, 'toByteData returned null');
+        }
+        return;
+      }
 
       final bytes = bd.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
@@ -88,16 +127,33 @@ class VerseShareController {
       final text =
           '${surah.englishName} · ${surah.number}:${ayah.numberInSurah}\n${l10n.appTitle}\nhttps://hafizpro.com';
 
-      await Share.shareXFiles(
-        [
-          XFile(
-            file.path,
-            mimeType: 'image/png',
-            name: 'hafiz_pro_verse.png',
-          ),
-        ],
-        text: text,
-      );
+      try {
+        await Share.shareXFiles(
+          [
+            XFile(
+              file.path,
+              mimeType: 'image/png',
+              name: 'hafiz_pro_verse.png',
+            ),
+          ],
+          text: text,
+          sharePositionOrigin: buildSharePositionOrigin(context),
+        );
+      } catch (e, st) {
+        if (kDebugMode) {
+          debugPrint('VerseShareController: Share.shareXFiles failed: $e\n$st');
+        }
+        if (context.mounted) {
+          _shareFailed(context, 'Share.shareXFiles failed: $e\n$st');
+        }
+      }
+    } catch (e, st) {
+      if (kDebugMode) {
+        debugPrint('VerseShareController: capture/write failed: $e\n$st');
+      }
+      if (context.mounted) {
+        _shareFailed(context, 'capture/write failed: $e\n$st');
+      }
     } finally {
       entry.remove();
     }

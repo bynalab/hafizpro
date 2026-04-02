@@ -12,6 +12,10 @@
   "@verseShareWebUnsupported": {
     "description": "Shown when the user tries to share a verse image on web."
   },
+  "verseShareFailed": "Couldn’t share this verse. Please try again.",
+  "@verseShareFailed": {
+    "description": "Shown when verse image sharing fails (overlay, render, file, or system share sheet)."
+  },
   "hello": "Hello",
   "@hello": {
     "description": "Short greeting shown in the app."

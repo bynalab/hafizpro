@@ -287,6 +287,9 @@ class _TestPage extends State<TestScreen> {
   double speed = 1;
   void updatePlaybackRate() {
     speed = (speed == 2.5) ? 0.5 : speed + 0.5;
+    unawaited(
+      audioServices.setSpeed(speed, audioName: currentAudioName),
+    );
 
     setState(() {});
   }
