@@ -521,6 +521,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                               ),
                               playingIndexNotifier: _playingIndexNotifier,
                               isPlayingNotifier: _isPlayingNotifier,
+                              audioCenter: _audioCenter,
+                              loadingMatchJuzNumber: widget.juz.number,
                               prefs: prefs,
                               backgroundColor: isDark
                                   ? (isEven

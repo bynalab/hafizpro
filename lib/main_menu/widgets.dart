@@ -506,36 +506,41 @@ class SurahCard extends StatelessWidget {
                 ),
               )
             else if (showPlayButton)
-              GestureDetector(
-                onTap: isLoading ? null : (onPlay ?? onTap),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: DashboardPalette.primaryText(context),
-                      width: 1.4,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: isLoading ? null : (onPlay ?? onTap),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: DashboardPalette.primaryText(context),
+                          width: 1.4,
+                        ),
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  DashboardPalette.primaryText(context),
+                                ),
+                              ),
+                            )
+                          : Icon(
+                              isPlaying
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              color: DashboardPalette.primaryText(context),
+                            ),
                     ),
                   ),
-                  child: isLoading
-                      ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              DashboardPalette.primaryText(context),
-                            ),
-                          ),
-                        )
-                      : Icon(
-                          isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          color: DashboardPalette.primaryText(context),
-                        ),
-                ),
+                ],
               ),
           ],
         ),

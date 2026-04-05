@@ -5,6 +5,8 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/quran/focus_read/quran_mushaf_placeholder_panel.dart';
+import 'package:hafiz_test/quran/focus_read/quran_verse_focus_panel.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
@@ -14,6 +16,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
@@ -43,9 +46,64 @@ class _QuranViewState extends State<QuranView> {
   int? _resumeAyah;
   String _trackingMode = 'smart';
 
+  PageController? _focusPageController;
+  int _focusPageIndex = 0;
+
+  void _disposeFocusController() {
+    _focusPageController?.dispose();
+    _focusPageController = null;
+  }
+
+  void _ensureFocusController(int initialPage) {
+    final surahVm = viewModel.surah;
+    if (surahVm == null) return;
+    final max = surahVm.ayahs.length - 1;
+    final p = initialPage.clamp(0, max);
+    _focusPageController?.dispose();
+    _focusPageController = PageController(initialPage: p);
+    _focusPageIndex = p;
+  }
+
+  void _syncReaderModeWithView() {
+    final prefs = ReadingPreferences.fromStorage(_storage);
+    if (prefs.readerViewMode != QuranReaderViewMode.verseFocus) {
+      _disposeFocusController();
+      return;
+    }
+    if (viewModel.surah == null) return;
+    final idx = viewModel.playingIndexNotifier.value ?? _focusPageIndex;
+    _ensureFocusController(idx);
+  }
+
   void _onPlayingIndexChanged() {
     final idx = viewModel.playingIndexNotifier.value;
     if (idx == null) return;
+
+    final mode = ReadingPreferences.fromStorage(_storage).readerViewMode;
+    if (mode == QuranReaderViewMode.verseFocus) {
+      final surahVm = viewModel.surah;
+      if (surahVm == null) return;
+      final max = surahVm.ayahs.length - 1;
+      final p = idx.clamp(0, max);
+      void animate() {
+        final c = _focusPageController;
+        if (c != null && c.hasClients) {
+          c.animateToPage(
+            p,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      }
+
+      animate();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        animate();
+      });
+      setState(() => _focusPageIndex = p);
+      return;
+    }
 
     _scrollWithRetry(idx, animated: true);
   }
@@ -87,13 +145,23 @@ class _QuranViewState extends State<QuranView> {
           _resumeAyah = _storage.getSurahGap(widget.surah.number);
         }
 
-        setState(() {});
         if (widget.initialAyahNumber != null) {
           final targetIdx = widget.initialAyahNumber! - 1;
           viewModel.playingIndexNotifier.value = targetIdx;
-          _scrollWithRetry(targetIdx, animated: false);
-        } else {
-          _onPlayingIndexChanged();
+        }
+
+        _syncReaderModeWithView();
+        setState(() {});
+
+        final layoutMode =
+            ReadingPreferences.fromStorage(_storage).readerViewMode;
+        if (layoutMode == QuranReaderViewMode.normal) {
+          if (widget.initialAyahNumber != null) {
+            final targetIdx = widget.initialAyahNumber! - 1;
+            _scrollWithRetry(targetIdx, animated: false);
+          } else {
+            _onPlayingIndexChanged();
+          }
         }
 
         final reciterId = _storage.getReciterId();
@@ -251,6 +319,7 @@ class _QuranViewState extends State<QuranView> {
 
   @override
   void dispose() {
+    _disposeFocusController();
     _progressController?.dispose();
     viewModel.playingIndexNotifier.removeListener(_onPlayingIndexChanged);
     viewModel.audioCenter.removeListener(_onAudioCenterChanged);
@@ -299,7 +368,23 @@ class _QuranViewState extends State<QuranView> {
     final toAyah = ayahIndex + 1;
 
     viewModel.playingIndexNotifier.value = ayahIndex;
-    _scrollWithRetry(ayahIndex, animated: true);
+
+    final mode = ReadingPreferences.fromStorage(_storage).readerViewMode;
+    if (mode == QuranReaderViewMode.verseFocus) {
+      final max = surahVm.ayahs.length - 1;
+      final p = ayahIndex.clamp(0, max);
+      final c = _focusPageController;
+      if (c != null && c.hasClients) {
+        c.animateToPage(
+          p,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+        );
+      }
+      setState(() => _focusPageIndex = p);
+    } else {
+      _scrollWithRetry(ayahIndex, animated: true);
+    }
 
     AnalyticsService.trackEvent('Reading Navigation', properties: {
       'action': 'jump',
@@ -319,6 +404,8 @@ class _QuranViewState extends State<QuranView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final readerPrefs = ReadingPreferences.fromStorage(_storage);
+    final readerViewMode = readerPrefs.readerViewMode;
 
     if (viewModel.isLoading) {
       return Scaffold(
@@ -485,7 +572,22 @@ class _QuranViewState extends State<QuranView> {
                               );
                               return;
                             }
+                            _syncReaderModeWithView();
                             setState(() {});
+                            final layout = ReadingPreferences.fromStorage(
+                              _storage,
+                            ).readerViewMode;
+                            if (layout == QuranReaderViewMode.normal) {
+                              WidgetsBinding.instance
+                                  .addPostFrameCallback((_) {
+                                if (!mounted) return;
+                                final i =
+                                    viewModel.playingIndexNotifier.value;
+                                if (i != null) {
+                                  _scrollWithRetry(i, animated: false);
+                                }
+                              });
+                            }
                           }
                         },
                       ),
@@ -503,55 +605,103 @@ class _QuranViewState extends State<QuranView> {
                       Expanded(
                         child: viewModel.surah == null
                             ? const SizedBox.shrink()
-                            : ListenableBuilder(
-                                listenable: viewModel.audioCenter,
-                                builder: (context, _) {
-                                  final state = viewModel.audioCenter.uiState;
-                                  double bottomPadding = 20;
-                                  if (state == AudioPlayerUiState.collapsed) {
-                                    bottomPadding = 72;
-                                  } else if (state ==
-                                      AudioPlayerUiState.expanded) {
-                                    bottomPadding = 200;
-                                  }
+                            : readerViewMode == QuranReaderViewMode.mushaf
+                                ? QuranMushafPlaceholderPanel(isDark: isDark)
+                                : ListenableBuilder(
+                                    listenable: viewModel.audioCenter,
+                                    builder: (context, _) {
+                                      final state =
+                                          viewModel.audioCenter.uiState;
+                                      double bottomPadding = 20;
+                                      if (state ==
+                                          AudioPlayerUiState.collapsed) {
+                                        bottomPadding = 72;
+                                      } else if (state ==
+                                          AudioPlayerUiState.expanded) {
+                                        bottomPadding = 200;
+                                      }
 
-                                  return QuranAyahList(
-                                    surah: viewModel.surah!,
-                                    showBismillah:
-                                        viewModel.shouldShowBismillah(
-                                      viewModel.surah?.number,
-                                    ),
-                                    playingIndexNotifier:
-                                        viewModel.playingIndexNotifier,
-                                    isPlayingNotifier:
-                                        viewModel.isPlayingNotifier,
-                                    scrollController:
-                                        viewModel.itemScrollController,
-                                    itemPositionsListener:
-                                        viewModel.itemPositionsListener,
-                                    onControlPressed:
-                                        viewModel.onAyahControlPressed,
-                                    onBookmarkUpdated: () => setState(() {}),
-                                    readingProgressController:
-                                        _progressController,
-                                    bottomPadding: bottomPadding,
-                                    onPreviousSurah: widget.surah.number > 1
-                                        ? () {
-                                            _openAdjacentSurah(
-                                              widget.surah.number - 1,
-                                            );
-                                          }
-                                        : null,
-                                    onNextSurah: widget.surah.number < 114
-                                        ? () {
-                                            _openAdjacentSurah(
-                                              widget.surah.number + 1,
-                                            );
-                                          }
-                                        : null,
-                                  );
-                                },
-                              ),
+                                      if (readerViewMode ==
+                                          QuranReaderViewMode.verseFocus) {
+                                        if (_focusPageController == null) {
+                                          return const Center(
+                                            child: SizedBox(
+                                              width: 28,
+                                              height: 28,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return QuranVerseFocusPanel(
+                                          surah: viewModel.surah!,
+                                          pageController:
+                                              _focusPageController!,
+                                          prefs: readerPrefs,
+                                          onPageChanged: (i) => setState(
+                                            () => _focusPageIndex = i,
+                                          ),
+                                          onControlPressed:
+                                              viewModel.onAyahControlPressed,
+                                          playingIndexNotifier:
+                                              viewModel.playingIndexNotifier,
+                                          isPlayingNotifier:
+                                              viewModel.isPlayingNotifier,
+                                          audioCenter: viewModel.audioCenter,
+                                          dark: isDark,
+                                          bottomPadding: bottomPadding,
+                                          showBismillah:
+                                              viewModel.shouldShowBismillah(
+                                            viewModel.surah?.number,
+                                          ),
+                                          readingProgressController:
+                                              _progressController,
+                                          onBookmarkUpdated: () =>
+                                              setState(() {}),
+                                        );
+                                      }
+
+                                      return QuranAyahList(
+                                        surah: viewModel.surah!,
+                                        showBismillah:
+                                            viewModel.shouldShowBismillah(
+                                          viewModel.surah?.number,
+                                        ),
+                                        playingIndexNotifier:
+                                            viewModel.playingIndexNotifier,
+                                        isPlayingNotifier:
+                                            viewModel.isPlayingNotifier,
+                                        audioCenter: viewModel.audioCenter,
+                                        scrollController:
+                                            viewModel.itemScrollController,
+                                        itemPositionsListener: viewModel
+                                            .itemPositionsListener,
+                                        onControlPressed:
+                                            viewModel.onAyahControlPressed,
+                                        onBookmarkUpdated: () =>
+                                            setState(() {}),
+                                        readingProgressController:
+                                            _progressController,
+                                        bottomPadding: bottomPadding,
+                                        onPreviousSurah:
+                                            widget.surah.number > 1
+                                                ? () {
+                                                    _openAdjacentSurah(
+                                                      widget.surah.number - 1,
+                                                    );
+                                                  }
+                                                : null,
+                                        onNextSurah: widget.surah.number < 114
+                                            ? () {
+                                                _openAdjacentSurah(
+                                                  widget.surah.number + 1,
+                                                );
+                                              }
+                                            : null,
+                                      );
+                                    },
+                                  ),
                       ),
                     ],
                   ),
@@ -629,7 +779,17 @@ class _QuranViewState extends State<QuranView> {
           TextButton(
             onPressed: () {
               final targetIdx = _resumeAyah! - 1;
-              _scrollWithRetry(targetIdx, animated: true);
+              viewModel.playingIndexNotifier.value = targetIdx;
+              final mode =
+                  ReadingPreferences.fromStorage(_storage).readerViewMode;
+              if (mode == QuranReaderViewMode.verseFocus) {
+                final max = widget.surah.ayahs.length - 1;
+                final p = targetIdx.clamp(0, max);
+                _focusPageController?.jumpToPage(p);
+                setState(() => _focusPageIndex = p);
+              } else if (mode == QuranReaderViewMode.normal) {
+                _scrollWithRetry(targetIdx, animated: true);
+              }
               _storage.setSurahGap(widget.surah.number, null);
               setState(() => _resumeAyah = null);
             },

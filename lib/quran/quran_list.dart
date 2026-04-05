@@ -6,6 +6,7 @@ import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:hafiz_test/util/app_colors.dart';
@@ -31,13 +32,15 @@ class QuranAyahList extends StatelessWidget {
   final double bottomPadding;
   final VoidCallback? onPreviousSurah;
   final VoidCallback? onNextSurah;
+  final AudioCenter audioCenter;
 
-  const QuranAyahList({
+  QuranAyahList({
     super.key,
     required this.surah,
     required this.showBismillah,
     required this.playingIndexNotifier,
     required this.isPlayingNotifier,
+    required this.audioCenter,
     required this.scrollController,
     required this.itemPositionsListener,
     required this.onControlPressed,
@@ -124,6 +127,8 @@ class QuranAyahList extends StatelessWidget {
               ayah: ayah.copyWith(text: displayText),
               playingIndexNotifier: playingIndexNotifier,
               isPlayingNotifier: isPlayingNotifier,
+              audioCenter: audioCenter,
+              loadingMatchSurahNumber: surah.number,
               prefs: prefs,
               isCompleted: isCompleted,
               backgroundColor: isDark

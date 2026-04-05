@@ -300,6 +300,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   return SurahCard(
                     surah: surah,
                     onTap: () {
+                      // TODO: If search query is surah:verse (see surahVerseQueryPattern),
+                      // pass initialAyahNumber into QuranView after range check.
                       AnalyticsService.trackSurahSelected(
                         surah.englishName,
                         surah.number,
