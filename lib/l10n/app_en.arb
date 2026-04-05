@@ -813,6 +813,10 @@
       }
     }
   },
+  "ayahFinderOpenInReader": "Open in reader",
+  "@ayahFinderOpenInReader": {
+    "description": "Opens the Quran reader at the matched surah and ayah from Ayah Finder."
+  },
   "progressTrackingTitle": "Reading Progress Tracking",
   "@progressTrackingTitle": {
     "description": "Title for progress tracking mode sheet and settings tile."

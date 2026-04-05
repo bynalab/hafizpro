@@ -263,6 +263,7 @@
       }
     }
   },
+  "ayahFinderOpenInReader": "Im Leser öffnen",
   "progressTrackingTitle": "Lesefortschritt verfolgen",
   "progressTrackingSmartTitle": "Smart",
   "progressTrackingSmartDescription": "Aktualisiert Ihren Fortschritt automatisch nach Ihrer Leseaktivität.",

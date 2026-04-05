@@ -263,6 +263,7 @@
       }
     }
   },
+  "ayahFinderOpenInReader": "Открыть в читалке",
   "progressTrackingTitle": "Отслеживание прогресса чтения",
   "progressTrackingSmartTitle": "Умный",
   "progressTrackingSmartDescription": "Прогресс обновляется автоматически по вашей активности.",

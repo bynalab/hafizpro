@@ -263,6 +263,7 @@
       }
     }
   },
+  "ayahFinderOpenInReader": "فتح في القارئ",
   "progressTrackingTitle": "تتبع تقدم القراءة",
   "progressTrackingSmartTitle": "ذكي",
   "progressTrackingSmartDescription": "يحدّث تقدمك تلقائيًا حسب نشاط القراءة.",

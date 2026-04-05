@@ -116,194 +116,194 @@ class AyahCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: chipBorderColor),
-                      ),
-                      child: Text(
-                        '${ayah.numberInSurah}',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: textColor,
-                        ),
+              Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: chipBorderColor),
+                    ),
+                    child: Text(
+                      '${ayah.numberInSurah}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: textColor,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    if (prefs.trackingMode != 'off') ...[
-                      GestureDetector(
-                        onTap: () => onMarkAsRead?.call(index),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isCompleted
-                                ? const Color(0xFF78B7C6).withValues(alpha: 0.2)
-                                : null,
-                            border: Border.all(
-                              color: isCompleted
-                                  ? const Color(0xFF78B7C6)
-                                  : chipBorderColor,
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              isCompleted ? Icons.check : Icons.done_all,
-                              size: 18,
-                              color: isCompleted
-                                  ? const Color(0xFF78B7C6)
-                                  : textColor.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  if (prefs.trackingMode != 'off') ...[
                     GestureDetector(
-                      onTap: () => onBookmark?.call(index),
+                      onTap: () => onMarkAsRead?.call(index),
                       child: Container(
                         width: 34,
                         height: 34,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isBookmarked
+                          color: isCompleted
                               ? const Color(0xFF78B7C6).withValues(alpha: 0.2)
                               : null,
                           border: Border.all(
-                            color: isBookmarked
+                            color: isCompleted
                                 ? const Color(0xFF78B7C6)
                                 : chipBorderColor,
                           ),
                         ),
                         child: Center(
                           child: Icon(
-                            isBookmarked
-                                ? Icons.bookmark_rounded
-                                : Icons.bookmark_outline_rounded,
+                            isCompleted ? Icons.check : Icons.done_all,
                             size: 18,
-                            color: isBookmarked
+                            color: isCompleted
                                 ? const Color(0xFF78B7C6)
                                 : textColor.withValues(alpha: 0.5),
                           ),
                         ),
                       ),
                     ),
-                    if (onShare != null) ...[
-                      const SizedBox(width: 8),
-                      Builder(
-                        builder: (context) {
-                          Widget btn = GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: onShare,
-                            child: Container(
-                              width: 34,
-                              height: 34,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: chipBorderColor),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.share_rounded,
-                                  size: 18,
-                                  color: textColor.withValues(alpha: 0.65),
-                                ),
-                              ),
-                            ),
-                          );
-                          final tip = verseShareTooltip;
-                          if (tip != null && tip.isNotEmpty) {
-                            btn = Tooltip(message: tip, child: btn);
-                          }
-                          return btn;
-                        },
-                      ),
-                    ],
-                    const Spacer(),
-                    if (showPlayButton)
-                      GestureDetector(
-                        onTap: isPlayLoading
-                            ? null
-                            : () => onPlayPressed?.call(index),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: chipBorderColor),
-                          ),
-                          child: Center(
-                            child: isPlayLoading
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: textColor.withValues(
-                                        alpha: 0.85,
-                                      ),
-                                    ),
-                                  )
-                                : Icon(
-                                    isActive
-                                        ? Icons.pause
-                                        : Icons.play_arrow_rounded,
-                                    size: 20,
-                                    color: textColor,
-                                  ),
-                          ),
+                    const SizedBox(width: 8),
+                  ],
+                  GestureDetector(
+                    onTap: () => onBookmark?.call(index),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isBookmarked
+                            ? const Color(0xFF78B7C6).withValues(alpha: 0.2)
+                            : null,
+                        border: Border.all(
+                          color: isBookmarked
+                              ? const Color(0xFF78B7C6)
+                              : chipBorderColor,
                         ),
                       ),
+                      child: Center(
+                        child: Icon(
+                          isBookmarked
+                              ? Icons.bookmark_rounded
+                              : Icons.bookmark_outline_rounded,
+                          size: 18,
+                          color: isBookmarked
+                              ? const Color(0xFF78B7C6)
+                              : textColor.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (onShare != null) ...[
+                    const SizedBox(width: 8),
+                    Builder(
+                      builder: (context) {
+                        Widget btn = GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onShare,
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: chipBorderColor),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.share_rounded,
+                                size: 18,
+                                color: textColor.withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ),
+                        );
+                        final tip = verseShareTooltip;
+                        if (tip != null && tip.isNotEmpty) {
+                          btn = Tooltip(message: tip, child: btn);
+                        }
+                        return btn;
+                      },
+                    ),
                   ],
+                  const Spacer(),
+                  if (showPlayButton)
+                    GestureDetector(
+                      onTap: isPlayLoading
+                          ? null
+                          : () => onPlayPressed?.call(index),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: chipBorderColor),
+                        ),
+                        child: Center(
+                          child: isPlayLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: textColor.withValues(
+                                      alpha: 0.85,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  isActive
+                                      ? Icons.pause
+                                      : Icons.play_arrow_rounded,
+                                  size: 20,
+                                  color: textColor,
+                                ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Align(
+                alignment: Alignment.centerRight,
+                child: SelectableText(
+                  '${QuranArabicDisplay.forCard(ayah.text)} ${QuranArabicDisplay.ayahNumberOrnament(ayah.numberInSurah)}',
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
+                  style: _getArabicStyle(),
                 ),
+              ),
+              if (prefs.showTransliteration &&
+                  (ayah.transliteration ?? '').trim().isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.centerLeft,
                   child: SelectableText(
-                    '${QuranArabicDisplay.forCard(ayah.text)} ${QuranArabicDisplay.ayahNumberOrnament(ayah.numberInSurah)}',
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
-                    style: _getArabicStyle(),
+                    ayah.transliteration!.trim(),
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.inter(
+                      fontSize: bodyFont,
+                      color: textColor,
+                    ),
                   ),
                 ),
-                if (prefs.showTransliteration &&
-                    (ayah.transliteration ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: SelectableText(
-                      ayah.transliteration!.trim(),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: bodyFont,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-                if (prefs.showTranslation &&
-                    (ayah.translation ?? '').trim().isNotEmpty) ...[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: SelectableText(
-                      ayah.translation!.trim(),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.inter(
-                        fontSize: bodyFont,
-                        color: textColor,
-                      ),
-                    ),
-                  ),
-                ],
+                const SizedBox(height: 10),
               ],
-            ),
+              if (prefs.showTranslation &&
+                  (ayah.translation ?? '').trim().isNotEmpty) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SelectableText(
+                    ayah.translation!.trim(),
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.inter(
+                      fontSize: bodyFont,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         );
 
         if (focusMode) return inner;
