@@ -547,6 +547,10 @@
   "@searchBySurahHint": {
     "description": "Search hint when filtering by surah."
   },
+  "searchBySurahOrVerseHint": "Search surah, 2, or 2:255",
+  "@searchBySurahOrVerseHint": {
+    "description": "Surah tab search hint: name filter or surah:verse (e.g. 2:255)."
+  },
   "searchByJuzHint": "Search by Juz",
   "@searchByJuzHint": {
     "description": "Search hint when filtering by juz."

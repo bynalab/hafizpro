@@ -162,6 +162,7 @@
   "segmentSurah": "سورة",
   "segmentJuz": "جزء",
   "searchBySurahHint": "ابحث بالسورة",
+  "searchBySurahOrVerseHint": "ابحث بسورة أو 2 أو 2:255",
   "searchByJuzHint": "ابحث بالجزء",
   "dashboardChallengeTitle": "تحدَّ نفسك",
   "dashboardChallengeDescription": "استمع إلى آية من\nالقرآن وخمّن\nالآية التالية.",

@@ -162,6 +162,7 @@
   "segmentSurah": "Сура",
   "segmentJuz": "Джуз",
   "searchBySurahHint": "Поиск по суре",
+  "searchBySurahOrVerseHint": "Сура, 2 или 2:255",
   "searchByJuzHint": "Поиск по джузу",
   "dashboardChallengeTitle": "Бросьте себе вызов",
   "dashboardChallengeDescription": "Послушайте аят\nКорана и угадайте\nследующий.",

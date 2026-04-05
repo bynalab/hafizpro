@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:hafiz_test/data/juz_list.dart';
+import 'package:hafiz_test/data/surah_dashboard_search.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/surah.model.dart';
@@ -63,7 +64,9 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
     const bottomNavReserved =
         pillOuterBottomPadding + pillHeight + (pillVerticalPadding * 2);
 
-    final displaySurahs = _isSearching ? searchSurah(widget.query) : surahList;
+    final surahSearch = resolveSurahDashboardSearch(widget.query);
+    final displaySurahs =
+        widget.segmentIndex == 0 ? surahSearch.surahs : surahList;
     final displayJuz = _isSearching ? searchJuz(widget.query) : juzList;
 
     final storage = getIt<IStorageService>();
@@ -123,7 +126,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                   SearchField(
                     controller: widget.searchController,
                     hintText: widget.segmentIndex == 0
-                        ? context.l10n.searchBySurahHint
+                        ? context.l10n.searchBySurahOrVerseHint
                         : context.l10n.searchByJuzHint,
                   ),
                   const SizedBox(height: 10),
@@ -309,7 +312,11 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                         context,
                         MaterialPageRoute(
                           builder: (_) {
-                            return QuranView(surah: surah);
+                            return QuranView(
+                              surah: surah,
+                              initialAyahNumber:
+                                  surahSearch.initialAyahNumber,
+                            );
                           },
                         ),
                       );

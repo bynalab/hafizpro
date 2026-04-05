@@ -162,6 +162,7 @@
   "segmentSurah": "Sure",
   "segmentJuz": "Dschuz",
   "searchBySurahHint": "Nach Sure suchen",
+  "searchBySurahOrVerseHint": "Sure, 2 oder 2:255",
   "searchByJuzHint": "Nach Dschuz suchen",
   "dashboardChallengeTitle": "Fordern Sie sich heraus",
   "dashboardChallengeDescription": "Hören Sie einen Vers\ndes Quran und erraten\nSie den nächsten.",
