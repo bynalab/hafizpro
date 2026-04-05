@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
@@ -11,6 +12,7 @@ import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/quran/widgets/quran_adjacent_reader_nav_bar.dart';
 import 'package:hafiz_test/quran/widgets/quran_settings_button.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/audio_center.dart';
@@ -525,6 +527,15 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     await _audioCenter.toggleJuz(widget.juz, startIndex: globalIndex);
   }
 
+  void _openAdjacentJuz(int juzNumber) {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => JuzQuranView(juz: findJuzByNumber(juzNumber)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -679,6 +690,14 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                     final reciter = TarteelAudio.reciterForId(reciterId);
                     final showPlayButton = reciter?.isVerseByVerse ?? true;
 
+                    final juzPrev = widget.juz.number > 1
+                        ? () => _openAdjacentJuz(widget.juz.number - 1)
+                        : null;
+                    final juzNext = widget.juz.number < juzList.length
+                        ? () => _openAdjacentJuz(widget.juz.number + 1)
+                        : null;
+                    final l10n = context.l10n;
+
                     if (readerViewMode == QuranReaderViewMode.mushaf) {
                       if (_mushafPageController == null) {
                         return const Center(
@@ -710,6 +729,13 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                           state,
                         ),
                         showSurahBoundaries: true,
+                        onPreviousNav: juzPrev,
+                        previousNavLabel: juzPrev != null
+                            ? l10n.quranReadPreviousJuz
+                            : null,
+                        onNextNav: juzNext,
+                        nextNavLabel:
+                            juzNext != null ? l10n.quranReadNextJuz : null,
                       );
                     }
 
@@ -739,6 +765,13 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                         loadingMatchJuzNumber: widget.juz.number,
                         bookmarkViewContext: BookmarkViewContext.juz,
                         juzNumber: widget.juz.number,
+                        onPreviousNav: juzPrev,
+                        previousNavLabel: juzPrev != null
+                            ? l10n.quranReadPreviousJuz
+                            : null,
+                        onNextNav: juzNext,
+                        nextNavLabel:
+                            juzNext != null ? l10n.quranReadNextJuz : null,
                       );
                     }
 
@@ -749,10 +782,23 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                             : 0,
                         bottom: bottomPadding,
                       ),
-                      itemCount: _entries.length,
+                      itemCount: _entries.length + 1,
                       itemScrollController: _itemScrollController,
                       itemPositionsListener: _itemPositionsListener,
                       itemBuilder: (context, index) {
+                        if (index == _entries.length) {
+                          return QuranAdjacentReaderNavBar(
+                            onPrevious: juzPrev,
+                            previousLabel: juzPrev != null
+                                ? l10n.quranReadPreviousJuz
+                                : null,
+                            onNext: juzNext,
+                            nextLabel: juzNext != null
+                                ? l10n.quranReadNextJuz
+                                : null,
+                          );
+                        }
+
                         final entry = _entries[index];
 
                         switch (entry.type) {

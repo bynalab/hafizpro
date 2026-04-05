@@ -163,6 +163,8 @@
   "segmentJuz": "جزء",
   "searchBySurahHint": "ابحث بالسورة",
   "searchBySurahOrVerseHint": "ابحث بسورة أو 2 أو 2:255",
+  "quranReadPreviousJuz": "الجزء السابق",
+  "quranReadNextJuz": "الجزء التالي",
   "searchByJuzHint": "ابحث بالجزء",
   "dashboardChallengeTitle": "تحدَّ نفسك",
   "dashboardChallengeDescription": "استمع إلى آية من\nالقرآن وخمّن\nالآية التالية.",

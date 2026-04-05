@@ -6,6 +6,7 @@ import 'package:hafiz_test/quran/focus_read/verse_focus_item.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/quran/widgets/quran_adjacent_reader_nav_bar.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/app_colors.dart';
@@ -37,6 +38,10 @@ class QuranVerseFocusPanel extends StatelessWidget {
     this.loadingMatchJuzNumber,
     this.bookmarkViewContext = BookmarkViewContext.surah,
     this.juzNumber,
+    this.onPreviousNav,
+    this.onNextNav,
+    this.previousNavLabel,
+    this.nextNavLabel,
   });
 
   final List<VerseFocusItem> items;
@@ -55,6 +60,11 @@ class QuranVerseFocusPanel extends StatelessWidget {
   final int? loadingMatchJuzNumber;
   final BookmarkViewContext bookmarkViewContext;
   final int? juzNumber;
+
+  final VoidCallback? onPreviousNav;
+  final VoidCallback? onNextNav;
+  final String? previousNavLabel;
+  final String? nextNavLabel;
 
   void _onPageChanged(int i) {
     HapticFeedback.selectionClick();
@@ -105,6 +115,12 @@ class QuranVerseFocusPanel extends StatelessWidget {
                   },
                 ),
               ),
+            ),
+            QuranAdjacentReaderNavBar(
+              onPrevious: onPreviousNav,
+              previousLabel: previousNavLabel,
+              onNext: onNextNav,
+              nextLabel: nextNavLabel,
             ),
             if (bottomPadding > 0) SizedBox(height: bottomPadding),
           ],

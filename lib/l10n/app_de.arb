@@ -230,6 +230,8 @@
   "deleteBookmarkMessage": "Dieses Lesezeichen wirklich löschen?",
   "quranReadPreviousSurah": "Vorherige Sure",
   "quranReadNextSurah": "Nächste Sure",
+  "quranReadPreviousJuz": "Vorheriger Dschuz",
+  "quranReadNextJuz": "Nächster Dschuz",
   "commonCancel": "Abbrechen",
   "undo": "Rückgängig",
   "markReadSuccessTitle": "Erfolg",

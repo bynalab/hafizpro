@@ -727,6 +727,14 @@
   "@quranReadNextSurah": {
     "description": "Navigate to the next surah in the reader."
   },
+  "quranReadPreviousJuz": "Previous Juz",
+  "@quranReadPreviousJuz": {
+    "description": "Navigate to the previous juz in the reader."
+  },
+  "quranReadNextJuz": "Next Juz",
+  "@quranReadNextJuz": {
+    "description": "Navigate to the next juz in the reader."
+  },
   "commonCancel": "Cancel",
   "@commonCancel": {
     "description": "Cancel button in dialogs."

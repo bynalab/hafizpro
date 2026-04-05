@@ -6,6 +6,7 @@ import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
+import 'package:hafiz_test/quran/widgets/quran_adjacent_reader_nav_bar.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -75,9 +76,18 @@ class QuranAyahList extends StatelessWidget {
         itemPositionsListener: itemPositionsListener,
         itemBuilder: (_, index) {
           if (index == _footerListIndex) {
-            return _SurahEndNavFooter(
-              onPreviousSurah: onPreviousSurah,
-              onNextSurah: onNextSurah,
+            return KeyedSubtree(
+              key: const ValueKey('surah_end_nav'),
+              child: QuranAdjacentReaderNavBar(
+                onPrevious: onPreviousSurah,
+                previousLabel: onPreviousSurah != null
+                    ? context.l10n.quranReadPreviousSurah
+                    : null,
+                onNext: onNextSurah,
+                nextLabel: onNextSurah != null
+                    ? context.l10n.quranReadNextSurah
+                    : null,
+              ),
             );
           }
 
@@ -166,96 +176,6 @@ class QuranAyahList extends StatelessWidget {
           );
         },
         separatorBuilder: (_, __) => const SizedBox(height: 2),
-      ),
-    );
-  }
-}
-
-class _SurahEndNavFooter extends StatelessWidget {
-  const _SurahEndNavFooter({
-    required this.onPreviousSurah,
-    required this.onNextSurah,
-  });
-
-  final VoidCallback? onPreviousSurah;
-  final VoidCallback? onNextSurah;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accent = isDark ? const Color(0xFF78B7C6) : const Color(0xFF1D353B);
-    final muted = isDark
-        ? Colors.white.withValues(alpha: 0.4)
-        : AppColors.black500.withValues(alpha: 0.45);
-
-    final prev = onPreviousSurah;
-    final next = onNextSurah;
-    if (prev == null && next == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      key: const ValueKey('surah_end_nav'),
-      padding: const EdgeInsets.fromLTRB(18, 20, 18, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Divider(
-              height: 1, thickness: 1, color: muted.withValues(alpha: 0.25)),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: prev != null
-                      ? TextButton(
-                          onPressed: prev,
-                          style: TextButton.styleFrom(
-                            foregroundColor: accent,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 8,
-                            ),
-                          ),
-                          child: Text(
-                            context.l10n.quranReadPreviousSurah,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: next != null
-                      ? TextButton(
-                          onPressed: next,
-                          style: TextButton.styleFrom(
-                            foregroundColor: accent,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 8,
-                            ),
-                          ),
-                          child: Text(
-                            context.l10n.quranReadNextSurah,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

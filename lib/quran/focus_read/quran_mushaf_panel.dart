@@ -7,6 +7,7 @@ import 'package:hafiz_test/quran/reading_progress_controller.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/bismillah.dart';
 import 'package:hafiz_test/util/quran_arabic_display.dart';
+import 'package:hafiz_test/quran/widgets/quran_adjacent_reader_nav_bar.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -25,6 +26,10 @@ class QuranMushafPanel extends StatelessWidget {
     required this.contentBottomInset,
     this.readingProgressController,
     this.showSurahBoundaries = false,
+    this.onPreviousNav,
+    this.onNextNav,
+    this.previousNavLabel,
+    this.nextNavLabel,
   });
 
   final List<MushafVerseLine> lines;
@@ -43,6 +48,11 @@ class QuranMushafPanel extends StatelessWidget {
   /// When true (e.g. Juz reader), inserts surah titles and basmallah at each
   /// surah boundary within the flat verse sequence.
   final bool showSurahBoundaries;
+
+  final VoidCallback? onPreviousNav;
+  final VoidCallback? onNextNav;
+  final String? previousNavLabel;
+  final String? nextNavLabel;
 
   void _onSliceChanged(int i) {
     HapticFeedback.selectionClick();
@@ -81,7 +91,6 @@ class QuranMushafPanel extends StatelessWidget {
                         dark: dark,
                         playingIndexNotifier: playingIndexNotifier,
                         readingProgressController: readingProgressController,
-                        contentBottomInset: contentBottomInset,
                         showSurahBoundaries: showSurahBoundaries,
                       ),
                     );
@@ -89,6 +98,13 @@ class QuranMushafPanel extends StatelessWidget {
                 ),
               ),
             ),
+            QuranAdjacentReaderNavBar(
+              onPrevious: onPreviousNav,
+              previousLabel: previousNavLabel,
+              onNext: onNextNav,
+              nextLabel: nextNavLabel,
+            ),
+            SizedBox(height: contentBottomInset),
           ],
         ),
       ],
@@ -274,7 +290,6 @@ class _MushafSlicePage extends StatelessWidget {
     required this.dark,
     required this.playingIndexNotifier,
     required this.readingProgressController,
-    required this.contentBottomInset,
     required this.showSurahBoundaries,
   });
 
@@ -284,7 +299,6 @@ class _MushafSlicePage extends StatelessWidget {
   final bool dark;
   final ValueNotifier<int?> playingIndexNotifier;
   final ReadingProgressController? readingProgressController;
-  final double contentBottomInset;
   final bool showSurahBoundaries;
 
   bool _lineStartsSurahBlock(int lineIndex) {
@@ -442,7 +456,6 @@ class _MushafSlicePage extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(height: contentBottomInset),
             ],
           ),
         ),

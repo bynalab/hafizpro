@@ -707,10 +707,23 @@ class _QuranViewState extends State<QuranView> {
                                       if (state ==
                                           AudioPlayerUiState.collapsed) {
                                         bottomPadding = 72;
-                                      } else if (state ==
+                                      } else                                       if (state ==
                                           AudioPlayerUiState.expanded) {
                                         bottomPadding = 200;
                                       }
+
+                                      final onPrevSurah = widget.surah.number > 1
+                                          ? () => _openAdjacentSurah(
+                                                widget.surah.number - 1,
+                                              )
+                                          : null;
+                                      final onNextSurah =
+                                          widget.surah.number < 114
+                                              ? () => _openAdjacentSurah(
+                                                    widget.surah.number + 1,
+                                                  )
+                                              : null;
+                                      final l10n = context.l10n;
 
                                       if (readerViewMode ==
                                           QuranReaderViewMode.mushaf) {
@@ -759,6 +772,14 @@ class _QuranViewState extends State<QuranView> {
                                           ),
                                           readingProgressController:
                                               _progressController,
+                                          onPreviousNav: onPrevSurah,
+                                          previousNavLabel: onPrevSurah != null
+                                              ? l10n.quranReadPreviousSurah
+                                              : null,
+                                          onNextNav: onNextSurah,
+                                          nextNavLabel: onNextSurah != null
+                                              ? l10n.quranReadNextSurah
+                                              : null,
                                         );
                                       }
 
@@ -806,6 +827,14 @@ class _QuranViewState extends State<QuranView> {
                                           onBookmarkUpdated: () =>
                                               setState(() {}),
                                           loadingMatchSurahNumber: s.number,
+                                          onPreviousNav: onPrevSurah,
+                                          previousNavLabel: onPrevSurah != null
+                                              ? l10n.quranReadPreviousSurah
+                                              : null,
+                                          onNextNav: onNextSurah,
+                                          nextNavLabel: onNextSurah != null
+                                              ? l10n.quranReadNextSurah
+                                              : null,
                                         );
                                       }
 
@@ -831,21 +860,8 @@ class _QuranViewState extends State<QuranView> {
                                         readingProgressController:
                                             _progressController,
                                         bottomPadding: bottomPadding,
-                                        onPreviousSurah:
-                                            widget.surah.number > 1
-                                                ? () {
-                                                    _openAdjacentSurah(
-                                                      widget.surah.number - 1,
-                                                    );
-                                                  }
-                                                : null,
-                                        onNextSurah: widget.surah.number < 114
-                                            ? () {
-                                                _openAdjacentSurah(
-                                                  widget.surah.number + 1,
-                                                );
-                                              }
-                                            : null,
+                                        onPreviousSurah: onPrevSurah,
+                                        onNextSurah: onNextSurah,
                                       );
                                     },
                                   ),

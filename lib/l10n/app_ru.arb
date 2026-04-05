@@ -230,6 +230,8 @@
   "deleteBookmarkMessage": "Удалить эту закладку?",
   "quranReadPreviousSurah": "Предыдущая сура",
   "quranReadNextSurah": "Следующая сура",
+  "quranReadPreviousJuz": "Предыдущий джуз",
+  "quranReadNextJuz": "Следующий джуз",
   "commonCancel": "Отмена",
   "undo": "Отменить",
   "markReadSuccessTitle": "Готово",
