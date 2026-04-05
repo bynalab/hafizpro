@@ -99,13 +99,20 @@ class SearchField extends StatelessWidget {
         border: Border.all(color: DashboardPalette.searchBorder(context)),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.search, color: DashboardPalette.secondaryText(context)),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
-              style: TextStyle(color: DashboardPalette.primaryText(context)),
+              textAlignVertical: TextAlignVertical.center,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: DashboardPalette.primaryText(context),
+              ),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: GoogleFonts.inter(
@@ -114,6 +121,8 @@ class SearchField extends StatelessWidget {
                   color: DashboardPalette.secondaryText(context),
                 ),
                 border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ),
@@ -497,36 +506,41 @@ class SurahCard extends StatelessWidget {
                 ),
               )
             else if (showPlayButton)
-              GestureDetector(
-                onTap: isLoading ? null : (onPlay ?? onTap),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: DashboardPalette.primaryText(context),
-                      width: 1.4,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: isLoading ? null : (onPlay ?? onTap),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: DashboardPalette.primaryText(context),
+                          width: 1.4,
+                        ),
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  DashboardPalette.primaryText(context),
+                                ),
+                              ),
+                            )
+                          : Icon(
+                              isPlaying
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              color: DashboardPalette.primaryText(context),
+                            ),
                     ),
                   ),
-                  child: isLoading
-                      ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              DashboardPalette.primaryText(context),
-                            ),
-                          ),
-                        )
-                      : Icon(
-                          isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          color: DashboardPalette.primaryText(context),
-                        ),
-                ),
+                ],
               ),
           ],
         ),

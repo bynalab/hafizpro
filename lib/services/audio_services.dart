@@ -12,6 +12,8 @@ class AudioServices {
 
   final audioPlayer = AudioPlayer(userAgent: AppConstants.userAgent);
 
+  bool isPlaybackBlocked = false;
+
   Future<void> setAudioSource(AudioSource audioSource,
       {bool preload = true}) async {
     try {
@@ -53,6 +55,10 @@ class AudioServices {
   }
 
   Future<void> play({String? audioName}) async {
+    if (isPlaybackBlocked) {
+      debugPrint('[AudioServices] Playback BLOCKED');
+      return;
+    }
     try {
       // If playback has completed, restart from beginning
       if (audioPlayer.processingState == ProcessingState.completed) {

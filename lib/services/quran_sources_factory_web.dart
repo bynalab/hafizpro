@@ -5,6 +5,9 @@ import 'package:hafiz_test/services/ayah_text_source.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/quran_api_providers.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/services/quran_sources.dart';
+import 'package:hafiz_test/services/quran_search_service.dart';
+import 'package:hafiz_test/services/quran_db.dart';
 import 'package:hafiz_test/services/surah_source.dart';
 
 class NetworkSurahSource implements SurahSource {
@@ -15,6 +18,8 @@ class NetworkSurahSource implements SurahSource {
     required this.networkServices,
     required this.storageServices,
   });
+
+  QuranDb? get quranDb => null;
 
   @override
   Future<Surah> getSurah(int surahNumber) async {
@@ -90,12 +95,20 @@ class NetworkSurahSource implements SurahSource {
   }
 }
 
-Future<SurahSource> createQuranSources({
+Future<QuranSources> createQuranSources({
   required NetworkServices networkServices,
   required IStorageService storageServices,
 }) async {
-  return NetworkSurahSource(
+  final source = NetworkSurahSource(
     networkServices: networkServices,
     storageServices: storageServices,
+  );
+
+  final searchService =
+      QuranSearchService(db: QuranDb()); // Will fail but keeps types happy
+
+  return QuranSources(
+    surahSource: source,
+    searchService: searchService,
   );
 }

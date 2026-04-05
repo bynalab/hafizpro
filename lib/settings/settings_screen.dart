@@ -12,6 +12,7 @@ import 'package:hafiz_test/settings/sheets/progress_tracking_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/util/locale_notifier.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
@@ -114,10 +115,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Want more reciters?'),
-          content: const Text(
-            'If your favorite reciter isn\'t available yet, you can request it anytime by joining our WhatsApp Feedback Group.\n\nWe use it to collect reciter requests, bug reports, and feature ideas.',
-          ),
+          title: Text(context.l10n.reciterWhatsAppPromptTitle),
+          content: Text(context.l10n.reciterWhatsAppPromptBody),
           actions: [
             TextButton(
               onPressed: () {
@@ -126,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
                 Navigator.of(context).pop();
               },
-              child: const Text('Not now'),
+              child: Text(context.l10n.reciterWhatsAppNotNow),
             ),
             ElevatedButton(
               onPressed: () {
@@ -136,10 +135,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Navigator.of(context).pop();
                 _launchInBrowser(
                   _whatsAppFeedbackGroupUrl,
-                  'WhatsApp Feedback Group',
+                  context.l10n.whatsappFeedbackGroup,
                 );
               },
-              child: const Text('Join group'),
+              child: Text(context.l10n.reciterWhatsAppJoinGroup),
             ),
           ],
         );
@@ -167,6 +166,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     return context.l10n.notificationSubtitleDisabled;
+  }
+
+  String _progressTrackingModeLabel(String mode) {
+    final l = context.l10n;
+    switch (mode) {
+      case 'smart':
+        return l.progressTrackingSmartTitle;
+      case 'manual':
+        return l.progressTrackingManualTitle;
+      case 'off':
+        return l.progressTrackingOffTitle;
+      default:
+        return mode;
+    }
+  }
+
+  String _languageSubtitleForCode(AppLocalizations l10n, String code) {
+    switch (code) {
+      case 'ar':
+        return l10n.languageArabic;
+      case 'ru':
+        return l10n.languageRussian;
+      case 'de':
+        return l10n.languageGerman;
+      default:
+        return l10n.languageEnglish;
+    }
   }
 
   Future<void> _pickLanguage() async {
@@ -203,6 +229,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: Text(context.l10n.languageArabic),
                 trailing: current == 'ar' ? const Icon(Icons.check) : null,
                 onTap: () => Navigator.of(context).pop('ar'),
+              ),
+              ListTile(
+                title: Text(context.l10n.languageRussian),
+                trailing: current == 'ru' ? const Icon(Icons.check) : null,
+                onTap: () => Navigator.of(context).pop('ru'),
+              ),
+              ListTile(
+                title: Text(context.l10n.languageGerman),
+                trailing: current == 'de' ? const Icon(Icons.check) : null,
+                onTap: () => Navigator.of(context).pop('de'),
               ),
               const SizedBox(height: 8),
             ],
@@ -270,9 +306,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: controller.isLoading
-          ? const QuranLoader(
-              title: 'Loading Settings...',
-              subtitle: 'جارٍ التحميل',
+          ? QuranLoader(
+              title: context.l10n.settingsLoadingTitle,
+              subtitle: context.l10n.commonLoadingSubtitle,
             )
           : SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
@@ -318,10 +354,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SettingsTile(
                     leading: const LeadingCircle(Icons.language_rounded),
                     title: context.l10n.language,
-                    subtitle:
-                        Localizations.localeOf(context).languageCode == 'ar'
-                            ? context.l10n.languageArabic
-                            : context.l10n.languageEnglish,
+                    subtitle: _languageSubtitleForCode(
+                      context.l10n,
+                      Localizations.localeOf(context).languageCode,
+                    ),
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -331,9 +367,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   SettingsTile(
                     leading: const LeadingCircle(Icons.track_changes_rounded),
-                    title: "Reading Progress Tracking",
-                    subtitle: controller.progressTrackingMode[0].toUpperCase() +
-                        controller.progressTrackingMode.substring(1),
+                    title: context.l10n.progressTrackingTitle,
+                    subtitle:
+                        _progressTrackingModeLabel(controller.progressTrackingMode),
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -374,7 +410,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context)
                           ..hideCurrentSnackBar()
-                          ..showSnackBar(SnackBar(content: Text('$e')));
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                context.l10n.notificationsUpdateError(
+                                  e.toString(),
+                                ),
+                              ),
+                            ),
+                          );
                       }
                     },
                   ),
@@ -392,7 +436,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () {
                       _launchInBrowser(
                         _whatsAppFeedbackGroupUrl,
-                        'WhatsApp Feedback Group',
+                        context.l10n.whatsappFeedbackGroup,
                       );
                     },
                   ),
@@ -410,7 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () {
                       _launchInBrowser(
                         'https://hafizpro.com',
-                        'Website',
+                        context.l10n.settingsLinkWebsite,
                       );
                     },
                   ),
@@ -428,7 +472,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () {
                       _launchInBrowser(
                         'https://whatsapp.com/channel/0029Vb7FCqkFHWpx566byH0Y',
-                        'WhatsApp Channel',
+                        context.l10n.settingsLinkWhatsAppChannel,
                       );
                     },
                   ),

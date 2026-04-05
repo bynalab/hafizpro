@@ -19,6 +19,7 @@ import 'package:hafiz_test/quran/quran_view.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/widget/compatibility_error_view.dart';
 
 class TestBySurah extends StatefulWidget {
   final int? surahNumber;
@@ -82,6 +83,7 @@ class _TestPage extends State<TestBySurah> {
   Future<void> _changeReciterAndRetry() async {
     final selected = await ReciterPickerSheet(
       selected: storageServices.getReciterId(),
+      showOnlyVerseByVerse: _isReciterModeError,
     ).openBottomSheet(context);
     if (selected == null) return;
 
@@ -184,13 +186,13 @@ class _TestPage extends State<TestBySurah> {
     }
   }
 
-  void _onRefresh() {
+  Future<void> _onRefresh() async {
     // For refresh, we want a new random surah (if multi-mode) or same surah random ayah
     if (widget.surahNumbers != null && widget.surahNumbers!.isNotEmpty) {
       _currentSurahNumber = null; // Forces picking a new random one in init()
     }
 
-    init();
+    await init();
   }
 
   Ayah _getAyahForSurah() {
@@ -199,7 +201,8 @@ class _TestPage extends State<TestBySurah> {
     }
     return widget.ayahNumber != null
         ? surah.getAyah(widget.ayahNumber)
-        : getIt<AyahServices>().getRandomAyahForSurah(surah.ayahs);
+        : getIt<AyahServices>()
+            .getRandomAyahForSurah(surah.ayahs, surahNumber: surah.number);
   }
 
   @override
@@ -253,7 +256,7 @@ class _TestPage extends State<TestBySurah> {
               ),
               const SizedBox(width: 14),
               Text(
-                surah.englishName,
+                '${surah.englishName} (${surah.number.toString().padLeft(2, '0')})',
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -268,48 +271,52 @@ class _TestPage extends State<TestBySurah> {
         body: Stack(
           children: [
             if (hasError)
-              CustomErrorWidget(
-                title: context.l10n.testErrorTitle,
-                message: errorMessage ?? context.l10n.testErrorMessage,
-                icon: Icons.quiz_outlined,
-                color: Colors.orange.shade700,
-                onRetry: () async {
-                  await init();
-                },
-                secondaryActionLabel:
-                    _isReciterModeError ? context.l10n.changeReciter : null,
-                onSecondaryAction:
-                    _isReciterModeError ? _changeReciterAndRetry : null,
-              )
+              _isReciterModeError
+                  ? CompatibilityErrorView(
+                      onChooseReciter: _changeReciterAndRetry,
+                      onRetry: init,
+                    )
+                  : CustomErrorWidget(
+                      title: context.l10n.testErrorTitle,
+                      message: errorMessage ?? context.l10n.testErrorMessage,
+                      icon: Icons.quiz_outlined,
+                      color: Colors.orange.shade700,
+                      onRetry: () async {
+                        await init();
+                      },
+                      secondaryActionLabel: _isReciterModeError
+                          ? context.l10n.changeReciter
+                          : null,
+                      onSecondaryAction:
+                          _isReciterModeError ? _changeReciterAndRetry : null,
+                    )
             else
-              SingleChildScrollView(
-                child: TestScreen(
-                  surah: surah,
-                  currentAyah: isLoading ? Ayah() : currentAyah,
-                  isLoading: isLoading,
-                  onReadFull: () async {
-                    final surahNumber = _currentSurahNumber ?? 0;
-                    final surahName = surah.englishName;
-                    if (surahNumber <= 0) return;
+              TestScreen(
+                surah: surah,
+                currentAyah: isLoading ? Ayah() : currentAyah,
+                isLoading: isLoading,
+                onReadFull: () async {
+                  final surahNumber = _currentSurahNumber ?? 0;
+                  final surahName = surah.englishName;
+                  if (surahNumber <= 0) return;
 
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => QuranView(
-                          surah: Surah(
-                            number: surahNumber,
-                            englishName: surahName,
-                          ),
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QuranView(
+                        surah: Surah(
+                          number: surahNumber,
+                          englishName: surahName,
                         ),
                       ),
-                    );
-                  },
-                  onRefresh: _onRefresh,
-                  onNextBoundary:
-                      _sortedSurahNumbers.isNotEmpty ? _onNextSurah : null,
-                  onPreviousBoundary:
-                      _sortedSurahNumbers.isNotEmpty ? _onPreviousSurah : null,
-                ),
+                    ),
+                  );
+                },
+                onRefresh: _onRefresh,
+                onNextBoundary:
+                    _sortedSurahNumbers.isNotEmpty ? _onNextSurah : null,
+                onPreviousBoundary:
+                    _sortedSurahNumbers.isNotEmpty ? _onPreviousSurah : null,
               ),
           ],
         ),

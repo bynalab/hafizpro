@@ -7,6 +7,9 @@ class Reciter {
   final String type;
   final String? direction;
 
+  bool get isVerseByVerse => type == 'versebyverse';
+  bool get isSurahBySurah => type == 'surahbysurah';
+
   Reciter({
     required this.identifier,
     required this.language,

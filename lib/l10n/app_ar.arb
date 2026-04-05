@@ -1,6 +1,9 @@
 {
   "@@locale": "ar",
   "appTitle": "حافظ القرآن",
+  "verseShareTooltip": "مشاركة الآية كصورة",
+  "verseShareWebUnsupported": "مشاركة الصورة غير متاحة في المتصفح. استخدم تطبيق الهاتف أو الحاسوب للمشاركة.",
+  "verseShareFailed": "تعذّرت مشاركة الآية. حاول مرة أخرى.",
   "hello": "مرحبا",
   "start": "ابدأ",
   "settings": "الإعدادات",
@@ -12,6 +15,8 @@
   "language": "اللغة",
   "languageEnglish": "الإنجليزية",
   "languageArabic": "العربية",
+  "languageRussian": "الروسية",
+  "languageGerman": "الألمانية",
   "languageSelectTitle": "اختر اللغة",
   "selectFavoriteReciter": "اختر قارئك المفضل",
   "searchReciters": "ابحث عن القرّاء...",
@@ -157,6 +162,9 @@
   "segmentSurah": "سورة",
   "segmentJuz": "جزء",
   "searchBySurahHint": "ابحث بالسورة",
+  "searchBySurahOrVerseHint": "ابحث بسورة أو 2 أو 2:255",
+  "quranReadPreviousJuz": "الجزء السابق",
+  "quranReadNextJuz": "الجزء التالي",
   "searchByJuzHint": "ابحث بالجزء",
   "dashboardChallengeTitle": "تحدَّ نفسك",
   "dashboardChallengeDescription": "استمع إلى آية من\nالقرآن وخمّن\nالآية التالية.",
@@ -171,6 +179,9 @@
       }
     }
   },
+  "versePickerTitle": "الانتقال إلى آية",
+  "versePickerSubtitleTest": "اختر آية لبدء الاختبار",
+  "versePickerSubtitleRead": "اختر آية للانتقال إليها",
   "verseNumberLabel": "الآية {number}",
   "@verseNumberLabel": {
     "placeholders": {
@@ -218,5 +229,149 @@
   "noBookmarksMessage": "لا توجد إشارات مرجعية. ابدأ بحفظ الآيات لتراها هنا!",
   "seeAllBookmarks": "عرض الكل",
   "deleteBookmarkTitle": "حذف الإشارة المرجعية",
-  "deleteBookmarkMessage": "هل أنت متأكد من حذف هذه الإشارة المرجعية؟"
+  "deleteBookmarkMessage": "هل أنت متأكد من حذف هذه الإشارة المرجعية؟",
+  "quranReadPreviousSurah": "السورة السابقة",
+  "quranReadNextSurah": "السورة التالية",
+  "commonCancel": "إلغاء",
+  "undo": "تراجع",
+  "markReadSuccessTitle": "تم",
+  "markReadProgressUpdated": "تم تحديث التقدم حتى الآية {number}",
+  "@markReadProgressUpdated": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "audioNeedsInternet": "لا يوجد اتصال بالإنترنت. الصوت يحتاج إلى الإنترنت.",
+  "reciterCompatibilityTitle": "توافق القارئ",
+  "reciterCompatibilityBody1": "يوفّر القارئ المحدد الصوت كسورة كاملة وليس آية بآية.",
+  "reciterCompatibilityBody2": "لاستخدام الاختبار وتتبع التقدم، اختر قارئًا يدعم التشغيل على مستوى الآية.",
+  "chooseCompatibleReciter": "اختر قارئًا متوافقًا",
+  "ayahFinderTitle": "مكتشف الآيات",
+  "testMenuAyahFinderSubtitle": "تعرّف على الآيات بالتلاوة",
+  "experimental": "تجريبي",
+  "ayahFinderListeningStatus": "جارٍ الاستماع للتلاوة...",
+  "ayahFinderTapToIdentify": "اضغط لتعرّف الآية",
+  "ayahFinderMatchesPlaceholder": "ستظهر النتائج هنا",
+  "ayahFinderNoMatchesYet": "لا توجد نتائج بعد",
+  "ayahFinderMatchScoreLabel": "{percent}٪ تطابق",
+  "@ayahFinderMatchScoreLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "ayahFinderOpenInReader": "فتح في القارئ",
+  "progressTrackingTitle": "تتبع تقدم القراءة",
+  "progressTrackingSmartTitle": "ذكي",
+  "progressTrackingSmartDescription": "يحدّث تقدمك تلقائيًا حسب نشاط القراءة.",
+  "progressTrackingManualTitle": "يدوي",
+  "progressTrackingManualDescription": "اضغط أيقونة التأكيد المزدوج على آخر آية قرأتها لتحديدها وكل ما قبلها كمكتمل.",
+  "progressTrackingOffTitle": "إيقاف",
+  "progressTrackingOffDescription": "لا يتم تتبع التقدم.",
+  "reciterWhatsAppPromptTitle": "تريد المزيد من القرّاء؟",
+  "reciterWhatsAppPromptBody": "إذا لم يكن قارئك المفضل متوفرًا بعد، يمكنك طلبه بالانضمام إلى مجموعة ملاحظات الواتساب.\n\nنستخدمها لطلبات القرّاء والأخطاء والأفكار.",
+  "reciterWhatsAppNotNow": "ليس الآن",
+  "reciterWhatsAppJoinGroup": "انضم للمجموعة",
+  "readingInsightsPageTitle": "إحصاءات القراءة",
+  "readingInsightsResetAllTitle": "إعادة ضبط كل التقدم؟",
+  "readingInsightsResetAllBody": "سيُمسح كل تقدم قراءة القرآن. لا يمكن التراجع.",
+  "readingInsightsResetAllConfirm": "إعادة ضبط الكل",
+  "readingInsightsResetSurahTitle": "إعادة ضبط سورة {surahName}؟",
+  "@readingInsightsResetSurahTitle": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahBody": "سيُمسح تقدم القراءة لسورة {surahName}.",
+  "@readingInsightsResetSurahBody": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahConfirm": "إعادة ضبط",
+  "readingInsightsTooltipResetAll": "إعادة ضبط كل التقدم",
+  "readingInsightsTooltipResetSurah": "إعادة ضبط تقدم السورة",
+  "readingInsightsStatRead": "مقروء",
+  "readingInsightsStatRemaining": "متبقٍ",
+  "readingInsightsStatCompleted": "مكتملة",
+  "readingInsightsSurahBreakdown": "تفصيل السور",
+  "readingInsightsOverallProgress": "التقدم الإجمالي",
+  "readingInsightsLastUpdated": "آخر تحديث: {dateTime}",
+  "@readingInsightsLastUpdated": {
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "testNoNextVerseInSurah": "لا توجد آية تالية في هذه السورة",
+  "recitationReadyListenHint": "جاهز للاستماع. اضغط هنا للبدء.",
+  "recitationExperimentalLabel": "(التحقق ميزة تجريبية)",
+  "recitationReciteVerse": "رتّل الآية {number}...",
+  "@recitationReciteVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationAnalyzingVerse": "جارٍ تحليل الآية {number}...",
+  "@recitationAnalyzingVerse": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationVerseResult": "نتيجة الآية {number}",
+  "@recitationVerseResult": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationStartNow": "ابدأ التلاوة الآن...",
+  "recitationSimilarityScore": "درجة التشابه",
+  "recitationYourRecitation": "تلاوتك:",
+  "recitationResultPerfect": "ما شاء الله! صحيح تمامًا",
+  "recitationResultAlmost": "مجهود جيد! قريب جدًا",
+  "recitationResultIncorrect": "غير صحيح. حاول مرة أخرى",
+  "versePickerSearchVerseHint": "ابحث برقم الآية...",
+  "verseSearchNoResults": "لا توجد آيات",
+  "audioPlayerTapToExpandSemantics": "اضغط للتوسيع",
+  "dateRelativeToday": "اليوم",
+  "dateRelativeYesterday": "أمس",
+  "dateRelativeTomorrow": "غدًا",
+  "adhkarHomeTitle": "الأذكار",
+  "adhkarHomeSubtitle": "مجموعة من الأدعية الخالدة تثبّت القلب وتحفظك",
+  "adhkarCategoryMorning": "الصباح",
+  "adhkarCategoryEvening": "المساء",
+  "adhkarCategoryBeforeSleeping": "قبل النوم",
+  "adhkarCategoryWakingUp": "عند الاستيقاظ",
+  "notificationsUpdateError": "تعذر تحديث الإشعارات: {message}",
+  "@notificationsUpdateError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLinkWebsite": "الموقع",
+  "settingsLinkWhatsAppChannel": "قناة الواتساب",
+  "quranResumeReadingPrompt": "تخطيتَ بعض الآيات. المتابعة من الآية {ayah}؟",
+  "@quranResumeReadingPrompt": {
+    "placeholders": {
+      "ayah": {
+        "type": "int"
+      }
+    }
+  }
 }

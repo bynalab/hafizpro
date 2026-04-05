@@ -1,36 +1,144 @@
 {
   "@@locale": "en",
-  "appTitle": "Quran Hafiz",
+  "appTitle": "Hafiz Pro",
+  "@appTitle": {
+    "description": "Application title shown in the system UI."
+  },
+  "verseShareTooltip": "Share verse as image",
+  "@verseShareTooltip": {
+    "description": "Tooltip on the verse card share button."
+  },
+  "verseShareWebUnsupported": "Image sharing isn’t available in the browser. Use the mobile or desktop app to share.",
+  "@verseShareWebUnsupported": {
+    "description": "Shown when the user tries to share a verse image on web."
+  },
+  "verseShareFailed": "Couldn’t share this verse. Please try again.",
+  "@verseShareFailed": {
+    "description": "Shown when verse image sharing fails (overlay, render, file, or system share sheet)."
+  },
   "hello": "Hello",
+  "@hello": {
+    "description": "Short greeting shown in the app."
+  },
   "start": "Start",
+  "@start": {
+    "description": "Label for the primary start action."
+  },
   "settings": "Settings",
+  "@settings": {
+    "description": "Title for the settings screen or entry."
+  },
   "autoplayVerse": "Autoplay verse",
+  "@autoplayVerse": {
+    "description": "Setting label for automatically playing the next verse."
+  },
   "theme": "Theme",
+  "@theme": {
+    "description": "Setting section title for app theme."
+  },
   "themeSystem": "System",
+  "@themeSystem": {
+    "description": "Theme option: follow system light/dark mode."
+  },
   "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme option: light appearance."
+  },
   "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme option: dark appearance."
+  },
   "language": "Language",
+  "@language": {
+    "description": "Setting label for app language."
+  },
   "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Language name: English."
+  },
   "languageArabic": "Arabic",
+  "@languageArabic": {
+    "description": "Language name: Arabic."
+  },
+  "languageRussian": "Russian",
+  "@languageRussian": {
+    "description": "Language name: Russian."
+  },
+  "languageGerman": "German",
+  "@languageGerman": {
+    "description": "Language name: German."
+  },
   "languageSelectTitle": "Choose language",
+  "@languageSelectTitle": {
+    "description": "Title for the language picker."
+  },
   "selectFavoriteReciter": "Select your favorite reciter",
+  "@selectFavoriteReciter": {
+    "description": "Prompt to choose a preferred Quran reciter."
+  },
   "searchReciters": "Search reciters...",
+  "@searchReciters": {
+    "description": "Hint text for searching the reciter list."
+  },
   "visitWebsite": "Visit Our Website",
+  "@visitWebsite": {
+    "description": "Link or button to open the official website."
+  },
   "joinWhatsappChannel": "Join WhatsApp Channel",
+  "@joinWhatsappChannel": {
+    "description": "Link or button to join the WhatsApp channel."
+  },
   "whatsappFeedbackGroup": "WhatsApp Feedback Group",
+  "@whatsappFeedbackGroup": {
+    "description": "Link or button for the WhatsApp feedback group."
+  },
   "rateThisApp": "Rate This App",
+  "@rateThisApp": {
+    "description": "Prompt to rate the app in the store."
+  },
   "debugRatingSystem": "Debug Rating System",
+  "@debugRatingSystem": {
+    "description": "Developer-only entry for testing the rating flow."
+  },
   "save": "Save",
+  "@save": {
+    "description": "Button label to save changes."
+  },
   "disable": "Disable",
+  "@disable": {
+    "description": "Button or action to turn a feature off."
+  },
   "ok": "OK",
+  "@ok": {
+    "description": "Standard confirmation button label."
+  },
   "notifications": "Notifications",
+  "@notifications": {
+    "description": "Settings section title for notification preferences."
+  },
   "enableNotifications": "Enable Notifications",
+  "@enableNotifications": {
+    "description": "Toggle or title to turn notifications on."
+  },
   "notificationsDailyMotivationSubtitle": "Receive daily motivational messages",
+  "@notificationsDailyMotivationSubtitle": {
+    "description": "Subtitle explaining daily notification content."
+  },
   "notificationTime": "Notification Time",
+  "@notificationTime": {
+    "description": "Label for choosing the time of day for notifications."
+  },
   "changesSaved": "Changes Saved!",
+  "@changesSaved": {
+    "description": "Confirmation that settings were saved."
+  },
   "settingsLoadingTitle": "Loading Settings...",
+  "@settingsLoadingTitle": {
+    "description": "Shown while settings are loading."
+  },
   "notificationSubtitleEnabled": "Notification time: {time}",
   "@notificationSubtitleEnabled": {
+    "description": "Subtitle when notifications are enabled, showing the chosen time.",
     "placeholders": {
       "time": {
         "type": "String"
@@ -38,30 +146,100 @@
     }
   },
   "notificationSubtitleDisabled": "Set your notification preference",
+  "@notificationSubtitleDisabled": {
+    "description": "Subtitle when notifications are disabled."
+  },
   "settingsAutoPlayTitle": "Auto Play Verse",
+  "@settingsAutoPlayTitle": {
+    "description": "Settings title for autoplay during tests."
+  },
   "settingsAutoPlaySubtitle": "Autoplay the verses as your test begins",
+  "@settingsAutoPlaySubtitle": {
+    "description": "Settings subtitle explaining autoplay behavior."
+  },
   "settingsSelectReciterTitle": "Select Reciter",
+  "@settingsSelectReciterTitle": {
+    "description": "Settings title for choosing a reciter."
+  },
   "settingsReportBugTitle": "Report Bug or Request Feature",
+  "@settingsReportBugTitle": {
+    "description": "Settings title for contact or feedback."
+  },
   "settingsReportBugSubtitle": "Talk to us",
+  "@settingsReportBugSubtitle": {
+    "description": "Settings subtitle inviting the user to reach out."
+  },
   "settingsOfficialWebsiteTitle": "Official Website",
+  "@settingsOfficialWebsiteTitle": {
+    "description": "Settings title for the website link."
+  },
   "settingsOfficialWebsiteSubtitle": "Check out our website",
+  "@settingsOfficialWebsiteSubtitle": {
+    "description": "Settings subtitle for the website link."
+  },
   "settingsJoinCommunityTitle": "Join our community",
+  "@settingsJoinCommunityTitle": {
+    "description": "Settings title for community links."
+  },
   "settingsJoinCommunitySubtitle": "Join discussions and get help",
+  "@settingsJoinCommunitySubtitle": {
+    "description": "Settings subtitle for community links."
+  },
   "settingsRateUsTitle": "Rate Us",
+  "@settingsRateUsTitle": {
+    "description": "Settings title for the rate-the-app action."
+  },
   "settingsRateUsSubtitle": "Leave a 5 star review on your app store",
+  "@settingsRateUsSubtitle": {
+    "description": "Settings subtitle encouraging a store review."
+  },
   "ratingDialogTitle": "Rate Our App",
+  "@ratingDialogTitle": {
+    "description": "Title of the in-app rating dialog."
+  },
   "ratingDialogPrompt": "How would you rate your experience with Hafiz Pro?",
+  "@ratingDialogPrompt": {
+    "description": "Main question in the rating dialog."
+  },
   "ratingDialogMaybeLater": "Maybe Later",
+  "@ratingDialogMaybeLater": {
+    "description": "Dismiss the rating dialog without submitting."
+  },
   "ratingDialogSubmit": "Submit",
+  "@ratingDialogSubmit": {
+    "description": "Submit the chosen rating."
+  },
   "ratingDialogHintPositive": "Optional: tell us what you like",
+  "@ratingDialogHintPositive": {
+    "description": "Hint for optional positive feedback text."
+  },
   "ratingDialogHintNegative": "Tell us what we can improve",
+  "@ratingDialogHintNegative": {
+    "description": "Hint for improvement feedback text."
+  },
   "ratingMessage1": "We're sorry to hear that. Please let us know how we can improve.",
+  "@ratingMessage1": {
+    "description": "Response message for the lowest rating tier."
+  },
   "ratingMessage2": "We appreciate your feedback. We're working to make it better.",
+  "@ratingMessage2": {
+    "description": "Response message for a low rating."
+  },
   "ratingMessage3": "Thank you for your feedback. We'll keep improving.",
+  "@ratingMessage3": {
+    "description": "Response message for a middling rating."
+  },
   "ratingMessage4": "Great! We're glad you're enjoying the app.",
+  "@ratingMessage4": {
+    "description": "Response message for a high rating."
+  },
   "ratingMessage5": "Excellent! Thank you for the amazing rating.",
+  "@ratingMessage5": {
+    "description": "Response message for the highest rating."
+  },
   "errorLaunchingUrl": "Error launching URL: {url}. Error: {error}",
   "@errorLaunchingUrl": {
+    "description": "Error when opening a link failed.",
     "placeholders": {
       "url": {
         "type": "String"
@@ -73,6 +251,7 @@
   },
   "errorOpeningRatingDialog": "Error opening rating dialog: {error}",
   "@errorOpeningRatingDialog": {
+    "description": "Error when the rating dialog could not be shown.",
     "placeholders": {
       "error": {
         "type": "String"
@@ -80,64 +259,236 @@
     }
   },
   "splashTagline": "Master the Quran, one Ayah at a time",
+  "@splashTagline": {
+    "description": "Marketing tagline on the splash screen."
+  },
   "splashAyahTranslation": "\"And We have certainly made the Qur'an easy for remembrance, so is there any who will remember?\" (Q54:17)",
+  "@splashAyahTranslation": {
+    "description": "Quoted translation and reference on the splash screen."
+  },
   "onboardingPage1Title": "Immerse yourself in the\nwords of Allah",
+  "@onboardingPage1Title": {
+    "description": "Onboarding page 1 headline."
+  },
   "onboardingPage1Subtitle": "Read, listen, and reflect on the\nQuran — anytime, anywhere.",
+  "@onboardingPage1Subtitle": {
+    "description": "Onboarding page 1 supporting text."
+  },
   "onboardingPage1Cta": "Start Reading",
+  "@onboardingPage1Cta": {
+    "description": "Onboarding page 1 primary button."
+  },
   "onboardingPage2Title": "Listen to beautiful\nrecitations and follow\nalong",
+  "@onboardingPage2Title": {
+    "description": "Onboarding page 2 headline."
+  },
   "onboardingPage2Subtitle": "Choose your favorite reciter and feel\nthe verses come alive.",
+  "@onboardingPage2Subtitle": {
+    "description": "Onboarding page 2 supporting text."
+  },
   "onboardingPage2Cta": "Start Listening",
+  "@onboardingPage2Cta": {
+    "description": "Onboarding page 2 primary button."
+  },
   "onboardingPage3Title": "Test your knowledge of the\nQur’an",
+  "@onboardingPage3Title": {
+    "description": "Onboarding page 3 headline."
+  },
   "onboardingPage3Subtitle": "Guess the Surah or Ayah from what\nyou hear — by Juz, Surah, or\nrandomly.",
+  "@onboardingPage3Subtitle": {
+    "description": "Onboarding page 3 supporting text."
+  },
   "onboardingPage3Cta": "Start Playing",
+  "@onboardingPage3Cta": {
+    "description": "Onboarding page 3 primary button."
+  },
   "mainMenuSettingsShowcaseTitle": "Settings",
+  "@mainMenuSettingsShowcaseTitle": {
+    "description": "Coach mark title for settings discovery."
+  },
   "mainMenuSettingsShowcaseDescription": "Change autoplay settings and select your favorite reciter",
+  "@mainMenuSettingsShowcaseDescription": {
+    "description": "Coach mark body for settings discovery."
+  },
   "mainMenuLastReadShowcaseTitle": "Last Read",
+  "@mainMenuLastReadShowcaseTitle": {
+    "description": "Coach mark title for last-read discovery."
+  },
   "mainMenuLastReadShowcaseDescription": "This shows your last read Surah and Ayah.",
+  "@mainMenuLastReadShowcaseDescription": {
+    "description": "Coach mark body for last-read discovery."
+  },
   "mainMenuQuranCardTitle": "Read Quran",
+  "@mainMenuQuranCardTitle": {
+    "description": "Main menu card title for reading the Quran."
+  },
   "mainMenuQuranCardDescription": "Start your memorization journey by reading and listening to each Surah.",
+  "@mainMenuQuranCardDescription": {
+    "description": "Main menu card subtitle for reading the Quran."
+  },
   "mainMenuSurahCardTitle": "By Surah",
+  "@mainMenuSurahCardTitle": {
+    "description": "Main menu card title for tests by surah."
+  },
   "mainMenuSurahCardDescription": "Test your memorization by selecting a specific Surah.",
+  "@mainMenuSurahCardDescription": {
+    "description": "Main menu card subtitle for tests by surah."
+  },
   "mainMenuJuzCardTitle": "By Juz",
+  "@mainMenuJuzCardTitle": {
+    "description": "Main menu card title for tests by juz."
+  },
   "mainMenuJuzCardDescription": "Begin your test journey by selecting a specific Juz of the Quran.",
+  "@mainMenuJuzCardDescription": {
+    "description": "Main menu card subtitle for tests by juz."
+  },
   "mainMenuRandomCardTitle": "Randomly",
+  "@mainMenuRandomCardTitle": {
+    "description": "Main menu card title for random verse tests."
+  },
   "mainMenuRandomCardDescription": "Challenge yourself with verses selected at random from across the Holy Quran.",
+  "@mainMenuRandomCardDescription": {
+    "description": "Main menu card subtitle for random verse tests."
+  },
   "mainMenuTestsHeader": "Tests",
+  "@mainMenuTestsHeader": {
+    "description": "Section header for test options on the main menu."
+  },
   "mainMenuExitHint": "Press back again within two seconds to exit the app",
+  "@mainMenuExitHint": {
+    "description": "Accessibility or hint text for double-back to exit."
+  },
   "mainMenuExitSnack": "Press back again to exit",
+  "@mainMenuExitSnack": {
+    "description": "Snackbar shown on first back press when exiting."
+  },
   "mainMenuExitDialogTitle": "Are you sure?",
+  "@mainMenuExitDialogTitle": {
+    "description": "Title of the exit confirmation dialog."
+  },
   "mainMenuExitDialogContent": "Do you want to exit?",
+  "@mainMenuExitDialogContent": {
+    "description": "Body of the exit confirmation dialog."
+  },
   "commonNo": "No",
+  "@commonNo": {
+    "description": "Negative answer in dialogs."
+  },
   "commonYes": "Yes",
+  "@commonYes": {
+    "description": "Affirmative answer in dialogs."
+  },
   "commonLoadingSubtitle": "Loading...",
+  "@commonLoadingSubtitle": {
+    "description": "Generic loading subtitle."
+  },
   "surahListTitle": "Surah List",
+  "@surahListTitle": {
+    "description": "App bar or screen title for the surah list."
+  },
   "surahListSearchHint": "Search Surah",
+  "@surahListSearchHint": {
+    "description": "Search field hint on the surah list."
+  },
   "surahListDesktopPlaceholder": "Select a Surah",
+  "@surahListDesktopPlaceholder": {
+    "description": "Placeholder when no surah is selected on large layouts."
+  },
   "surahListTestDescription": "Listen to a verse from a surah and\nguess the next verse.",
+  "@surahListTestDescription": {
+    "description": "Description of the surah-based test mode."
+  },
   "juzListTitle": "Juz List",
+  "@juzListTitle": {
+    "description": "App bar or screen title for the juz list."
+  },
   "juzListSearchHint": "Search Juz",
+  "@juzListSearchHint": {
+    "description": "Search field hint on the juz list."
+  },
   "juzListSelectTitle": "Select a Juz",
+  "@juzListSelectTitle": {
+    "description": "Prompt to pick a juz."
+  },
   "juzListTestDescription": "Listen to a verse from a Juz and\nguess the next verse.",
+  "@juzListTestDescription": {
+    "description": "Description of the juz-based test mode."
+  },
   "juzListTypeNumberHint": "Type Juz number",
+  "@juzListTypeNumberHint": {
+    "description": "Hint for entering a juz number."
+  },
   "testReadEntireSurah": "Read Entire Surah",
+  "@testReadEntireSurah": {
+    "description": "Action to read the full surah in test context."
+  },
   "testReadEntireJuz": "Read Entire Juz",
+  "@testReadEntireJuz": {
+    "description": "Action to read the full juz in test context."
+  },
   "testErrorTitle": "Failed to Load Test",
+  "@testErrorTitle": {
+    "description": "Error title when a surah test fails to load."
+  },
   "testErrorMessage": "Unable to load the surah for testing. Please check your connection and try again.",
+  "@testErrorMessage": {
+    "description": "Error message when a surah test fails to load."
+  },
   "juzTestErrorTitle": "Failed to Load Juz Test",
+  "@juzTestErrorTitle": {
+    "description": "Error title when a juz test fails to load."
+  },
   "juzTestErrorMessage": "Unable to load the juz for testing. Please check your connection and try again.",
+  "@juzTestErrorMessage": {
+    "description": "Error message when a juz test fails to load."
+  },
   "juzLoadingTitle": "Loading Juz...",
+  "@juzLoadingTitle": {
+    "description": "Title while a juz is loading."
+  },
   "juzLoadingSubtitle": "جارٍ تحميل الجزء",
+  "@juzLoadingSubtitle": {
+    "description": "Subtitle while a juz is loading (Arabic)."
+  },
   "juzErrorTitle": "Failed to Load Juz",
+  "@juzErrorTitle": {
+    "description": "Error title when juz content fails to load."
+  },
   "juzErrorMessage": "Please check your internet connection or try again shortly.",
+  "@juzErrorMessage": {
+    "description": "Error message when juz content fails to load."
+  },
   "changeReciter": "Change Reciter",
+  "@changeReciter": {
+    "description": "Button to switch reciter."
+  },
   "errorRetryButton": "Try Again",
+  "@errorRetryButton": {
+    "description": "Button to retry after an error."
+  },
   "testRefreshAyah": "Refresh Ayah",
+  "@testRefreshAyah": {
+    "description": "Button to load another ayah in the test."
+  },
   "testLoadingAyahTitle": "Loading Ayah",
+  "@testLoadingAyahTitle": {
+    "description": "Shown while the test ayah is loading."
+  },
   "testGuessNextAyah": "Guess the next Ayah",
+  "@testGuessNextAyah": {
+    "description": "Instruction for the memorization test."
+  },
   "testBeginningOfSurah": "Beginning of Surah",
+  "@testBeginningOfSurah": {
+    "description": "Label when at the start of a surah in a test."
+  },
   "testEndOfSurah": "End of Surah",
+  "@testEndOfSurah": {
+    "description": "Label when at the end of a surah in a test."
+  },
   "testVersesCount": "{count} Verses",
   "@testVersesCount": {
+    "description": "Shows how many verses are in the current test scope.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -145,34 +496,109 @@
     }
   },
   "testMenuTitle": "Test Your Knowledge of the Qur’an",
+  "@testMenuTitle": {
+    "description": "Title for the test mode menu."
+  },
   "testMenuSubtitle": "Challenge yourself by listening to an ayah of the Quran and guessing the next one.",
+  "@testMenuSubtitle": {
+    "description": "Subtitle for the test mode menu."
+  },
   "testMenuOptionBySurahSubtitle": "Test your knowledge based\non different surahs",
+  "@testMenuOptionBySurahSubtitle": {
+    "description": "Subtitle for the by-surah test option."
+  },
   "testMenuOptionByJuzSubtitle": "Test how well you know each\nJuz.",
+  "@testMenuOptionByJuzSubtitle": {
+    "description": "Subtitle for the by-juz test option."
+  },
   "testMenuOptionRandomTitle": "Random Verses",
+  "@testMenuOptionRandomTitle": {
+    "description": "Title for the random verses test option."
+  },
   "testMenuOptionRandomSubtitle": "Get verses from anywhere in\nthe Qur’an.",
+  "@testMenuOptionRandomSubtitle": {
+    "description": "Subtitle for the random verses test option."
+  },
   "customSurahSelectTitle": "Select Surahs",
+  "@customSurahSelectTitle": {
+    "description": "Title for picking multiple surahs."
+  },
   "customSurahSelectContinue": "Continue",
+  "@customSurahSelectContinue": {
+    "description": "Proceed after surah selection."
+  },
   "bottomNavQuran": "Quran",
+  "@bottomNavQuran": {
+    "description": "Bottom navigation label for Quran."
+  },
   "bottomNavTest": "Test",
+  "@bottomNavTest": {
+    "description": "Bottom navigation label for tests."
+  },
   "segmentSurah": "Surah",
+  "@segmentSurah": {
+    "description": "Segment control label for surah."
+  },
   "segmentJuz": "Juz",
+  "@segmentJuz": {
+    "description": "Segment control label for juz."
+  },
   "searchBySurahHint": "Search by Surah",
+  "@searchBySurahHint": {
+    "description": "Search hint when filtering by surah."
+  },
+  "searchBySurahOrVerseHint": "Search surah, 2, or 2:255",
+  "@searchBySurahOrVerseHint": {
+    "description": "Surah tab search hint: name filter or surah:verse (e.g. 2:255)."
+  },
   "searchByJuzHint": "Search by Juz",
+  "@searchByJuzHint": {
+    "description": "Search hint when filtering by juz."
+  },
   "dashboardChallengeTitle": "Challenge yourself",
+  "@dashboardChallengeTitle": {
+    "description": "Dashboard card title for the test challenge."
+  },
   "dashboardChallengeDescription": "Listen to an ayah of\nthe Quran and guess\nthe next one.",
+  "@dashboardChallengeDescription": {
+    "description": "Dashboard card description for the test challenge."
+  },
   "dashboardListenReadHeader": "Listen/Read",
+  "@dashboardListenReadHeader": {
+    "description": "Dashboard section header for listen and read."
+  },
   "dashboardContinueLastTestTitle": "Continue your last test",
+  "@dashboardContinueLastTestTitle": {
+    "description": "Dashboard action to resume the previous test."
+  },
   "dashboardNowPlayingTitle": "Now Playing",
+  "@dashboardNowPlayingTitle": {
+    "description": "Dashboard label for current audio."
+  },
   "juzNumberLabel": "Juz {number}",
   "@juzNumberLabel": {
+    "description": "Displays a juz number.",
     "placeholders": {
       "number": {
         "type": "int"
       }
     }
   },
+  "versePickerTitle": "Jump to Verse",
+  "@versePickerTitle": {
+    "description": "Title of the verse picker sheet."
+  },
+  "versePickerSubtitleTest": "Select a verse to begin testing",
+  "@versePickerSubtitleTest": {
+    "description": "Subtitle in verse picker when in test mode."
+  },
+  "versePickerSubtitleRead": "Select a verse to scroll to",
+  "@versePickerSubtitleRead": {
+    "description": "Subtitle in verse picker when reading."
+  },
   "verseNumberLabel": "Verse {number}",
   "@verseNumberLabel": {
+    "description": "Displays a verse number.",
     "placeholders": {
       "number": {
         "type": "int"
@@ -180,11 +606,24 @@
     }
   },
   "lastReadTitle": "Last Read",
+  "@lastReadTitle": {
+    "description": "Title for the last-read section."
+  },
   "lastReadDescription": "This shows your last read Surah and Ayah.",
+  "@lastReadDescription": {
+    "description": "Explains the last-read widget."
+  },
   "lastReadContinue": "Continue",
+  "@lastReadContinue": {
+    "description": "Continue reading from last position."
+  },
   "lastReadNone": "No last read",
+  "@lastReadNone": {
+    "description": "Shown when there is no saved reading position."
+  },
   "lastReadAyahNumber": "Ayah no. {number}",
   "@lastReadAyahNumber": {
+    "description": "Shows the last-read ayah number.",
     "placeholders": {
       "number": {
         "type": "int"
@@ -192,21 +631,64 @@
     }
   },
   "quranViewErrorTitle": "Failed to Load Surah",
+  "@quranViewErrorTitle": {
+    "description": "Error title when surah content fails in the reader."
+  },
   "quranViewErrorMessage": "Please check your internet connection or try again shortly.",
+  "@quranViewErrorMessage": {
+    "description": "Error message when surah content fails in the reader."
+  },
   "quranViewPlayFullSurah": "Play Full Surah",
+  "@quranViewPlayFullSurah": {
+    "description": "Action to play audio for the entire surah."
+  },
   "quranViewPlayingFullSurah": "Playing Full Surah",
+  "@quranViewPlayingFullSurah": {
+    "description": "State label while full-surah playback is active."
+  },
   "lastReadNoData": "No last read",
+  "@lastReadNoData": {
+    "description": "Empty state when no last read exists."
+  },
   "lastReadContinueButton": "Continue",
+  "@lastReadContinueButton": {
+    "description": "Button to continue from last read."
+  },
   "readingPreferencesTitle": "Reading Preferences",
+  "@readingPreferencesTitle": {
+    "description": "Title for reading display options."
+  },
   "translationLabel": "Translation",
+  "@translationLabel": {
+    "description": "Toggle label for showing translation."
+  },
   "translationSubtitle": "Show meaning under each ayah",
+  "@translationSubtitle": {
+    "description": "Subtitle for the translation toggle."
+  },
   "transliterationLabel": "Transliteration",
+  "@transliterationLabel": {
+    "description": "Toggle label for showing transliteration."
+  },
   "transliterationSubtitle": "Show pronunciation in Latin letters",
+  "@transliterationSubtitle": {
+    "description": "Subtitle for the transliteration toggle."
+  },
   "surahLoadingTitle": "Loading Surah...",
+  "@surahLoadingTitle": {
+    "description": "Title while a surah is loading."
+  },
   "surahLoadingSubtitle": "جارٍ التحميل",
+  "@surahLoadingSubtitle": {
+    "description": "Subtitle while a surah is loading (Arabic)."
+  },
   "saveProgressTitle": "Save Progress",
+  "@saveProgressTitle": {
+    "description": "Title of the save-reading-progress dialog."
+  },
   "saveProgressPrompt": "Mark up to Verse {number} as read?",
   "@saveProgressPrompt": {
+    "description": "Asks the user to confirm marking verses as read up to a number.",
     "placeholders": {
       "number": {
         "type": "int"
@@ -214,9 +696,381 @@
     }
   },
   "markAsRead": "Mark as Read",
+  "@markAsRead": {
+    "description": "Confirm marking progress as read."
+  },
   "bookmarksTitle": "Bookmarks",
+  "@bookmarksTitle": {
+    "description": "Title for the bookmarks list or screen."
+  },
   "noBookmarksMessage": "No bookmarks found. Start bookmarking verses to see them here!",
+  "@noBookmarksMessage": {
+    "description": "Empty state when the user has no bookmarks."
+  },
   "seeAllBookmarks": "See All",
+  "@seeAllBookmarks": {
+    "description": "Link to open the full bookmarks list."
+  },
   "deleteBookmarkTitle": "Delete Bookmark",
-  "deleteBookmarkMessage": "Are you sure you want to delete this bookmark?"
+  "@deleteBookmarkTitle": {
+    "description": "Title of the delete bookmark confirmation."
+  },
+  "deleteBookmarkMessage": "Are you sure you want to delete this bookmark?",
+  "@deleteBookmarkMessage": {
+    "description": "Body of the delete bookmark confirmation."
+  },
+  "quranReadPreviousSurah": "Previous Surah",
+  "@quranReadPreviousSurah": {
+    "description": "Navigate to the previous surah in the reader."
+  },
+  "quranReadNextSurah": "Next Surah",
+  "@quranReadNextSurah": {
+    "description": "Navigate to the next surah in the reader."
+  },
+  "quranReadPreviousJuz": "Previous Juz",
+  "@quranReadPreviousJuz": {
+    "description": "Navigate to the previous juz in the reader."
+  },
+  "quranReadNextJuz": "Next Juz",
+  "@quranReadNextJuz": {
+    "description": "Navigate to the next juz in the reader."
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Cancel button in dialogs."
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "Undo the last action (e.g. mark as read)."
+  },
+  "markReadSuccessTitle": "Success",
+  "@markReadSuccessTitle": {
+    "description": "Title on snackbar after reading progress was saved."
+  },
+  "markReadProgressUpdated": "Progress updated to Ayah {number}",
+  "@markReadProgressUpdated": {
+    "description": "Snackbar body after marking ayahs as read.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "audioNeedsInternet": "No internet connection. Audio needs internet.",
+  "@audioNeedsInternet": {
+    "description": "Snackbar when playback requires network."
+  },
+  "reciterCompatibilityTitle": "Reciter Compatibility",
+  "@reciterCompatibilityTitle": {
+    "description": "Title on compatibility error card."
+  },
+  "reciterCompatibilityBody1": "The selected reciter provides audio as a \"Whole Chapter\" (Surah) instead of \"Verse by Verse\".",
+  "@reciterCompatibilityBody1": {
+    "description": "First paragraph explaining incompatible reciter audio."
+  },
+  "reciterCompatibilityBody2": "To use the Test feature and track your progress, please choose a reciter that supports verse-level playback.",
+  "@reciterCompatibilityBody2": {
+    "description": "Second paragraph asking user to pick another reciter."
+  },
+  "chooseCompatibleReciter": "Choose Compatible Reciter",
+  "@chooseCompatibleReciter": {
+    "description": "Primary button on reciter compatibility card."
+  },
+  "ayahFinderTitle": "Ayah Finder",
+  "@ayahFinderTitle": {
+    "description": "Title for verse identification feature."
+  },
+  "testMenuAyahFinderSubtitle": "Identify verses by reciting them",
+  "@testMenuAyahFinderSubtitle": {
+    "description": "Subtitle on test menu card for Ayah Finder feature."
+  },
+  "experimental": "Experimental",
+  "@experimental": {
+    "description": "Standalone label for experimental features."
+  },
+  "ayahFinderListeningStatus": "Listening for recitation...",
+  "@ayahFinderListeningStatus": {
+    "description": "Status while microphone is active on Ayah Finder page."
+  },
+  "ayahFinderTapToIdentify": "Tap to identify Ayah",
+  "@ayahFinderTapToIdentify": {
+    "description": "Hint when not listening on Ayah Finder page."
+  },
+  "ayahFinderMatchesPlaceholder": "Matches will appear here",
+  "@ayahFinderMatchesPlaceholder": {
+    "description": "Empty state before any search input on Ayah Finder page."
+  },
+  "ayahFinderNoMatchesYet": "No matches found yet",
+  "@ayahFinderNoMatchesYet": {
+    "description": "Empty state when recognition has no results."
+  },
+  "ayahFinderMatchScoreLabel": "{percent}% match",
+  "@ayahFinderMatchScoreLabel": {
+    "description": "Similarity score label in Ayah Finder results.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "ayahFinderOpenInReader": "Open in reader",
+  "@ayahFinderOpenInReader": {
+    "description": "Opens the Quran reader at the matched surah and ayah from Ayah Finder."
+  },
+  "progressTrackingTitle": "Reading Progress Tracking",
+  "@progressTrackingTitle": {
+    "description": "Title for progress tracking mode sheet and settings tile."
+  },
+  "progressTrackingSmartTitle": "Smart",
+  "@progressTrackingSmartTitle": {
+    "description": "Automatic progress tracking mode name."
+  },
+  "progressTrackingSmartDescription": "Automatically updates your progress based on your reading activity.",
+  "@progressTrackingSmartDescription": {
+    "description": "Description for smart progress tracking."
+  },
+  "progressTrackingManualTitle": "Manual",
+  "@progressTrackingManualTitle": {
+    "description": "Manual progress tracking mode name."
+  },
+  "progressTrackingManualDescription": "Tap the \"double-tick\" icon on the last verse you've read to mark it and everything before it as completed.",
+  "@progressTrackingManualDescription": {
+    "description": "Description for manual progress tracking."
+  },
+  "progressTrackingOffTitle": "Off",
+  "@progressTrackingOffTitle": {
+    "description": "Progress tracking disabled mode name."
+  },
+  "progressTrackingOffDescription": "Progress is not tracked.",
+  "@progressTrackingOffDescription": {
+    "description": "Description when progress tracking is off."
+  },
+  "reciterWhatsAppPromptTitle": "Want more reciters?",
+  "@reciterWhatsAppPromptTitle": {
+    "description": "Title of dialog inviting user to WhatsApp group."
+  },
+  "reciterWhatsAppPromptBody": "If your favorite reciter isn't available yet, you can request it anytime by joining our WhatsApp Feedback Group.\n\nWe use it to collect reciter requests, bug reports, and feature ideas.",
+  "@reciterWhatsAppPromptBody": {
+    "description": "Body text for reciter WhatsApp prompt dialog."
+  },
+  "reciterWhatsAppNotNow": "Not now",
+  "@reciterWhatsAppNotNow": {
+    "description": "Dismiss reciter WhatsApp prompt."
+  },
+  "reciterWhatsAppJoinGroup": "Join group",
+  "@reciterWhatsAppJoinGroup": {
+    "description": "Open WhatsApp from reciter prompt dialog."
+  },
+  "readingInsightsPageTitle": "Reading Insights",
+  "@readingInsightsPageTitle": {
+    "description": "App bar title for reading statistics screen."
+  },
+  "readingInsightsResetAllTitle": "Reset All Progress?",
+  "@readingInsightsResetAllTitle": {
+    "description": "Dialog title for clearing all reading progress."
+  },
+  "readingInsightsResetAllBody": "This will clear all your Quran reading progress. This action cannot be undone.",
+  "@readingInsightsResetAllBody": {
+    "description": "Dialog body for reset all progress."
+  },
+  "readingInsightsResetAllConfirm": "Reset All",
+  "@readingInsightsResetAllConfirm": {
+    "description": "Confirm button for reset all progress."
+  },
+  "readingInsightsResetSurahTitle": "Reset Surah {surahName}?",
+  "@readingInsightsResetSurahTitle": {
+    "description": "Dialog title for resetting one surah's progress.",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahBody": "This will clear all reading progress for Surah {surahName}.",
+  "@readingInsightsResetSurahBody": {
+    "description": "Dialog body for resetting one surah.",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readingInsightsResetSurahConfirm": "Reset",
+  "@readingInsightsResetSurahConfirm": {
+    "description": "Confirm button for reset one surah."
+  },
+  "readingInsightsTooltipResetAll": "Reset All Progress",
+  "@readingInsightsTooltipResetAll": {
+    "description": "Tooltip on reset-all icon."
+  },
+  "readingInsightsTooltipResetSurah": "Reset Surah Progress",
+  "@readingInsightsTooltipResetSurah": {
+    "description": "Tooltip on per-surah reset icon."
+  },
+  "readingInsightsStatRead": "Read",
+  "@readingInsightsStatRead": {
+    "description": "Label for verses read count."
+  },
+  "readingInsightsStatRemaining": "Remaining",
+  "@readingInsightsStatRemaining": {
+    "description": "Label for verses remaining count."
+  },
+  "readingInsightsStatCompleted": "Completed",
+  "@readingInsightsStatCompleted": {
+    "description": "Label for completed surahs count."
+  },
+  "readingInsightsSurahBreakdown": "Surah Breakdown",
+  "@readingInsightsSurahBreakdown": {
+    "description": "Section header above per-surah list."
+  },
+  "readingInsightsOverallProgress": "Overall Progress",
+  "@readingInsightsOverallProgress": {
+    "description": "Label above overall progress bar."
+  },
+  "readingInsightsLastUpdated": "Last updated: {dateTime}",
+  "@readingInsightsLastUpdated": {
+    "description": "Prefix for last-updated timestamp on a surah row.",
+    "placeholders": {
+      "dateTime": {
+        "type": "String"
+      }
+    }
+  },
+  "testNoNextVerseInSurah": "No next verse in this surah",
+  "@testNoNextVerseInSurah": {
+    "description": "Snackbar when recitation test has no following verse."
+  },
+  "recitationReadyListenHint": "Ready to listen. Tap here to start.",
+  "@recitationReadyListenHint": {
+    "description": "Hint under guess-next-ayah on test screen."
+  },
+  "recitationExperimentalLabel": "(Verification is experimental)",
+  "@recitationExperimentalLabel": {
+    "description": "Experimental label for recitation feature."
+  },
+  "recitationReciteVerse": "Recite Verse {number}...",
+  "@recitationReciteVerse": {
+    "description": "Header while user is recording recitation.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationAnalyzingVerse": "Analyzing Verse {number}...",
+  "@recitationAnalyzingVerse": {
+    "description": "Header while recitation is being analyzed.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationVerseResult": "Verse {number} Result",
+  "@recitationVerseResult": {
+    "description": "Header when showing recitation verification result.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "recitationStartNow": "Start reciting now...",
+  "@recitationStartNow": {
+    "description": "Placeholder while recording with no speech yet."
+  },
+  "recitationSimilarityScore": "Similarity Score",
+  "@recitationSimilarityScore": {
+    "description": "Label for similarity percentage in recitation result."
+  },
+  "recitationYourRecitation": "Your Recitation:",
+  "@recitationYourRecitation": {
+    "description": "Label above recognized Arabic text."
+  },
+  "recitationResultPerfect": "MashaAllah! Perfectly Correct",
+  "@recitationResultPerfect": {
+    "description": "Message when recitation matches fully."
+  },
+  "recitationResultAlmost": "Good effort! Almost there",
+  "@recitationResultAlmost": {
+    "description": "Message when recitation is close."
+  },
+  "recitationResultIncorrect": "Incorrect. Please try again",
+  "@recitationResultIncorrect": {
+    "description": "Message when recitation does not match."
+  },
+  "versePickerSearchVerseHint": "Search verse number...",
+  "@versePickerSearchVerseHint": {
+    "description": "Search field hint in verse picker."
+  },
+  "verseSearchNoResults": "No verses found",
+  "@verseSearchNoResults": {
+    "description": "Empty state when verse search has no matches."
+  },
+  "audioPlayerTapToExpandSemantics": "Tap to expand",
+  "@audioPlayerTapToExpandSemantics": {
+    "description": "Semantics hint for collapsed audio player."
+  },
+  "dateRelativeToday": "Today",
+  "@dateRelativeToday": {
+    "description": "Relative date label for today."
+  },
+  "dateRelativeYesterday": "Yesterday",
+  "@dateRelativeYesterday": {
+    "description": "Relative date label for yesterday."
+  },
+  "dateRelativeTomorrow": "Tomorrow",
+  "@dateRelativeTomorrow": {
+    "description": "Relative date label for tomorrow."
+  },
+  "adhkarHomeTitle": "Adhkar",
+  "@adhkarHomeTitle": {
+    "description": "Title on Adhkar home screen."
+  },
+  "adhkarHomeSubtitle": "A collection of timeless supplications to anchor the heart and protect you",
+  "@adhkarHomeSubtitle": {
+    "description": "Subtitle on Adhkar home screen."
+  },
+  "adhkarCategoryMorning": "Morning",
+  "@adhkarCategoryMorning": {
+    "description": "Adhkar category: morning."
+  },
+  "adhkarCategoryEvening": "Evening",
+  "@adhkarCategoryEvening": {
+    "description": "Adhkar category: evening."
+  },
+  "adhkarCategoryBeforeSleeping": "Before sleeping",
+  "@adhkarCategoryBeforeSleeping": {
+    "description": "Adhkar category: before sleep."
+  },
+  "adhkarCategoryWakingUp": "Waking up",
+  "@adhkarCategoryWakingUp": {
+    "description": "Adhkar category: waking up."
+  },
+  "notificationsUpdateError": "Could not update notifications: {message}",
+  "@notificationsUpdateError": {
+    "description": "Snackbar when saving notification settings failed.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLinkWebsite": "Website",
+  "@settingsLinkWebsite": {
+    "description": "Analytics/link label for official website."
+  },
+  "settingsLinkWhatsAppChannel": "WhatsApp Channel",
+  "@settingsLinkWhatsAppChannel": {
+    "description": "Analytics/link label for WhatsApp channel."
+  },
+  "quranResumeReadingPrompt": "You skipped some verses. Continue from Ayah {ayah}?",
+  "@quranResumeReadingPrompt": {
+    "description": "Banner asking to jump to first unread ayah.",
+    "placeholders": {
+      "ayah": {
+        "type": "int"
+      }
+    }
+  }
 }

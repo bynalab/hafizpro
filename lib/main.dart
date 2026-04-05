@@ -22,8 +22,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
+    androidNotificationChannelId: 'com.bynalab.hafiz_test.channel.audio',
+    androidNotificationChannelName: 'Hafiz Pro Audio',
     androidNotificationOngoing: true,
   );
 
@@ -83,7 +83,8 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
       final storage = getIt<IStorageService>();
       final raw = storage.getString('language');
       if (raw == null) return;
-      if (raw != 'en' && raw != 'ar') return;
+      const allowed = {'en', 'ar', 'ru', 'de'};
+      if (!allowed.contains(raw)) return;
       appLocale.value = Locale(raw);
     } catch (_) {
       // Ignore locale restore errors.
@@ -152,7 +153,8 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
         return MaterialApp(
           scaffoldMessengerKey: appScaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
-          title: 'Quran Hafiz',
+          onGenerateTitle: (context) =>
+              AppLocalizations.of(context)!.appTitle,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: _themeMode,
@@ -160,6 +162,8 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
           supportedLocales: const [
             Locale('en'),
             Locale('ar'),
+            Locale('ru'),
+            Locale('de'),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,

@@ -1,7 +1,9 @@
-import 'package:hafiz_test/services/network.services.dart';
-import 'package:hafiz_test/services/quran_db.dart';
-import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/services/quran_sources.dart';
 import 'package:hafiz_test/services/surah_source.dart';
+import 'package:hafiz_test/services/quran_search_service.dart';
+import 'package:hafiz_test/services/quran_db.dart';
+import 'package:hafiz_test/services/network.services.dart';
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 
@@ -15,6 +17,8 @@ class DbSurahSource implements SurahSource {
     required this.translationId,
     required this.transliterationId,
   });
+
+  QuranDb get quranDb => db;
 
   @override
   Future<Surah> getSurah(int surahNumber) async {
@@ -33,18 +37,26 @@ class DbSurahSource implements SurahSource {
   }
 }
 
-Future<SurahSource> createQuranSources({
+Future<QuranSources> createQuranSources({
   required NetworkServices networkServices,
   required IStorageService storageServices,
 }) async {
   final db = QuranDb();
   await db.init();
 
-  return DbSurahSource(
-    db: db,
-    translationId: () =>
-        storageServices.getString('translation_id') ?? 'en_default',
-    transliterationId: () =>
-        storageServices.getString('transliteration_id') ?? 'tr_default',
+  final searchService = QuranSearchService(db: db);
+  // We don't await init here to avoid blocking startup,
+  // but it will be ready soon.
+  searchService.init();
+
+  return QuranSources(
+    surahSource: DbSurahSource(
+      db: db,
+      translationId: () =>
+          storageServices.getString('translation_id') ?? 'en_default',
+      transliterationId: () =>
+          storageServices.getString('transliteration_id') ?? 'tr_default',
+    ),
+    searchService: searchService,
   );
 }

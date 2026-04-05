@@ -341,9 +341,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -375,9 +373,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -464,9 +460,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -506,9 +500,7 @@ class AudioCenter extends ChangeNotifier {
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
-      AppMessenger.showSnackBar(
-        'No internet connection. Audio needs internet.',
-      );
+      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
       return;
     }
@@ -526,6 +518,10 @@ class AudioCenter extends ChangeNotifier {
           notifyListeners();
           await _audioServices.pause(audioName: currentSurahName);
           return;
+        }
+
+        if (_uiState == AudioPlayerUiState.hidden) {
+          _uiState = AudioPlayerUiState.expanded;
         }
 
         // Resume playback without rewinding. Only seek when a non-zero index
@@ -571,6 +567,10 @@ class AudioCenter extends ChangeNotifier {
 
       if (playlist.isEmpty) {
         throw Exception('No verses available for Juz ${juz.number}');
+      }
+
+      if (_uiState == AudioPlayerUiState.hidden) {
+        _uiState = AudioPlayerUiState.expanded;
       }
 
       await _audioServices.setPlaylistAudio(playlist);

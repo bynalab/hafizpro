@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/data/juz_list.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
@@ -7,15 +8,22 @@ import 'package:hafiz_test/model/juz.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/model/bookmark.model.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
+import 'package:hafiz_test/quran/share/verse_share_controller.dart';
 import 'package:hafiz_test/quran/widgets/ayah_card.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
+import 'package:hafiz_test/quran/widgets/quran_adjacent_reader_nav_bar.dart';
 import 'package:hafiz_test/quran/widgets/quran_settings_button.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
+import 'package:hafiz_test/quran/focus_read/mushaf_surah_layout.dart';
+import 'package:hafiz_test/quran/focus_read/quran_mushaf_panel.dart';
+import 'package:hafiz_test/quran/focus_read/quran_verse_focus_panel.dart';
+import 'package:hafiz_test/quran/focus_read/verse_focus_item.dart';
 import 'package:hafiz_test/util/bismillah.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
+import 'package:hafiz_test/util/tarteel_audio.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -51,6 +59,12 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
   double _speed = 1.5;
 
+  PageController? _focusPageController;
+  int _focusPageIndex = 0;
+
+  PageController? _mushafPageController;
+  int _mushafPageIndex = 0;
+
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ItemPositionsListener _itemPositionsListener =
       ItemPositionsListener.create();
@@ -71,6 +85,184 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   String get _rangeText {
     final j = widget.juz;
     return '${_surahName(j.startSurah)}(${_pad2(j.startAyah)}) : ${_surahName(j.endSurah)}(${_pad2(j.endAyah)})';
+  }
+
+  List<VerseFocusItem> get _verseFocusItems {
+    final out = <VerseFocusItem>[];
+    for (final e in _entries) {
+      if (e.type != _JuzEntryType.ayah) continue;
+      final g = e.globalAyahIndex;
+      final s = e.surah;
+      final a = e.ayah;
+      if (g == null || s == null || a == null) continue;
+      out.add(
+        VerseFocusItem(
+          surah: s,
+          ayah: a,
+          displayArabic: e.displayText ?? a.text,
+          playingIndex: g,
+        ),
+      );
+    }
+    return out;
+  }
+
+  List<Ayah> get _juzAyahsOrdered {
+    final out = <Ayah>[];
+    for (final e in _entries) {
+      if (e.type == _JuzEntryType.ayah && e.ayah != null) {
+        out.add(e.ayah!);
+      }
+    }
+    return out;
+  }
+
+  List<MushafVerseLine> get _mushafLines {
+    final out = <MushafVerseLine>[];
+    for (final e in _entries) {
+      if (e.type != _JuzEntryType.ayah) continue;
+      final g = e.globalAyahIndex;
+      final s = e.surah;
+      final a = e.ayah;
+      if (g == null || s == null || a == null) continue;
+      out.add(
+        MushafVerseLine(
+          surah: s,
+          ayah: a,
+          displayArabic: e.displayText ?? a.text,
+          playingIndex: g,
+        ),
+      );
+    }
+    return out;
+  }
+
+  void _disposeFocusController() {
+    _focusPageController?.dispose();
+    _focusPageController = null;
+  }
+
+  void _disposeMushafController() {
+    _mushafPageController?.dispose();
+    _mushafPageController = null;
+  }
+
+  void _ensureFocusController(int initialPage) {
+    final items = _verseFocusItems;
+    if (items.isEmpty) return;
+    final max = items.length - 1;
+    final p = initialPage.clamp(0, max);
+    _focusPageController?.dispose();
+    _focusPageController = PageController(initialPage: p);
+    _focusPageIndex = p;
+  }
+
+  void _ensureMushafController(int initialSliceIndex) {
+    final ayahs = _juzAyahsOrdered;
+    final slices = buildMushafSlicesForSurah(ayahs);
+    if (slices.isEmpty) return;
+    final max = slices.length - 1;
+    final p = initialSliceIndex.clamp(0, max);
+    _mushafPageController?.dispose();
+    _mushafPageController = PageController(initialPage: p);
+    _mushafPageIndex = p;
+  }
+
+  void _syncReaderModeWithView() {
+    if (_globalAyahIndexToEntryIndex.isEmpty) return;
+
+    final mode = ReadingPreferences.fromStorage(_storage).readerViewMode;
+    final items = _verseFocusItems;
+    final ayahs = _juzAyahsOrdered;
+    if (items.isEmpty || ayahs.isEmpty) return;
+
+    if (mode == QuranReaderViewMode.verseFocus) {
+      _disposeMushafController();
+      final idx = _playingIndexNotifier.value ?? _focusPageIndex;
+      _ensureFocusController(idx);
+      return;
+    }
+
+    if (mode == QuranReaderViewMode.mushaf) {
+      _disposeFocusController();
+      final slices = buildMushafSlicesForSurah(ayahs);
+      if (slices.isEmpty) return;
+      final int ayahIdx;
+      if (_playingIndexNotifier.value != null) {
+        ayahIdx =
+            _playingIndexNotifier.value!.clamp(0, ayahs.length - 1);
+      } else if (_mushafPageIndex >= 0 &&
+          _mushafPageIndex < slices.length) {
+        ayahIdx = slices[_mushafPageIndex].ayahIndices.first;
+      } else {
+        ayahIdx = 0;
+      }
+      final sliceIdx = mushafSliceIndexForAyahIndex(slices, ayahIdx);
+      _ensureMushafController(sliceIdx);
+      return;
+    }
+
+    _disposeFocusController();
+    _disposeMushafController();
+  }
+
+  void _onPlayingIndexChangedForReader() {
+    final idx = _playingIndexNotifier.value;
+    if (idx == null) return;
+
+    final mode = ReadingPreferences.fromStorage(_storage).readerViewMode;
+    if (mode == QuranReaderViewMode.verseFocus) {
+      final items = _verseFocusItems;
+      if (items.isEmpty) return;
+      final max = items.length - 1;
+      final p = idx.clamp(0, max);
+      void animate() {
+        final c = _focusPageController;
+        if (c != null && c.hasClients) {
+          c.animateToPage(
+            p,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      }
+
+      animate();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        animate();
+      });
+      setState(() => _focusPageIndex = p);
+      return;
+    }
+
+    if (mode == QuranReaderViewMode.mushaf) {
+      final ayahs = _juzAyahsOrdered;
+      if (ayahs.isEmpty) return;
+      final slices = buildMushafSlicesForSurah(ayahs);
+      if (slices.isEmpty) return;
+      final p = mushafSliceIndexForAyahIndex(
+        slices,
+        idx.clamp(0, ayahs.length - 1),
+      );
+      void animate() {
+        final c = _mushafPageController;
+        if (c != null && c.hasClients) {
+          c.animateToPage(
+            p,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      }
+
+      animate();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        animate();
+      });
+      setState(() => _mushafPageIndex = p);
+    }
   }
 
   Future<void> _load() async {
@@ -141,6 +333,16 @@ class _JuzQuranViewState extends State<JuzQuranView> {
         _isLoading = false;
       });
 
+      _syncReaderModeWithView();
+      if (mounted) setState(() {});
+
+      final reciterId = _storage.getReciterId();
+      final reciter = TarteelAudio.reciterForId(reciterId);
+      if (reciter?.isSurahBySurah == true &&
+          _audioCenter.uiState == AudioPlayerUiState.hidden) {
+        _audioCenter.setUiState(AudioPlayerUiState.expanded);
+      }
+
       _itemPositionsListener.itemPositions.addListener(_onPositionsChanged);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -182,6 +384,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
   @override
   void initState() {
     super.initState();
+    _playingIndexNotifier.addListener(_onPlayingIndexChangedForReader);
     _load();
 
     _audioCenter.juzPlayingIndexNotifier.addListener(_onJuzAudioIndexChanged);
@@ -189,9 +392,12 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
   @override
   void dispose() {
+    _playingIndexNotifier.removeListener(_onPlayingIndexChangedForReader);
     _itemPositionsListener.itemPositions.removeListener(_onPositionsChanged);
     _audioCenter.juzPlayingIndexNotifier
         .removeListener(_onJuzAudioIndexChanged);
+    _disposeFocusController();
+    _disposeMushafController();
     _playingIndexNotifier.dispose();
     _isPlayingNotifier.dispose();
     super.dispose();
@@ -212,6 +418,11 @@ class _JuzQuranViewState extends State<JuzQuranView> {
 
     final entryIndex = _globalAyahIndexToEntryIndex[idx];
     _playingIndexNotifier.value = idx;
+
+    final layoutMode = ReadingPreferences.fromStorage(_storage).readerViewMode;
+    if (layoutMode != QuranReaderViewMode.normal) {
+      return;
+    }
 
     if (!_itemScrollController.isAttached) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -316,6 +527,15 @@ class _JuzQuranViewState extends State<JuzQuranView> {
     await _audioCenter.toggleJuz(widget.juz, startIndex: globalIndex);
   }
 
+  void _openAdjacentJuz(int juzNumber) {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => JuzQuranView(juz: findJuzByNumber(juzNumber)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -342,6 +562,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
       );
     }
 
+    final readerViewMode = prefs.readerViewMode;
+
     return Scaffold(
       backgroundColor: isDark
           ? Theme.of(context).scaffoldBackgroundColor
@@ -350,95 +572,100 @@ class _JuzQuranViewState extends State<JuzQuranView> {
         children: [
           Container(
             color: isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6),
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+            padding: const EdgeInsets.fromLTRB(18, 6, 18, 10),
             child: SafeArea(
               bottom: false,
               child: SizedBox(
-                height: 120,
-                child: Stack(
+                height: 54,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1A1A1A)
+                                : Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 18,
                               color: isDark
-                                  ? const Color(0xFF1A1A1A)
-                                  : Colors.white,
-                              shape: BoxShape.circle,
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
                             ),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Juz ${widget.juz.number}',
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                height: 1.15,
+                                fontWeight: FontWeight.w700,
                                 color: isDark
                                     ? Colors.white
                                     : const Color(0xFF111827),
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 1),
+                            Text(
+                              '$_rangeText · ${context.l10n.testVersesCount(widget.juz.ayahCount)}',
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                height: 1.15,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.75)
+                                    : const Color(0xFF111827)
+                                        .withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          'Juz ${widget.juz.number}',
-                          style: GoogleFonts.cairo(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                isDark ? Colors.white : const Color(0xFF111827),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: QuranSettingsButton(
-                        storage: _storage,
-                        isDark: isDark,
-                        onChanged: () {
-                          if (mounted) setState(() {});
-                        },
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _rangeText,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? const Color(0xFFE5E7EB)
-                                  : const Color(0xFF111827),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            context.l10n.testVersesCount(widget.juz.ayahCount),
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: isDark
-                                  ? const Color(0xFF9CA3AF)
-                                  : const Color(0xFF111827),
-                            ),
-                          ),
-                        ],
-                      ),
+                    QuranSettingsButton(
+                      storage: _storage,
+                      isDark: isDark,
+                      onChanged: () {
+                        if (!mounted) return;
+                        _syncReaderModeWithView();
+                        setState(() {});
+                        final layout =
+                            ReadingPreferences.fromStorage(_storage)
+                                .readerViewMode;
+                        if (layout == QuranReaderViewMode.normal) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!mounted) return;
+                            final i = _playingIndexNotifier.value;
+                            if (i != null) {
+                              _setPlayingIndexAndScroll(i, animated: false);
+                            }
+                          });
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -458,12 +685,120 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                     } else if (state == AudioPlayerUiState.expanded) {
                       bottomPadding = 200;
                     }
+
+                    final reciterId = _storage.getReciterId();
+                    final reciter = TarteelAudio.reciterForId(reciterId);
+                    final showPlayButton = reciter?.isVerseByVerse ?? true;
+
+                    final juzPrev = widget.juz.number > 1
+                        ? () => _openAdjacentJuz(widget.juz.number - 1)
+                        : null;
+                    final juzNext = widget.juz.number < juzList.length
+                        ? () => _openAdjacentJuz(widget.juz.number + 1)
+                        : null;
+                    final l10n = context.l10n;
+
+                    if (readerViewMode == QuranReaderViewMode.mushaf) {
+                      if (_mushafPageController == null) {
+                        return const Center(
+                          child: SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      final lines = _mushafLines;
+                      final ayahs = _juzAyahsOrdered;
+                      final slices = buildMushafSlicesForSurah(ayahs);
+                      if (slices.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return QuranMushafPanel(
+                        lines: lines,
+                        slices: slices,
+                        pageController: _mushafPageController!,
+                        prefs: prefs,
+                        onPageChanged: (i) =>
+                            setState(() => _mushafPageIndex = i),
+                        playingIndexNotifier: _playingIndexNotifier,
+                        dark: isDark,
+                        contentBottomInset:
+                            BottomAudioControls.readerBottomClearance(
+                          context,
+                          state,
+                        ),
+                        showSurahBoundaries: true,
+                        onPreviousNav: juzPrev,
+                        previousNavLabel: juzPrev != null
+                            ? l10n.quranReadPreviousJuz
+                            : null,
+                        onNextNav: juzNext,
+                        nextNavLabel:
+                            juzNext != null ? l10n.quranReadNextJuz : null,
+                      );
+                    }
+
+                    if (readerViewMode == QuranReaderViewMode.verseFocus) {
+                      if (_focusPageController == null) {
+                        return const Center(
+                          child: SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      return QuranVerseFocusPanel(
+                        items: _verseFocusItems,
+                        pageController: _focusPageController!,
+                        prefs: prefs,
+                        onPageChanged: (i) =>
+                            setState(() => _focusPageIndex = i),
+                        onControlPressed: (i) => _onPlayPressed(i),
+                        playingIndexNotifier: _playingIndexNotifier,
+                        isPlayingNotifier: _isPlayingNotifier,
+                        audioCenter: _audioCenter,
+                        dark: isDark,
+                        bottomPadding: bottomPadding,
+                        onBookmarkUpdated: () => setState(() {}),
+                        loadingMatchJuzNumber: widget.juz.number,
+                        bookmarkViewContext: BookmarkViewContext.juz,
+                        juzNumber: widget.juz.number,
+                        onPreviousNav: juzPrev,
+                        previousNavLabel: juzPrev != null
+                            ? l10n.quranReadPreviousJuz
+                            : null,
+                        onNextNav: juzNext,
+                        nextNavLabel:
+                            juzNext != null ? l10n.quranReadNextJuz : null,
+                      );
+                    }
+
                     return ScrollablePositionedList.separated(
-                      padding: EdgeInsets.only(top: 54, bottom: bottomPadding),
-                      itemCount: _entries.length,
+                      padding: EdgeInsets.only(
+                        top: readerViewMode == QuranReaderViewMode.normal
+                            ? 54
+                            : 0,
+                        bottom: bottomPadding,
+                      ),
+                      itemCount: _entries.length + 1,
                       itemScrollController: _itemScrollController,
                       itemPositionsListener: _itemPositionsListener,
                       itemBuilder: (context, index) {
+                        if (index == _entries.length) {
+                          return QuranAdjacentReaderNavBar(
+                            onPrevious: juzPrev,
+                            previousLabel: juzPrev != null
+                                ? l10n.quranReadPreviousJuz
+                                : null,
+                            onNext: juzNext,
+                            nextLabel: juzNext != null
+                                ? l10n.quranReadNextJuz
+                                : null,
+                          );
+                        }
+
                         final entry = _entries[index];
 
                         switch (entry.type) {
@@ -507,6 +842,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                               ),
                               playingIndexNotifier: _playingIndexNotifier,
                               isPlayingNotifier: _isPlayingNotifier,
+                              audioCenter: _audioCenter,
+                              loadingMatchJuzNumber: widget.juz.number,
                               prefs: prefs,
                               backgroundColor: isDark
                                   ? (isEven
@@ -515,6 +852,7 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                   : (isEven
                                       ? const Color(0xFFFCFCFC)
                                       : const Color(0xFFF2F2F2)),
+                              showPlayButton: showPlayButton,
                               onPlayPressed: _onPlayPressed,
                               isBookmarked: isBookmarked,
                               onBookmark: (idx) async {
@@ -538,6 +876,18 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                                 }
                                 if (mounted) setState(() {});
                               },
+                              onShare: () {
+                                final s = entry.surah;
+                                if (s == null) return;
+                                VerseShareController.shareVerse(
+                                  context: context,
+                                  surah: s,
+                                  ayah: ayah,
+                                  displayArabic:
+                                      entry.displayText ?? ayah.text,
+                                );
+                              },
+                              verseShareTooltip: context.l10n.verseShareTooltip,
                             );
                         }
                       },
@@ -545,7 +895,8 @@ class _JuzQuranViewState extends State<JuzQuranView> {
                     );
                   },
                 ),
-                _PinnedHeader(title: _currentStickySurahTitle),
+                if (readerViewMode == QuranReaderViewMode.normal)
+                  _PinnedHeader(title: _currentStickySurahTitle),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: ListenableBuilder(
