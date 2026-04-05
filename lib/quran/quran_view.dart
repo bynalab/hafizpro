@@ -8,6 +8,7 @@ import 'package:hafiz_test/quran/widgets/error.dart';
 import 'package:hafiz_test/quran/focus_read/quran_mushaf_panel.dart';
 import 'package:hafiz_test/quran/focus_read/quran_verse_focus_panel.dart';
 import 'package:hafiz_test/quran/focus_read/mushaf_surah_layout.dart';
+import 'package:hafiz_test/quran/focus_read/verse_focus_item.dart';
 import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
@@ -543,11 +544,11 @@ class _QuranViewState extends State<QuranView> {
           children: [
             Container(
               color: isDark ? const Color(0xFF1D353B) : const Color(0xFF78B7C6),
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+              padding: const EdgeInsets.fromLTRB(18, 6, 18, 10),
               child: SafeArea(
                 bottom: false,
                 child: SizedBox(
-                  height: 70,
+                  height: 54,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -587,12 +588,13 @@ class _QuranViewState extends State<QuranView> {
                                   borderRadius: BorderRadius.circular(12),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
+                                      horizontal: 6,
+                                      vertical: 2,
                                     ),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
@@ -606,7 +608,8 @@ class _QuranViewState extends State<QuranView> {
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 16,
+                                                  height: 1.15,
                                                   fontWeight: FontWeight.w700,
                                                   color: isDark
                                                       ? Colors.white
@@ -616,14 +619,14 @@ class _QuranViewState extends State<QuranView> {
                                             ),
                                             Icon(
                                               Icons.keyboard_arrow_down_rounded,
-                                              size: 20,
+                                              size: 18,
                                               color: isDark
                                                   ? Colors.white
                                                   : const Color(0xFF111827),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 1),
                                         Text(
                                           context.l10n.testVersesCount(
                                             viewModel.surah!.numberOfAyahs,
@@ -632,6 +635,7 @@ class _QuranViewState extends State<QuranView> {
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.montserrat(
                                             fontSize: 11,
+                                            height: 1.15,
                                             fontWeight: FontWeight.w600,
                                             color: isDark
                                                 ? Colors.white.withValues(
@@ -721,15 +725,22 @@ class _QuranViewState extends State<QuranView> {
                                             ),
                                           );
                                         }
-                                        final slices =
-                                            buildMushafSlicesForSurah(
-                                          viewModel.surah!.ayahs,
+                                        final s = viewModel.surah!;
+                                        final showBi =
+                                            viewModel.shouldShowBismillah(
+                                          s.number,
                                         );
+                                        final mushafLines = mushafLinesForSurah(
+                                          s,
+                                          showBismillah: showBi,
+                                        );
+                                        final slices =
+                                            buildMushafSlicesForSurah(s.ayahs);
                                         if (slices.isEmpty) {
                                           return const SizedBox.shrink();
                                         }
                                         return QuranMushafPanel(
-                                          surah: viewModel.surah!,
+                                          lines: mushafLines,
                                           slices: slices,
                                           pageController:
                                               _mushafPageController!,
@@ -740,10 +751,6 @@ class _QuranViewState extends State<QuranView> {
                                           playingIndexNotifier:
                                               viewModel.playingIndexNotifier,
                                           dark: isDark,
-                                          showBismillah:
-                                              viewModel.shouldShowBismillah(
-                                            viewModel.surah?.number,
-                                          ),
                                           contentBottomInset:
                                               BottomAudioControls
                                                   .readerBottomClearance(
@@ -768,8 +775,17 @@ class _QuranViewState extends State<QuranView> {
                                             ),
                                           );
                                         }
+                                        final s = viewModel.surah!;
+                                        final focusItems =
+                                            verseFocusItemsForSurah(
+                                          s,
+                                          showBismillah:
+                                              viewModel.shouldShowBismillah(
+                                            s.number,
+                                          ),
+                                        );
                                         return QuranVerseFocusPanel(
-                                          surah: viewModel.surah!,
+                                          items: focusItems,
                                           pageController:
                                               _focusPageController!,
                                           prefs: readerPrefs,
@@ -785,14 +801,11 @@ class _QuranViewState extends State<QuranView> {
                                           audioCenter: viewModel.audioCenter,
                                           dark: isDark,
                                           bottomPadding: bottomPadding,
-                                          showBismillah:
-                                              viewModel.shouldShowBismillah(
-                                            viewModel.surah?.number,
-                                          ),
                                           readingProgressController:
                                               _progressController,
                                           onBookmarkUpdated: () =>
                                               setState(() {}),
+                                          loadingMatchSurahNumber: s.number,
                                         );
                                       }
 

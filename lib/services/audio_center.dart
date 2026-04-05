@@ -520,6 +520,10 @@ class AudioCenter extends ChangeNotifier {
           return;
         }
 
+        if (_uiState == AudioPlayerUiState.hidden) {
+          _uiState = AudioPlayerUiState.expanded;
+        }
+
         // Resume playback without rewinding. Only seek when a non-zero index
         // is explicitly requested (e.g. user taps a specific verse).
         if (startIndex != 0) {
@@ -563,6 +567,10 @@ class AudioCenter extends ChangeNotifier {
 
       if (playlist.isEmpty) {
         throw Exception('No verses available for Juz ${juz.number}');
+      }
+
+      if (_uiState == AudioPlayerUiState.hidden) {
+        _uiState = AudioPlayerUiState.expanded;
       }
 
       await _audioServices.setPlaylistAudio(playlist);

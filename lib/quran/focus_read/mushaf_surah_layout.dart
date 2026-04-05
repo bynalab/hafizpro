@@ -1,6 +1,25 @@
 import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/util/bismillah.dart';
 
-/// One Madani mushaf page (or a single fallback slice) within the current surah.
+/// One line of Arabic in mushaf order (single surah or juz sequence).
+class MushafVerseLine {
+  const MushafVerseLine({
+    required this.surah,
+    required this.ayah,
+    required this.displayArabic,
+    required this.playingIndex,
+  });
+
+  final Surah surah;
+  final Ayah ayah;
+  final String displayArabic;
+
+  /// Matched with [ValueNotifier] for highlight / audio (surah-local or juz-global).
+  final int playingIndex;
+}
+
+/// One Madani mushaf page (or a single fallback slice) within a verse sequence.
 class MushafPageSlice {
   const MushafPageSlice({
     required this.mushafPageNumber,
@@ -10,7 +29,7 @@ class MushafPageSlice {
   /// Standard mushaf page 1–604; `0` when metadata is missing (whole surah on one “page”).
   final int mushafPageNumber;
 
-  /// Indices into [Surah.ayahs], in surah order.
+  /// Indices into [MushafVerseLine] list or [Surah.ayahs] (same order).
   final List<int> ayahIndices;
 }
 
@@ -52,4 +71,22 @@ int mushafSliceIndexForAyahIndex(List<MushafPageSlice> slices, int ayahIndex) {
     if (slices[s].ayahIndices.contains(ayahIndex)) return s;
   }
   return 0;
+}
+
+/// Builds [MushafVerseLine]s for a whole surah (same order as [Surah.ayahs]).
+List<MushafVerseLine> mushafLinesForSurah(
+  Surah surah, {
+  required bool showBismillah,
+}) {
+  return List.generate(
+    surah.ayahs.length,
+    (i) => MushafVerseLine(
+      surah: surah,
+      ayah: surah.ayahs[i],
+      displayArabic: (showBismillah && i == 0)
+          ? Bismillah.trimLeadingForDisplay(surah.ayahs[i].text)
+          : surah.ayahs[i].text,
+      playingIndex: i,
+    ),
+  );
 }

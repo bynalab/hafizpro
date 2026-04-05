@@ -34,7 +34,7 @@ class QuranAyahList extends StatelessWidget {
   final VoidCallback? onNextSurah;
   final AudioCenter audioCenter;
 
-  QuranAyahList({
+  const QuranAyahList({
     super.key,
     required this.surah,
     required this.showBismillah,
