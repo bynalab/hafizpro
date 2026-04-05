@@ -33,6 +33,37 @@ class BottomAudioControls extends StatelessWidget {
     required this.onTogglePlayPause,
   });
 
+  /// Fixed bottom inset for reader UIs when the bar is expanded.
+  /// Tune here if [_buildExpanded] height changes.
+  static const double kReaderBottomInsetExpanded = 200;
+
+  /// Fixed bottom inset for reader UIs when the bar is minimized (collapsed).
+  /// Tune here if [_buildCollapsed] height changes.
+  static const double kReaderBottomInsetMinimized =
+      kReaderBottomInsetExpanded - 120;
+
+  /// Space reader bodies should leave above this bar so content is not covered.
+  ///
+  /// **hidden:** `0` when the bar is absent; only [MediaQuery.viewInsets.bottom]
+  /// (IME) is added.
+  ///
+  /// **collapsed / expanded:** [kReaderBottomInsetMinimized] /
+  /// [kReaderBottomInsetExpanded] — no layout math, adjust constants if needed.
+  static double readerBottomClearance(
+    BuildContext context,
+    AudioPlayerUiState uiState,
+  ) {
+    final ime = MediaQuery.viewInsetsOf(context).bottom;
+    switch (uiState) {
+      case AudioPlayerUiState.hidden:
+        return ime;
+      case AudioPlayerUiState.collapsed:
+        return kReaderBottomInsetMinimized;
+      case AudioPlayerUiState.expanded:
+        return kReaderBottomInsetExpanded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(

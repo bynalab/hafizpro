@@ -208,9 +208,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         'Amiri',
                                       );
-                                      setSheetState(() => prefs = prefs
-                                          .copyWith(arabicFontFamily: 'Amiri'));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                     fontStyle: GoogleFonts.amiri(),
                                   ),
@@ -228,10 +228,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         'Lateef',
                                       );
-                                      setSheetState(() => prefs =
-                                          prefs.copyWith(
-                                              arabicFontFamily: 'Lateef'));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                     fontStyle: GoogleFonts.lateef(),
                                   ),
@@ -249,11 +248,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         'Scheherazade New',
                                       );
-                                      setSheetState(() => prefs =
-                                          prefs.copyWith(
-                                              arabicFontFamily:
-                                                  'Scheherazade New'));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                     fontStyle: GoogleFonts.scheherazadeNew(),
                                   ),
@@ -284,11 +281,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         QuranReaderViewMode.normal,
                                       );
-                                      setSheetState(() => prefs =
-                                          prefs.copyWith(
-                                              readerViewMode:
-                                                  QuranReaderViewMode.normal));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                   ),
                                 ),
@@ -305,12 +300,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         QuranReaderViewMode.verseFocus,
                                       );
-                                      setSheetState(() => prefs =
-                                          prefs.copyWith(
-                                              readerViewMode:
-                                                  QuranReaderViewMode
-                                                      .verseFocus));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                   ),
                                 ),
@@ -327,11 +319,9 @@ class QuranSettingsButton extends StatelessWidget {
                                         storage,
                                         QuranReaderViewMode.mushaf,
                                       );
-                                      setSheetState(() => prefs =
-                                          prefs.copyWith(
-                                              readerViewMode:
-                                                  QuranReaderViewMode.mushaf));
+                                      if (!ctx.mounted) return;
                                       onChanged();
+                                      Navigator.of(ctx).pop();
                                     },
                                   ),
                                 ),

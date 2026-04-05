@@ -5,13 +5,14 @@ import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/data/surah_list.dart';
 import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/quran/widgets/error.dart';
-import 'package:hafiz_test/quran/focus_read/quran_mushaf_placeholder_panel.dart';
+import 'package:hafiz_test/quran/focus_read/quran_mushaf_panel.dart';
 import 'package:hafiz_test/quran/focus_read/quran_verse_focus_panel.dart';
+import 'package:hafiz_test/quran/focus_read/mushaf_surah_layout.dart';
+import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/quran/quran_list.dart';
 import 'package:hafiz_test/quran/quran_viewmodel.dart';
 import 'package:hafiz_test/quran/surah_loader.dart';
 import 'package:hafiz_test/quran/widgets/quran_settings_button.dart';
-import 'package:hafiz_test/quran/widgets/bottom_audio_controls.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -49,9 +50,17 @@ class _QuranViewState extends State<QuranView> {
   PageController? _focusPageController;
   int _focusPageIndex = 0;
 
+  PageController? _mushafPageController;
+  int _mushafPageIndex = 0;
+
   void _disposeFocusController() {
     _focusPageController?.dispose();
     _focusPageController = null;
+  }
+
+  void _disposeMushafController() {
+    _mushafPageController?.dispose();
+    _mushafPageController = null;
   }
 
   void _ensureFocusController(int initialPage) {
@@ -64,15 +73,52 @@ class _QuranViewState extends State<QuranView> {
     _focusPageIndex = p;
   }
 
+  void _ensureMushafController(int initialSliceIndex) {
+    final surahVm = viewModel.surah;
+    if (surahVm == null) return;
+    final slices = buildMushafSlicesForSurah(surahVm.ayahs);
+    if (slices.isEmpty) return;
+    final max = slices.length - 1;
+    final p = initialSliceIndex.clamp(0, max);
+    _mushafPageController?.dispose();
+    _mushafPageController = PageController(initialPage: p);
+    _mushafPageIndex = p;
+  }
+
   void _syncReaderModeWithView() {
     final prefs = ReadingPreferences.fromStorage(_storage);
-    if (prefs.readerViewMode != QuranReaderViewMode.verseFocus) {
-      _disposeFocusController();
+    if (viewModel.surah == null) return;
+    final mode = prefs.readerViewMode;
+
+    if (mode == QuranReaderViewMode.verseFocus) {
+      _disposeMushafController();
+      final idx = viewModel.playingIndexNotifier.value ?? _focusPageIndex;
+      _ensureFocusController(idx);
       return;
     }
-    if (viewModel.surah == null) return;
-    final idx = viewModel.playingIndexNotifier.value ?? _focusPageIndex;
-    _ensureFocusController(idx);
+
+    if (mode == QuranReaderViewMode.mushaf) {
+      _disposeFocusController();
+      final surahVm = viewModel.surah!;
+      final slices = buildMushafSlicesForSurah(surahVm.ayahs);
+      if (slices.isEmpty) return;
+      final int ayahIdx;
+      if (viewModel.playingIndexNotifier.value != null) {
+        ayahIdx = viewModel.playingIndexNotifier.value!
+            .clamp(0, surahVm.ayahs.length - 1);
+      } else if (_mushafPageIndex >= 0 &&
+          _mushafPageIndex < slices.length) {
+        ayahIdx = slices[_mushafPageIndex].ayahIndices.first;
+      } else {
+        ayahIdx = 0;
+      }
+      final sliceIdx = mushafSliceIndexForAyahIndex(slices, ayahIdx);
+      _ensureMushafController(sliceIdx);
+      return;
+    }
+
+    _disposeFocusController();
+    _disposeMushafController();
   }
 
   void _onPlayingIndexChanged() {
@@ -102,6 +148,35 @@ class _QuranViewState extends State<QuranView> {
         animate();
       });
       setState(() => _focusPageIndex = p);
+      return;
+    }
+
+    if (mode == QuranReaderViewMode.mushaf) {
+      final surahVm = viewModel.surah;
+      if (surahVm == null) return;
+      final slices = buildMushafSlicesForSurah(surahVm.ayahs);
+      if (slices.isEmpty) return;
+      final p = mushafSliceIndexForAyahIndex(
+        slices,
+        idx.clamp(0, surahVm.ayahs.length - 1),
+      );
+      void animate() {
+        final c = _mushafPageController;
+        if (c != null && c.hasClients) {
+          c.animateToPage(
+            p,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      }
+
+      animate();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        animate();
+      });
+      setState(() => _mushafPageIndex = p);
       return;
     }
 
@@ -320,6 +395,7 @@ class _QuranViewState extends State<QuranView> {
   @override
   void dispose() {
     _disposeFocusController();
+    _disposeMushafController();
     _progressController?.dispose();
     viewModel.playingIndexNotifier.removeListener(_onPlayingIndexChanged);
     viewModel.audioCenter.removeListener(_onAudioCenterChanged);
@@ -382,6 +458,19 @@ class _QuranViewState extends State<QuranView> {
         );
       }
       setState(() => _focusPageIndex = p);
+    } else if (mode == QuranReaderViewMode.mushaf) {
+      final slices = buildMushafSlicesForSurah(surahVm.ayahs);
+      if (slices.isEmpty) return;
+      final p = mushafSliceIndexForAyahIndex(slices, ayahIndex);
+      final c = _mushafPageController;
+      if (c != null && c.hasClients) {
+        c.animateToPage(
+          p,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+        );
+      }
+      setState(() => _mushafPageIndex = p);
     } else {
       _scrollWithRetry(ayahIndex, animated: true);
     }
@@ -605,9 +694,7 @@ class _QuranViewState extends State<QuranView> {
                       Expanded(
                         child: viewModel.surah == null
                             ? const SizedBox.shrink()
-                            : readerViewMode == QuranReaderViewMode.mushaf
-                                ? QuranMushafPlaceholderPanel(isDark: isDark)
-                                : ListenableBuilder(
+                            : ListenableBuilder(
                                     listenable: viewModel.audioCenter,
                                     builder: (context, _) {
                                       final state =
@@ -619,6 +706,53 @@ class _QuranViewState extends State<QuranView> {
                                       } else if (state ==
                                           AudioPlayerUiState.expanded) {
                                         bottomPadding = 200;
+                                      }
+
+                                      if (readerViewMode ==
+                                          QuranReaderViewMode.mushaf) {
+                                        if (_mushafPageController == null) {
+                                          return const Center(
+                                            child: SizedBox(
+                                              width: 28,
+                                              height: 28,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        final slices =
+                                            buildMushafSlicesForSurah(
+                                          viewModel.surah!.ayahs,
+                                        );
+                                        if (slices.isEmpty) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return QuranMushafPanel(
+                                          surah: viewModel.surah!,
+                                          slices: slices,
+                                          pageController:
+                                              _mushafPageController!,
+                                          prefs: readerPrefs,
+                                          onPageChanged: (i) => setState(
+                                            () => _mushafPageIndex = i,
+                                          ),
+                                          playingIndexNotifier:
+                                              viewModel.playingIndexNotifier,
+                                          dark: isDark,
+                                          showBismillah:
+                                              viewModel.shouldShowBismillah(
+                                            viewModel.surah?.number,
+                                          ),
+                                          contentBottomInset:
+                                              BottomAudioControls
+                                                  .readerBottomClearance(
+                                            context,
+                                            state,
+                                          ),
+                                          readingProgressController:
+                                              _progressController,
+                                        );
                                       }
 
                                       if (readerViewMode ==
@@ -787,6 +921,13 @@ class _QuranViewState extends State<QuranView> {
                 final p = targetIdx.clamp(0, max);
                 _focusPageController?.jumpToPage(p);
                 setState(() => _focusPageIndex = p);
+              } else if (mode == QuranReaderViewMode.mushaf) {
+                final slices = buildMushafSlicesForSurah(widget.surah.ayahs);
+                if (slices.isNotEmpty) {
+                  final p = mushafSliceIndexForAyahIndex(slices, targetIdx);
+                  _mushafPageController?.jumpToPage(p);
+                  setState(() => _mushafPageIndex = p);
+                }
               } else if (mode == QuranReaderViewMode.normal) {
                 _scrollWithRetry(targetIdx, animated: true);
               }

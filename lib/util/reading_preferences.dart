@@ -8,7 +8,7 @@ enum QuranReaderViewMode {
   /// One ayah per page with swipe transitions.
   verseFocus,
 
-  /// Page-by-page mushaf-style layout (planned).
+  /// Page-by-page layout using Madani [Ayah.page] groupings.
   mushaf,
 }
 
