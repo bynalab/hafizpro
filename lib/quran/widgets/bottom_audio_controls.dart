@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/util/app_colors.dart';
 import 'package:just_audio/just_audio.dart';
@@ -32,6 +33,37 @@ class BottomAudioControls extends StatelessWidget {
     required this.onTogglePlayPause,
   });
 
+  /// Fixed bottom inset for reader UIs when the bar is expanded.
+  /// Tune here if [_buildExpanded] height changes.
+  static const double kReaderBottomInsetExpanded = 200;
+
+  /// Fixed bottom inset for reader UIs when the bar is minimized (collapsed).
+  /// Tune here if [_buildCollapsed] height changes.
+  static const double kReaderBottomInsetMinimized =
+      kReaderBottomInsetExpanded - 120;
+
+  /// Space reader bodies should leave above this bar so content is not covered.
+  ///
+  /// **hidden:** `0` when the bar is absent; only [MediaQuery.viewInsets.bottom]
+  /// (IME) is added.
+  ///
+  /// **collapsed / expanded:** [kReaderBottomInsetMinimized] /
+  /// [kReaderBottomInsetExpanded] — no layout math, adjust constants if needed.
+  static double readerBottomClearance(
+    BuildContext context,
+    AudioPlayerUiState uiState,
+  ) {
+    final ime = MediaQuery.viewInsetsOf(context).bottom;
+    switch (uiState) {
+      case AudioPlayerUiState.hidden:
+        return ime;
+      case AudioPlayerUiState.collapsed:
+        return kReaderBottomInsetMinimized;
+      case AudioPlayerUiState.expanded:
+        return kReaderBottomInsetExpanded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -58,7 +90,7 @@ class BottomAudioControls extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Tooltip(
-        message: 'Tap to expand',
+        message: AppLocalizations.of(context)!.audioPlayerTapToExpandSemantics,
         child: GestureDetector(
           onTap: () {
             audioCenter.setUiState(AudioPlayerUiState.expanded);

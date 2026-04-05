@@ -52,5 +52,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone to record your recitation for verification.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>We need speech recognition permission to analyze your recitation and provide feedback.</string>
 </dict>
 </plist>

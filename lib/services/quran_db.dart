@@ -133,6 +133,38 @@ class QuranDb {
         .toList(growable: false);
   }
 
+  Future<List<QuranDbAyahRow>> getAllAyahsRaw() async {
+    final db = _db;
+    if (db == null) {
+      throw StateError('QuranDb not initialized. Call init() first.');
+    }
+
+    final rows = await db.rawQuery(
+      '''
+SELECT
+  id,
+  surah_number,
+  ayah_number,
+  text
+FROM verses
+ORDER BY id ASC;
+''',
+    );
+
+    return rows
+        .map(
+          (r) => QuranDbAyahRow(
+            ayahId: (r['id'] as int?) ?? 0,
+            surah: (r['surah_number'] as int?) ?? 0,
+            ayah: (r['ayah_number'] as int?) ?? 0,
+            textAr: (r['text'] as String?) ?? '',
+            translation: null,
+            transliteration: null,
+          ),
+        )
+        .toList(growable: false);
+  }
+
   Future<List<QuranDbAyahRow>> getAyahsForSurah(
     int surahNumber, {
     String translationId = defaultTranslationId,

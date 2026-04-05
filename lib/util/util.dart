@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 void showSnackBar(BuildContext context, String text) {
-  final snackBar = SnackBar(
-    content: Text(text),
-    action: SnackBarAction(
-      label: 'Toh',
-      onPressed: () {},
-    ),
-  );
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(text)));
 }
 
 /// Formats a number with comma separators for better readability (e.g., 6236 -> 6,236).
@@ -23,7 +19,8 @@ String formatPercentage(double percentage, {int decimalPlaces = 1}) {
 }
 
 /// Formats a DateTime into a human-readable string (e.g., Today, 5:45 PM or Feb 23, 2026, 5:45 PM).
-String formatDateTime(DateTime dt) {
+String formatDateTime(BuildContext context, DateTime dt) {
+  final l10n = AppLocalizations.of(context)!;
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final yesterday = today.subtract(const Duration(days: 1));
@@ -32,11 +29,11 @@ String formatDateTime(DateTime dt) {
 
   String datePart;
   if (dateToCheck == today) {
-    datePart = 'Today';
+    datePart = l10n.dateRelativeToday;
   } else if (dateToCheck == yesterday) {
-    datePart = 'Yesterday';
+    datePart = l10n.dateRelativeYesterday;
   } else if (dateToCheck == tomorrow) {
-    datePart = 'Tomorrow';
+    datePart = l10n.dateRelativeTomorrow;
   } else {
     datePart = DateFormat('MMM d, yyyy').format(dt);
   }

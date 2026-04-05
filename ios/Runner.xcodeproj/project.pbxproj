@@ -366,7 +366,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 26.02.19;
+				MARKETING_VERSION = 26.04.05;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bynalab.hafizpro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -497,7 +497,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 26.02.19;
+				MARKETING_VERSION = 26.04.05;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bynalab.hafizpro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -522,7 +522,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 26.02.19;
+				MARKETING_VERSION = 26.04.05;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bynalab.hafizpro;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

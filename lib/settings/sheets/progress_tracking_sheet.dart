@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class ProgressTrackingSheet extends StatelessWidget {
   final String initialMode;
@@ -43,7 +44,7 @@ class ProgressTrackingSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Reading Progress Tracking",
+                  context.l10n.progressTrackingTitle,
                   style: GoogleFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -52,9 +53,8 @@ class ProgressTrackingSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _TrackingModeOption(
-                  title: 'Smart',
-                  description:
-                      'Automatically updates your progress based on your reading activity.',
+                  title: context.l10n.progressTrackingSmartTitle,
+                  description: context.l10n.progressTrackingSmartDescription,
                   icon: Icons.auto_awesome_rounded,
                   isSelected: currentMode == 'smart',
                   isDark: isDark,
@@ -62,9 +62,8 @@ class ProgressTrackingSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 _TrackingModeOption(
-                  title: 'Manual',
-                  description:
-                      'Tap the "double-tick" icon on the last verse you’ve read to mark it and everything before it as completed.',
+                  title: context.l10n.progressTrackingManualTitle,
+                  description: context.l10n.progressTrackingManualDescription,
                   icon: Icons.touch_app_rounded,
                   isSelected: currentMode == 'manual',
                   isDark: isDark,
@@ -72,8 +71,8 @@ class ProgressTrackingSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 _TrackingModeOption(
-                  title: 'Off',
-                  description: 'Progress is not tracked.',
+                  title: context.l10n.progressTrackingOffTitle,
+                  description: context.l10n.progressTrackingOffDescription,
                   icon: Icons.block_rounded,
                   isSelected: currentMode == 'off',
                   isDark: isDark,

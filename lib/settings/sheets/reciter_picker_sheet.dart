@@ -6,8 +6,13 @@ import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class ReciterPickerSheet extends StatefulWidget {
   final String? selected;
+  final bool showOnlyVerseByVerse;
 
-  const ReciterPickerSheet({super.key, required this.selected});
+  const ReciterPickerSheet({
+    super.key,
+    required this.selected,
+    this.showOnlyVerseByVerse = false,
+  });
 
   Future<Reciter?> openBottomSheet(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -50,14 +55,19 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
   }
 
   List<Reciter> searchReciters(String query) {
-    final filtered = query.isEmpty
-        ? reciters
-        : reciters.where((r) {
-            final a = r.englishName.toLowerCase();
-            final b = r.name.toLowerCase();
-            final c = r.identifier.toLowerCase();
-            return a.contains(query) || b.contains(query) || c.contains(query);
-          }).toList(growable: false);
+    var list = reciters;
+    if (widget.showOnlyVerseByVerse) {
+      list = list.where((r) => r.isVerseByVerse).toList();
+    }
+
+    if (query.isEmpty) return list;
+
+    final filtered = list.where((r) {
+      final a = r.englishName.toLowerCase();
+      final b = r.name.toLowerCase();
+      final c = r.identifier.toLowerCase();
+      return a.contains(query) || b.contains(query) || c.contains(query);
+    }).toList(growable: false);
 
     return filtered;
   }
@@ -186,14 +196,44 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                             ),
                           ),
                         ),
-                        title: Text(
-                          reciter.englishName,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color:
-                                isDark ? Colors.white : const Color(0xFF111827),
-                          ),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                reciter.englishName,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF111827),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: reciter.isVerseByVerse
+                                    ? const Color(0xFFE0F2F1)
+                                    : const Color(0xFFFFF3E0),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                reciter.isVerseByVerse ? 'Verse' : 'Chapter',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: reciter.isVerseByVerse
+                                      ? const Color(0xFF00695C)
+                                      : const Color(0xFFE65100),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         subtitle: arabicName.isEmpty
                             ? null

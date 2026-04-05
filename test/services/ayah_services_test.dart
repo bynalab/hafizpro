@@ -5,6 +5,7 @@ import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
+import 'package:hafiz_test/model/surah.model.dart';
 
 class MockNetworkServices extends Mock implements NetworkServices {}
 
@@ -23,6 +24,8 @@ void main() {
         networkServices: mockNetworkServices,
         storageServices: mockStorageServices,
       );
+      // TarteelAudioResolver probes CDN URLs before choosing audio mode.
+      when(() => mockNetworkServices.urlExists(any())).thenAnswer((_) async => false);
     });
 
     group('getSurahAyahs', () {
@@ -67,9 +70,13 @@ void main() {
           requestOptions: RequestOptions(path: ''),
         );
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
-            .thenAnswer((_) async => mockResponse);
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciter);
+        // AyahServices prepends Quran API base URLs; match any full URL containing the path.
+        when(() => mockNetworkServices.get(any())).thenAnswer((invocation) async {
+          final url = invocation.positionalArguments.first as String;
+          expect(url, contains('surah/$surahNumber/$reciter'));
+          return mockResponse;
+        });
 
         // Act
         final result = await ayahServices.getSurahAyahs(surahNumber);
@@ -77,9 +84,8 @@ void main() {
         // Assert
         expect(result, isA<List<Ayah>>());
         expect(result.length, equals(2));
-        verify(() => mockStorageServices.getReciter()).called(1);
-        verify(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
-            .called(1);
+        verify(() => mockStorageServices.getReciterId()).called(1);
+        verify(() => mockNetworkServices.get(any())).called(1);
       });
 
       test('should return empty list on null response data', () async {
@@ -92,8 +98,8 @@ void main() {
           requestOptions: RequestOptions(path: ''),
         );
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciter);
+        when(() => mockNetworkServices.get(any()))
             .thenAnswer((_) async => mockResponse);
 
         // Act
@@ -108,8 +114,8 @@ void main() {
         const surahNumber = 1;
         const reciter = 'ar.alafasy';
 
-        when(() => mockStorageServices.getReciter()).thenReturn(reciter);
-        when(() => mockNetworkServices.get('surah/$surahNumber/$reciter'))
+        when(() => mockStorageServices.getReciterId()).thenReturn(reciter);
+        when(() => mockNetworkServices.get(any()))
             .thenThrow(DioException(requestOptions: RequestOptions(path: '')));
 
         // Act
@@ -176,8 +182,8 @@ void main() {
     });
 
     group('getRandomAyahForSurah', () {
-      test('should return random ayah from provided list', () {
-        // Arrange
+      test('should return middle ayah when metadata is missing (positional fallback)', () {
+        // Arrange — numberInSurah unset: falls back to dropping list ends
         final ayahs = [
           Ayah(number: 1, text: 'First'),
           Ayah(number: 2, text: 'Second'),
@@ -188,8 +194,23 @@ void main() {
         final result = ayahServices.getRandomAyahForSurah(ayahs);
 
         // Assert
-        expect(result, isA<Ayah>());
-        expect(ayahs.any((ayah) => ayah.number == result.number), isTrue);
+        expect(result.number, equals(2));
+      });
+
+      test('should exclude first and last verse when surahNumber is given', () {
+        final s = Surah(number: 2, numberOfAyahs: 286);
+        final ayahs = [
+          Ayah(numberInSurah: 1, surah: s),
+          Ayah(numberInSurah: 2, surah: s),
+          Ayah(numberInSurah: 286, surah: s),
+        ];
+
+        final result = ayahServices.getRandomAyahForSurah(
+          ayahs,
+          surahNumber: 2,
+        );
+
+        expect(result.numberInSurah, equals(2));
       });
 
       test('should return empty ayah when list is empty', () {
