@@ -788,11 +788,13 @@ class CircleIconButton extends StatelessWidget {
 
 class BottomPillNav extends StatelessWidget {
   final int index;
+  final bool showAdhkar;
   final ValueChanged<int> onChanged;
 
   const BottomPillNav({
     super.key,
     required this.index,
+    this.showAdhkar = false,
     required this.onChanged,
   });
 
@@ -801,7 +803,7 @@ class BottomPillNav extends StatelessWidget {
     final isDark = DashboardPalette.isDark(context);
 
     return Container(
-      width: 340,
+      width: showAdhkar ? 400 : 340,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: DashboardPalette.pillBg(context),
@@ -846,21 +848,23 @@ class BottomPillNav extends StatelessWidget {
               onTap: () => onChanged(1),
             ),
           ),
-          // const SizedBox(width: 4),
-          // Expanded(
-          //   child: PillNavItem(
-          //     active: index == 2,
-          //     label: 'Adhkar',
-          //     icon: Icon(
-          //       Icons.spa_outlined,
-          //       size: 18,
-          //       color: index == 2
-          //           ? Colors.white
-          //           : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
-          //     ),
-          //     onTap: () => onChanged(2),
-          //   ),
-          // ),
+          if (showAdhkar) ...[
+            const SizedBox(width: 4),
+            Expanded(
+              child: PillNavItem(
+                active: index == 2,
+                label: context.l10n.bottomNavAdhkar,
+                icon: Icon(
+                  Icons.spa_outlined,
+                  size: 18,
+                  color: index == 2
+                      ? Colors.white
+                      : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                ),
+                onTap: () => onChanged(2),
+              ),
+            ),
+          ],
         ],
       ),
     );

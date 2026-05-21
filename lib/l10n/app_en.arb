@@ -535,6 +535,10 @@
   "@bottomNavTest": {
     "description": "Bottom navigation label for tests."
   },
+  "bottomNavAdhkar": "Adhkar",
+  "@bottomNavAdhkar": {
+    "description": "Bottom navigation label for Adhkar (web)."
+  },
   "segmentSurah": "Surah",
   "@segmentSurah": {
     "description": "Segment control label for surah."
