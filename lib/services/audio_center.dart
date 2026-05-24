@@ -13,6 +13,7 @@ import 'package:hafiz_test/services/surah.services.dart';
 import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:hafiz_test/util/internet_checker.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:hafiz_test/main_menu/takbeer_screen.dart';
 
 enum PlaybackOwner { reading, test, juz }
 
@@ -30,6 +31,7 @@ class AudioCenter extends ChangeNotifier {
   PlaybackOwner _playbackOwner = PlaybackOwner.reading;
   AudioPlayerUiState _uiState = AudioPlayerUiState.hidden;
   PlaybackSnapshot? _readingSnapshot;
+  PlaybackSnapshot? _takbeerResumeSnapshot;
 
   final ValueNotifier<int?> juzPlayingIndexNotifier = ValueNotifier<int?>(null);
 
@@ -109,6 +111,28 @@ class AudioCenter extends ChangeNotifier {
     } else {
       _readingSnapshot = null;
     }
+  }
+
+  void saveStateForTakbeer() {
+    final audioPlayer = _audioServices.audioPlayer;
+    final current = currentSurahNumber;
+    final name = currentSurahName;
+    final idx = audioPlayer.currentIndex;
+
+    if (current != null && name != null && idx != null) {
+      _takbeerResumeSnapshot = PlaybackSnapshot(
+        surahNumber: current,
+        surahName: name,
+        index: idx,
+        position: audioPlayer.position,
+      );
+    } else {
+      _takbeerResumeSnapshot = null;
+    }
+
+    _resetPlaybackSession();
+    _uiState = AudioPlayerUiState.hidden;
+    notifyListeners();
   }
 
   void beginTestSession() {
@@ -227,6 +251,11 @@ class AudioCenter extends ChangeNotifier {
       final newPlaying = state.playing;
       if (newPlaying == isPlaying) return;
 
+      if (newPlaying && !TakbeerAudioService.instance.isTakbeerActive) {
+        // Pause the looping Takbeer if normal Quran playback starts to prevent conflicts
+        TakbeerAudioService.instance.pause();
+      }
+
       isPlaying = newPlaying;
       notifyListeners();
     });
@@ -339,6 +368,8 @@ class AudioCenter extends ChangeNotifier {
   Future<void> playSingleAyah(Surah surah, AudioSource source) async {
     if (isLoading) return;
 
+    _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
+
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
       AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
@@ -375,6 +406,26 @@ class AudioCenter extends ChangeNotifier {
     if (!hasInternet) {
       AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
 
+      return;
+    }
+
+    // Dismiss loop/Takbeer snapshot state and handle resume if matching
+    final snapshot = _takbeerResumeSnapshot;
+    _takbeerResumeSnapshot = null;
+
+    if (snapshot != null && snapshot.surahNumber == surah.number) {
+      if (_playbackOwner != PlaybackOwner.reading) {
+        _playbackOwner = PlaybackOwner.reading;
+        currentJuzNumber = null;
+        _indexSub?.cancel();
+        _indexSub = null;
+        juzPlayingIndexNotifier.value = null;
+      }
+
+      await _restoreReadingSession(snapshot);
+      unawaited(_audioServices.play(audioName: currentSurahName));
+      isPlaying = true;
+      notifyListeners();
       return;
     }
 
@@ -458,6 +509,8 @@ class AudioCenter extends ChangeNotifier {
   Future<void> playFromAyahIndex(Surah surah, int index) async {
     if (isLoading) return;
 
+    _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
+
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {
       AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
@@ -497,6 +550,8 @@ class AudioCenter extends ChangeNotifier {
     bool forceReload = false,
   }) async {
     if (isLoading) return;
+
+    _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
 
     final hasInternet = await hasInternetConnection();
     if (!hasInternet) {

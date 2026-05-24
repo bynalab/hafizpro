@@ -76,6 +76,10 @@ class DashboardPalette {
   static Color cardPurple(BuildContext context) {
     return isDark(context) ? const Color(0xFF2D182D) : const Color(0xFFE6BDEB);
   }
+
+  static Color cardAmber(BuildContext context) {
+    return isDark(context) ? const Color(0xFF2D2200) : const Color(0xFFFFF3CC);
+  }
 }
 
 class SearchField extends StatelessWidget {
