@@ -370,13 +370,6 @@ class AudioCenter extends ChangeNotifier {
 
     _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
 
-    final hasInternet = await hasInternetConnection();
-    if (!hasInternet) {
-      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
-
-      return;
-    }
-
     isLoading = true;
     _readingWasPlaylist = false;
     setCurrentSurah(surah);
@@ -389,6 +382,11 @@ class AudioCenter extends ChangeNotifier {
       await _audioServices.setAudioSource(source);
       isPlaying = true;
       unawaited(_audioServices.play(audioName: currentSurahName));
+    } catch (e) {
+      final hasInternet = await hasInternetConnection();
+      if (!hasInternet) {
+        AppMessenger.showOfflineAudioDialog();
+      }
     } finally {
       isLoading = false;
       notifyListeners();
@@ -401,13 +399,6 @@ class AudioCenter extends ChangeNotifier {
     bool forceReload = false,
   }) async {
     if (isLoading) return;
-
-    final hasInternet = await hasInternetConnection();
-    if (!hasInternet) {
-      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
-
-      return;
-    }
 
     // Dismiss loop/Takbeer snapshot state and handle resume if matching
     final snapshot = _takbeerResumeSnapshot;
@@ -461,7 +452,7 @@ class AudioCenter extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final fullSurah = await _surahServices.getSurah(surah.number);
+      final fullSurah = await _surahServices.getSurah(surah.number, forPlayback: true);
       if (fullSurah.ayahs.isEmpty) return;
 
       currentSurahName = fullSurah.englishName;
@@ -498,8 +489,14 @@ class AudioCenter extends ChangeNotifier {
       unawaited(_audioServices.play(audioName: fullSurah.englishName));
 
       isPlaying = true;
-    } catch (_) {
+    } catch (e) {
       isPlaying = audioPlayer.playing;
+      currentSurahNumber = null;
+      currentSurahName = null;
+      final hasInternet = await hasInternetConnection();
+      if (!hasInternet) {
+        AppMessenger.showOfflineAudioDialog();
+      }
     } finally {
       isLoading = false;
       notifyListeners();
@@ -510,13 +507,6 @@ class AudioCenter extends ChangeNotifier {
     if (isLoading) return;
 
     _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
-
-    final hasInternet = await hasInternetConnection();
-    if (!hasInternet) {
-      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
-
-      return;
-    }
 
     // Force reading mode for surah playback.
     if (_playbackOwner != PlaybackOwner.reading) {
@@ -552,13 +542,6 @@ class AudioCenter extends ChangeNotifier {
     if (isLoading) return;
 
     _takbeerResumeSnapshot = null; // Dismiss saved Takbeer state
-
-    final hasInternet = await hasInternetConnection();
-    if (!hasInternet) {
-      AppMessenger.showLocalizedSnackBar((l) => l.audioNeedsInternet);
-
-      return;
-    }
 
     final audioPlayer = _audioServices.audioPlayer;
 
@@ -604,7 +587,7 @@ class AudioCenter extends ChangeNotifier {
       final playlist = <AudioSource>[];
 
       for (final range in juz.surahRanges()) {
-        final full = await _surahServices.getSurah(range.surahNumber);
+        final full = await _surahServices.getSurah(range.surahNumber, forPlayback: true);
         if (full.ayahs.isEmpty) continue;
 
         final endAyah = range.endAyah ?? full.numberOfAyahs;
@@ -642,8 +625,14 @@ class AudioCenter extends ChangeNotifier {
       unawaited(_audioServices.play(audioName: currentSurahName));
 
       isPlaying = true;
-    } catch (_) {
+    } catch (e) {
       isPlaying = audioPlayer.playing;
+      currentJuzNumber = null;
+      currentSurahName = null;
+      final hasInternet = await hasInternetConnection();
+      if (!hasInternet) {
+        AppMessenger.showOfflineAudioDialog();
+      }
     } finally {
       isLoading = false;
       notifyListeners();
