@@ -353,7 +353,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(
-                    leading: const LeadingCircle(Icons.download_for_offline_rounded),
+                    leading:
+                        const LeadingCircle(Icons.download_for_offline_rounded),
                     title: context.l10n.audioDownloadsTitle,
                     subtitle: context.l10n.audioDownloadsSubtitle,
                     trailing: Icon(
@@ -386,8 +387,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SettingsTile(
                     leading: const LeadingCircle(Icons.track_changes_rounded),
                     title: context.l10n.progressTrackingTitle,
-                    subtitle:
-                        _progressTrackingModeLabel(controller.progressTrackingMode),
+                    subtitle: _progressTrackingModeLabel(
+                        controller.progressTrackingMode),
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -417,6 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final result = await NotificationsSheet(
                         initialEnabled: controller.notificationsEnabled,
                         initialTime: controller.notificationTime,
+                        onTestNotification: controller.testNotification,
                       ).openBottomSheet(context);
                       if (result == null) return;
                       try {

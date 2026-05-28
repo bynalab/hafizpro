@@ -26,8 +26,8 @@ class SettingsController extends ChangeNotifier {
   String? reciter;
   late ThemeMode themeMode;
 
-  bool notificationsEnabled = false;
-  TimeOfDay notificationTime = const TimeOfDay(hour: 20, minute: 0);
+  bool notificationsEnabled = true;
+  TimeOfDay notificationTime = const TimeOfDay(hour: 9, minute: 0);
   String progressTrackingMode = 'smart';
   String appVersion = '';
 
@@ -38,10 +38,20 @@ class SettingsController extends ChangeNotifier {
       themeMode = ThemeMode.values.byName(_theme.mode);
 
       final rawEnabled = _storage.getString('notifications_enabled');
-      notificationsEnabled = rawEnabled == 'true';
+      if (rawEnabled == null) {
+        // No stored value – default to enabled and persist it.
+        notificationsEnabled = true;
+        await _storage.setString('notifications_enabled', 'true');
+      } else {
+        notificationsEnabled = rawEnabled == 'true';
+      }
 
       final rawTime = _storage.getString('notification_time');
-      if (rawTime != null && rawTime.contains(':')) {
+      if (rawTime == null) {
+        // No stored time – default to 9:00 AM and persist it.
+        notificationTime = const TimeOfDay(hour: 9, minute: 0);
+        await _storage.setString('notification_time', '9:0');
+      } else if (rawTime.contains(':')) {
         final parts = rawTime.split(':');
         if (parts.length == 2) {
           final h = int.tryParse(parts[0]);
@@ -114,5 +124,9 @@ class SettingsController extends ChangeNotifier {
     AnalyticsService.trackSettingsChanged(
         'progress_tracking_mode', oldValue, mode);
     await _storage.setProgressTrackingMode(mode);
+  }
+  /// Trigger an immediate test notification for the user.
+  Future<void> testNotification() async {
+    await _notifications.showTestNotification();
   }
 }
