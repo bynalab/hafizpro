@@ -845,12 +845,16 @@ class BottomPillNav extends StatelessWidget {
                 child: PillNavItem(
                   active: index == 1,
                   label: context.l10n.bottomNavTest,
-                  icon: Icon(
-                    Icons.school_outlined,
-                    size: 18,
-                    color: index == 1
-                        ? Colors.white
-                        : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                  icon: SvgPicture.asset(
+                    'assets/img/brain.svg',
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      index == 1
+                          ? Colors.white
+                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                      BlendMode.srcIn,
+                    ),
                   ),
                   onTap: () => onChanged(1),
                 ),
