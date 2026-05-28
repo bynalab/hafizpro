@@ -76,6 +76,10 @@ class DashboardPalette {
   static Color cardPurple(BuildContext context) {
     return isDark(context) ? const Color(0xFF2D182D) : const Color(0xFFE6BDEB);
   }
+
+  static Color cardAmber(BuildContext context) {
+    return isDark(context) ? const Color(0xFF2D2200) : const Color(0xFFFFF3CC);
+  }
 }
 
 class SearchField extends StatelessWidget {
@@ -788,11 +792,13 @@ class CircleIconButton extends StatelessWidget {
 
 class BottomPillNav extends StatelessWidget {
   final int index;
+  final bool showAdhkar;
   final ValueChanged<int> onChanged;
 
   const BottomPillNav({
     super.key,
     required this.index,
+    this.showAdhkar = false,
     required this.onChanged,
   });
 
@@ -800,69 +806,76 @@ class BottomPillNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = DashboardPalette.isDark(context);
 
-    return Container(
-      width: 340,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: DashboardPalette.pillBg(context),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: PillNavItem(
-              active: index == 0,
-              label: context.l10n.bottomNavQuran,
-              icon: SvgPicture.asset(
-                'assets/img/quran-01.svg',
-                width: 18,
-                height: 18,
-                colorFilter: ColorFilter.mode(
-                  index == 0
-                      ? Colors.white
-                      : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
-                  BlendMode.srcIn,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final targetWidth = showAdhkar ? 400.0 : 340.0;
+        final responsiveWidth = targetWidth > constraints.maxWidth - 32
+            ? constraints.maxWidth - 32
+            : targetWidth;
+
+        return Container(
+          width: responsiveWidth,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: DashboardPalette.pillBg(context),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: PillNavItem(
+                  active: index == 0,
+                  label: context.l10n.bottomNavQuran,
+                  icon: SvgPicture.asset(
+                    'assets/img/quran-01.svg',
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      index == 0
+                          ? Colors.white
+                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onTap: () => onChanged(0),
                 ),
               ),
-              onTap: () => onChanged(0),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: PillNavItem(
-              active: index == 1,
-              label: context.l10n.bottomNavTest,
-              icon: SvgPicture.asset(
-                'assets/img/brain.svg',
-                width: 18,
-                height: 18,
-                colorFilter: ColorFilter.mode(
-                  index == 1
-                      ? Colors.white
-                      : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
-                  BlendMode.srcIn,
+              const SizedBox(width: 4),
+              Expanded(
+                child: PillNavItem(
+                  active: index == 1,
+                  label: context.l10n.bottomNavTest,
+                  icon: Icon(
+                    Icons.school_outlined,
+                    size: 18,
+                    color: index == 1
+                        ? Colors.white
+                        : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                  ),
+                  onTap: () => onChanged(1),
                 ),
               ),
-              onTap: () => onChanged(1),
-            ),
+              if (showAdhkar) ...[
+                const SizedBox(width: 4),
+                Expanded(
+                  child: PillNavItem(
+                    active: index == 2,
+                    label: context.l10n.bottomNavAdhkar,
+                    icon: Icon(
+                      Icons.spa_outlined,
+                      size: 18,
+                      color: index == 2
+                          ? Colors.white
+                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                    ),
+                    onTap: () => onChanged(2),
+                  ),
+                ),
+              ],
+            ],
           ),
-          // const SizedBox(width: 4),
-          // Expanded(
-          //   child: PillNavItem(
-          //     active: index == 2,
-          //     label: 'Adhkar',
-          //     icon: Icon(
-          //       Icons.spa_outlined,
-          //       size: 18,
-          //       color: index == 2
-          //           ? Colors.white
-          //           : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
-          //     ),
-          //     onTap: () => onChanged(2),
-          //   ),
-          // ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

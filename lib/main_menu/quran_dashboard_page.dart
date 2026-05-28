@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -27,6 +26,7 @@ import 'package:hafiz_test/bookmark/bookmarks_page.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/main_menu/widgets/quran_progress_card.dart';
+import 'package:hafiz_test/main_menu/widgets/takbeer_card.dart';
 
 class QuranDashboardPage extends StatefulWidget {
   const QuranDashboardPage({
@@ -191,6 +191,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       _ContinueLastTestCard(lastRead: lastRead),
                     const SizedBox(height: 10),
                     _ContinueReadingCard(bookmark: bookmark),
+                    const SizedBox(height: 10),
+                    const TakbeerCard(),
                     ListenableBuilder(
                       listenable: _audioCenter,
                       builder: (context, _) {
@@ -569,7 +571,7 @@ class _ContinueReadingCard extends StatelessWidget {
               color: isDark ? Colors.black26 : Colors.white54,
               shape: BoxShape.circle,
             ),
-            child: Icon(CupertinoIcons.book,
+            child: Icon(Icons.menu_book_rounded,
                 size: 18, color: DashboardPalette.primaryText(context)),
           ),
           const SizedBox(width: 12),
@@ -646,7 +648,7 @@ class _NowPlayingCard extends StatelessWidget {
           return Row(
             children: [
               Icon(
-                CupertinoIcons.waveform,
+                Icons.graphic_eq_rounded,
                 color: DashboardPalette.primaryText(context),
               ),
               const SizedBox(width: 12),
@@ -715,8 +717,8 @@ class _NowPlayingCard extends StatelessWidget {
                                 )
                               : Icon(
                                   playing
-                                      ? CupertinoIcons.pause_circle_fill
-                                      : CupertinoIcons.play_circle_fill,
+                                      ? Icons.pause_circle_filled_rounded
+                                      : Icons.play_circle_filled_rounded,
                                   size: 36,
                                 ),
                         ),

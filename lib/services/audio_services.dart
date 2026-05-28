@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:hafiz_test/main_menu/takbeer_screen.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/util/constants.dart';
 
@@ -23,6 +24,8 @@ class AudioServices {
         return;
       }
 
+      await TakbeerAudioService.instance.pause();
+      await audioPlayer.setLoopMode(LoopMode.off);
       await audioPlayer.setAudioSource(audioSource, preload: preload);
     } catch (e) {
       debugPrint(e.toString());
@@ -48,6 +51,8 @@ class AudioServices {
   Future<void> setPlaylistAudio(List<AudioSource> audioSources) async {
     try {
       await stop(trackEvent: false);
+      await TakbeerAudioService.instance.pause();
+      await audioPlayer.setLoopMode(LoopMode.off);
       await audioPlayer.setAudioSources(audioSources);
     } catch (e) {
       debugPrint(e.toString());
@@ -66,6 +71,7 @@ class AudioServices {
         await seek(Duration.zero, index: 0);
       }
 
+      await TakbeerAudioService.instance.pause();
       await audioPlayer.play();
 
       // Track audio play with context

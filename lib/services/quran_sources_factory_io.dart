@@ -44,7 +44,7 @@ Future<QuranSources> createQuranSources({
   final db = QuranDb();
   await db.init();
 
-  final searchService = QuranSearchService(db: db);
+  final searchService = QuranSearchService.db(db: db);
   // We don't await init here to avoid blocking startup,
   // but it will be ready soon.
   searchService.init();

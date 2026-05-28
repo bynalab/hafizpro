@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/util/reciter_audio_profile.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
@@ -29,6 +30,9 @@ class TarteelAudioResolver {
     required String reciterId,
     required int surahNumber,
   }) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.every((r) => r == ConnectivityResult.none)) return null;
+
     final profile = ReciterAudioProfiles.forReciter(reciterId);
     final sources = profile?.sources ?? const <ReciterAudioSource>[];
     for (var i = 0; i < sources.length; i++) {
@@ -53,6 +57,9 @@ class TarteelAudioResolver {
     required String reciterId,
     required int surahNumber,
   }) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult.every((r) => r == ConnectivityResult.none)) return null;
+
     final profile = ReciterAudioProfiles.forReciter(reciterId);
     final sources = profile?.sources ?? const <ReciterAudioSource>[];
 
@@ -71,55 +78,64 @@ class TarteelAudioResolver {
     required NetworkServices networkServices,
     required String reciterId,
     required int surahNumber,
+    bool checkNetwork = true,
   }) async {
     final reciterType = TarteelAudio.reciterType(reciterId);
 
     final surahBase = TarteelAudio.surahBaseForReciter(reciterId);
     if (reciterType == RecitationType.surahbysurah && surahBase != null) {
-      final sourceIndex = await _firstReachableSurahSourceIndex(
-        networkServices: networkServices,
-        reciterId: reciterId,
-        surahNumber: surahNumber,
-      );
+      if (checkNetwork) {
+        int? sourceIndex = ReciterAudioProfiles.preferredSourceIndexForReciter(reciterId);
+        
+        if (sourceIndex == null) {
+          sourceIndex = await _firstReachableSurahSourceIndex(
+            networkServices: networkServices,
+            reciterId: reciterId,
+            surahNumber: surahNumber,
+          );
 
-      if (sourceIndex != null) {
-        ReciterAudioProfiles.setPreferredSourceIndexForReciter(
-          reciterId,
-          sourceIndex,
-        );
-
-        return TarteelSelection._(
-          mode: TarteelMode.surah,
-          ayahBase: null,
-          surahBase: surahBase,
-        );
+          if (sourceIndex != null) {
+            ReciterAudioProfiles.setPreferredSourceIndexForReciter(
+              reciterId,
+              sourceIndex,
+            );
+          }
+        }
       }
 
-      ReciterAudioProfiles.setPreferredSourceIndexForReciter(reciterId, null);
+      return TarteelSelection._(
+        mode: TarteelMode.surah,
+        ayahBase: null,
+        surahBase: surahBase,
+      );
     }
 
     final ayahBase = TarteelAudio.ayahBaseForReciter(reciterId);
     if (reciterType == RecitationType.versebyverse && ayahBase != null) {
-      final sourceIndex = await _firstReachableAyahSourceIndex(
-        networkServices: networkServices,
-        reciterId: reciterId,
-        surahNumber: surahNumber,
-      );
+      if (checkNetwork) {
+        int? sourceIndex = ReciterAudioProfiles.preferredSourceIndexForReciter(reciterId);
+        
+        if (sourceIndex == null) {
+          sourceIndex = await _firstReachableAyahSourceIndex(
+            networkServices: networkServices,
+            reciterId: reciterId,
+            surahNumber: surahNumber,
+          );
 
-      if (sourceIndex != null) {
-        ReciterAudioProfiles.setPreferredSourceIndexForReciter(
-          reciterId,
-          sourceIndex,
-        );
-
-        return TarteelSelection._(
-          mode: TarteelMode.verse,
-          ayahBase: ayahBase,
-          surahBase: null,
-        );
+          if (sourceIndex != null) {
+            ReciterAudioProfiles.setPreferredSourceIndexForReciter(
+              reciterId,
+              sourceIndex,
+            );
+          }
+        }
       }
 
-      ReciterAudioProfiles.setPreferredSourceIndexForReciter(reciterId, null);
+      return TarteelSelection._(
+        mode: TarteelMode.verse,
+        ayahBase: ayahBase,
+        surahBase: null,
+      );
     }
 
     return const TarteelSelection._(

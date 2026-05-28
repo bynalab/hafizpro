@@ -47,6 +47,7 @@ dependencies:
   speech_to_text: ^7.0.0
   string_similarity: ^2.0.0
   share_plus: ^10.1.4
+  background_downloader: ^9.5.4
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hafiz_test/services/audio_center.dart';
+import 'package:hafiz_test/services/audio_download_service.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/ayah.services.dart';
 import 'package:hafiz_test/services/notification_service.dart';
@@ -61,6 +62,7 @@ Future<void> setupLocator() async {
   getIt.registerSingleton<NetworkServices>(NetworkServices());
   getIt.registerSingleton<SurahPicker>(SurahPicker());
   getIt.registerSingleton<AudioServices>(AudioServices());
+  getIt.registerSingleton<AudioDownloadService>(AudioDownloadService());
   getIt.registerSingleton<ThemeController>(ThemeController());
   getIt.registerSingleton<NotificationService>(
       NotificationService(storage: getIt<IStorageService>()));
@@ -80,6 +82,7 @@ Future<void> setupLocator() async {
       storageServices: getIt<IStorageService>(),
       surahPicker: getIt<SurahPicker>(),
       surahSource: getIt<SurahSource>(),
+      audioDownloadService: getIt<AudioDownloadService>(),
     ),
   );
 

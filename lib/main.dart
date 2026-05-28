@@ -14,6 +14,7 @@ import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
 import 'package:hafiz_test/services/user_identification_service.dart';
+import 'package:hafiz_test/services/audio_download_service.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
 final quranHafizKey = GlobalKey<_QuranHafizState>();
@@ -28,6 +29,14 @@ void main() async {
   );
 
   await setupLocator();
+  
+  try {
+    await getIt<AudioDownloadService>().init();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error initializing AudioDownloadService: $e');
+    }
+  }
 
   try {
     // Initialize analytics
@@ -151,6 +160,7 @@ class _QuranHafizState extends State<QuranHafiz> with WidgetsBindingObserver {
       valueListenable: appLocale,
       builder: (context, locale, _) {
         return MaterialApp(
+          navigatorKey: appNavigatorKey,
           scaffoldMessengerKey: appScaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) =>

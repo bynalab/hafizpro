@@ -1,8 +1,9 @@
-import 'dart:io';
-
-import 'package:android_intent_plus/android_intent.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import 'package:hafiz_test/services/tts_settings_launcher_io.dart'
+    if (dart.library.html) 'package:hafiz_test/services/tts_settings_launcher_stub.dart'
+    as tts_settings;
 
 class TtsService {
   static final TtsService _instance = TtsService._internal();
@@ -22,16 +23,17 @@ class TtsService {
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
 
-    // iOS audio session category
-    await _flutterTts.setIosAudioCategory(
-      IosTextToSpeechAudioCategory.playback,
-      [
-        IosTextToSpeechAudioCategoryOptions.defaultToSpeaker,
-        IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-        IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
-      ],
-      IosTextToSpeechAudioMode.defaultMode,
-    );
+    if (!kIsWeb) {
+      await _flutterTts.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        [
+          IosTextToSpeechAudioCategoryOptions.defaultToSpeaker,
+          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+        ],
+        IosTextToSpeechAudioMode.defaultMode,
+      );
+    }
 
     _isInitialized = true;
   }
@@ -63,15 +65,5 @@ class TtsService {
     _flutterTts.setCancelHandler(onPause);
   }
 
-  Future<void> openSystemTtsSettings() async {
-    if (Platform.isAndroid) {
-      const intent = AndroidIntent(
-        action: 'com.android.settings.TTS_SETTINGS',
-      );
-      await intent.launch();
-    } else if (Platform.isIOS) {
-      // iOS doesn't have a direct link to TTS settings, so we open the main settings
-      await launchUrl(Uri.parse('App-Prefs:root=General&path=Accessibility'));
-    }
-  }
+  Future<void> openSystemTtsSettings() => tts_settings.openSystemTtsSettings();
 }
