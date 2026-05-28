@@ -290,7 +290,7 @@ class _AyahFinderHero extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: isListening ? 'Stop listening' : 'Start listening',
+      label: isListening ? context.l10n.ayahFinderStopListening : context.l10n.ayahFinderStartListening,
       child: Material(
         color: Colors.transparent,
         child: InkWell(

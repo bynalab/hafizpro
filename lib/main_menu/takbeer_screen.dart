@@ -10,6 +10,7 @@ import 'package:hafiz_test/services/audio_services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:hafiz_test/util/app_messenger.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -558,8 +559,8 @@ class _TakbeerScreenState extends State<TakbeerScreen>
       child: Text(
         key: ValueKey(isPlaying),
         isPlaying
-            ? 'Looping endlessly...'
-            : 'Tap play to begin. It will loop endlessly.',
+            ? context.l10n.takbeerLooping
+            : context.l10n.takbeerPlayHint,
         style: GoogleFonts.inter(fontSize: 12, color: _kDimText),
       ),
     );

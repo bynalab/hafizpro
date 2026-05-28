@@ -138,7 +138,7 @@ class QuranSettingsButton extends StatelessWidget {
                                     size: 18, color: onPanel),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Font size',
+                                  context.l10n.quranSettingsFontSize,
                                   style: GoogleFonts.cairo(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
@@ -186,7 +186,7 @@ class QuranSettingsButton extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Arabic font',
+                              context.l10n.quranSettingsArabicFont,
                               style: GoogleFonts.cairo(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -259,7 +259,7 @@ class QuranSettingsButton extends StatelessWidget {
                             ),
                             const SizedBox(height: 14),
                             Text(
-                              'Layout',
+                              context.l10n.quranSettingsLayout,
                               style: GoogleFonts.cairo(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -271,7 +271,7 @@ class QuranSettingsButton extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: _LayoutChip(
-                                    label: 'List',
+                                    label: context.l10n.quranSettingsLayoutList,
                                     icon: Icons.view_list_rounded,
                                     selected: prefs.readerViewMode ==
                                         QuranReaderViewMode.normal,
@@ -290,7 +290,7 @@ class QuranSettingsButton extends StatelessWidget {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: _LayoutChip(
-                                    label: 'Focus',
+                                    label: context.l10n.quranSettingsLayoutFocus,
                                     icon: Icons.auto_stories_rounded,
                                     selected: prefs.readerViewMode ==
                                         QuranReaderViewMode.verseFocus,
@@ -309,7 +309,7 @@ class QuranSettingsButton extends StatelessWidget {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: _LayoutChip(
-                                    label: 'Mushaf',
+                                    label: context.l10n.quranSettingsLayoutMushaf,
                                     icon: Icons.menu_book_rounded,
                                     selected: prefs.readerViewMode ==
                                         QuranReaderViewMode.mushaf,

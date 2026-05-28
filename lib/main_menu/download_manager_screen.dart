@@ -366,16 +366,16 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
                             builder: (context) => AlertDialog(
                               backgroundColor: isDark ? const Color(0xFF161C1A) : const Color(0xFFF4F7F6),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              title: const Text('Cancel Download', style: TextStyle(fontWeight: FontWeight.bold)),
-                              content: Text('Are you sure you want to cancel the download for ${surah.englishName}?'),
+                              title: Text(context.l10n.cancelDownloadTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              content: Text(context.l10n.cancelDownloadConfirm(surah.englishName)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, false),
-                                  child: Text('No', style: TextStyle(color: isDark ? Colors.white38 : Colors.grey[600], fontWeight: FontWeight.bold)),
+                                  child: Text(context.l10n.dialogNo, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey[600], fontWeight: FontWeight.bold)),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Yes, Cancel', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                  child: Text(context.l10n.dialogYesCancel, style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
@@ -477,7 +477,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
                       isDense: true,
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                      hintText: 'Search Surah...',
+                      hintText: context.l10n.searchSurahHint,
                       hintStyle: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.white30 : Colors.black38,

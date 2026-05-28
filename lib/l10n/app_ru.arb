@@ -388,5 +388,35 @@
   },
   "readyOffline": "Доступно оффлайн",
   "notDownloaded": "Не загружено",
-  "offlineDownloads": "Аудиозагрузки"
+  "offlineDownloads": "Аудиозагрузки",
+  "cancelDownloadTitle": "Отменить загрузку",
+  "cancelDownloadConfirm": "Вы уверены, что хотите отменить загрузку суры {surahName}?",
+  "@cancelDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "dialogNo": "Нет",
+  "dialogYesCancel": "Да, отменить",
+  "searchSurahHint": "Поиск суры...",
+  "takbeerLooping": "Бесконечный повтор...",
+  "takbeerPlayHint": "Нажмите воспроизведение. Будет повторяться бесконечно.",
+  "takbeerErrorLaunching": "Ошибка запуска Такбир: {error}",
+  "@takbeerErrorLaunching": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quranSettingsFontSize": "\u0420\u0430\u0437\u043c\u0435\u0440 \u0448\u0440\u0438\u0444\u0442\u0430",
+  "quranSettingsArabicFont": "\u0410\u0440\u0430\u0431\u0441\u043a\u0438\u0439 \u0448\u0440\u0438\u0444\u0442",
+  "quranSettingsLayout": "\u041c\u0430\u043a\u0435\u0442",
+  "quranSettingsLayoutList": "\u0421\u043f\u0438\u0441\u043e\u043a",
+  "quranSettingsLayoutFocus": "\u0424\u043e\u043a\u0443\u0441",
+  "quranSettingsLayoutMushaf": "\u041c\u0443\u0441\u0445\u0430\u0444",
+  "ayahFinderStartListening": "\u041d\u0430\u0447\u0430\u0442\u044c \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0435",
+  "ayahFinderStopListening": "\u041e\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c \u043f\u0440\u043e\u0441\u043b\u0443\u0448\u0438\u0432\u0430\u043d\u0438\u0435"
 }
