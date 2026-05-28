@@ -5,6 +5,8 @@ import 'package:hafiz_test/model/surah.model.dart';
 import 'package:hafiz_test/util/tarteel_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hafiz_test/services/tarteel_audio_resolver.dart';
+import 'package:hafiz_test/services/surah_source.dart';
+import 'package:hafiz_test/locator.dart';
 
 class AudioDownloadService {
   AudioDownloadService();
@@ -118,10 +120,14 @@ class AudioDownloadService {
           _updateProgress(key, progress);
         });
       } else if (selection.mode == TarteelMode.verse) {
+        // Fallback to fetching full Surah if ayahs is empty to make sure we have all Ayahs
+        final fullSurah = surah.ayahs.isEmpty
+            ? await getIt<SurahSource>().getSurah(surahNumber)
+            : surah;
         int completedAyahs = 0;
-        final totalAyahs = surah.ayahs.length;
+        final totalAyahs = fullSurah.numberOfAyahs > 0 ? fullSurah.numberOfAyahs : fullSurah.ayahs.length;
 
-        for (final ayah in surah.ayahs) {
+        for (final ayah in fullSurah.ayahs) {
           final remoteUrl = TarteelAudio.ayahUrlForReciter(
             reciterId,
             surahNumber,
@@ -210,7 +216,9 @@ class AudioDownloadService {
 
   Future<void> _downloadFile(
       String key, String url, String reciterId, String filename, void Function(double) onProgress) async {
-    if (url.isEmpty) return;
+    if (url.isEmpty) {
+      throw ArgumentError.value(url, 'url', 'Empty download URL for key $key');
+    }
     
     final task = DownloadTask(
       url: url,
@@ -243,5 +251,10 @@ class AudioDownloadService {
       debugPrint('Error downloading file $url: $e');
       rethrow;
     }
+  }
+
+  void dispose() {
+    downloadProgress.dispose();
+    completedDownloads.dispose();
   }
 }

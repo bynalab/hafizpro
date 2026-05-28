@@ -354,8 +354,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   SettingsTile(
                     leading: const LeadingCircle(Icons.download_for_offline_rounded),
-                    title: 'Audio Downloads',
-                    subtitle: 'Manage offline audio recitations',
+                    title: context.l10n.audioDownloadsTitle,
+                    subtitle: context.l10n.audioDownloadsSubtitle,
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),

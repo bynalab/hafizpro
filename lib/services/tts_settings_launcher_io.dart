@@ -10,6 +10,13 @@ Future<void> openSystemTtsSettings() async {
     );
     await intent.launch();
   } else if (Platform.isIOS) {
-    await launchUrl(Uri.parse('App-Prefs:root=General&path=Accessibility'));
+    try {
+      final url = Uri.parse('app-settings:');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      }
+    } catch (e) {
+      // safe fallback
+    }
   }
 }

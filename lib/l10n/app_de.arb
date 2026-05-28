@@ -374,5 +374,19 @@
         "type": "int"
       }
     }
-  }
+  },
+  "audioDownloadsTitle": "Audio-Downloads",
+  "audioDownloadsSubtitle": "Offline-Audio-Rezitationen verwalten",
+  "deleteDownload": "Download löschen",
+  "deleteDownloadConfirm": "Sind Sie sicher, dass Sie das heruntergeladene Audio für {surahName} löschen möchten?",
+  "@deleteDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "Offline verfügbar",
+  "notDownloaded": "Nicht heruntergeladen",
+  "offlineDownloads": "Offline-Downloads"
 }

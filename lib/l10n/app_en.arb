@@ -1076,5 +1076,38 @@
         "type": "int"
       }
     }
+  },
+  "audioDownloadsTitle": "Audio Downloads",
+  "@audioDownloadsTitle": {
+    "description": "Title for the audio downloads settings entry."
+  },
+  "audioDownloadsSubtitle": "Manage offline audio recitations",
+  "@audioDownloadsSubtitle": {
+    "description": "Subtitle explaining audio downloads management."
+  },
+  "deleteDownload": "Delete Download",
+  "@deleteDownload": {
+    "description": "Title of the delete confirmation dialog."
+  },
+  "deleteDownloadConfirm": "Are you sure you want to delete the downloaded audio for {surahName}?",
+  "@deleteDownloadConfirm": {
+    "description": "Confirmation message for deleting a surah download.",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "Ready Offline",
+  "@readyOffline": {
+    "description": "Label for successfully downloaded offline content."
+  },
+  "notDownloaded": "Not Downloaded",
+  "@notDownloaded": {
+    "description": "Label for content not yet downloaded."
+  },
+  "offlineDownloads": "Offline Downloads",
+  "@offlineDownloads": {
+    "description": "AppBar title for download manager screen."
   }
 }

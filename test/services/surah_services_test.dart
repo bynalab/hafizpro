@@ -112,7 +112,7 @@ void main() {
         // Assert
         expect(result, isA<Surah>());
         expect(result.number, equals(1));
-        expect(result.ayahs.first.audio, isNot('local_url'));
+        expect(result.ayahs.first.audio, equals('https://audio-cdn.tarteel.ai/quran/alafasy/001001.mp3'));
         verify(() => mockStorageServices.getReciterId()).called(1);
         verify(() => mockSurahSource.getSurah(surahNumber)).called(1);
         verify(() => mockAudioDownloadService.getLocalAudioUrlIfExists(

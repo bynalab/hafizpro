@@ -9,6 +9,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -114,6 +115,7 @@ class TakbeerAudioService extends ChangeNotifier {
       await player.play();
     } catch (e) {
       debugPrint('[TakbeerAudioService] $e');
+      AppMessenger.showSnackBar('Error launching Takbeer: $e');
     } finally {
       isLoading = false;
       notifyListeners();

@@ -30,7 +30,13 @@ void main() async {
 
   await setupLocator();
   
-  await getIt<AudioDownloadService>().init();
+  try {
+    await getIt<AudioDownloadService>().init();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error initializing AudioDownloadService: $e');
+    }
+  }
 
   try {
     // Initialize analytics

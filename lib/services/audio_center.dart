@@ -251,9 +251,11 @@ class AudioCenter extends ChangeNotifier {
       final newPlaying = state.playing;
       if (newPlaying == isPlaying) return;
 
-      if (newPlaying && !TakbeerAudioService.instance.isTakbeerActive) {
-        // Pause the looping Takbeer if normal Quran playback starts to prevent conflicts
-        TakbeerAudioService.instance.pause();
+      if (newPlaying) {
+        final takbeerSvc = TakbeerAudioService.instance;
+        if (takbeerSvc.isTakbeerActive) {
+          takbeerSvc.pause();
+        }
       }
 
       isPlaying = newPlaying;

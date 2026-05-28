@@ -374,5 +374,19 @@
         "type": "int"
       }
     }
-  }
+  },
+  "audioDownloadsTitle": "تحميلات الصوت",
+  "audioDownloadsSubtitle": "إدارة تلاوات الصوت غير المتصلة بالإنترنت",
+  "deleteDownload": "حذف التحميل",
+  "deleteDownloadConfirm": "هل أنت متأكد من رغبتك في حذف تلاوة سورة {surahName} المحملة؟",
+  "@deleteDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "جاهز بدون اتصال",
+  "notDownloaded": "غير محمل",
+  "offlineDownloads": "تحميلات بدون اتصال"
 }

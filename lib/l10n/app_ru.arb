@@ -374,5 +374,19 @@
         "type": "int"
       }
     }
-  }
+  },
+  "audioDownloadsTitle": "Аудиозагрузки",
+  "audioDownloadsSubtitle": "Управление оффлайн-аудио",
+  "deleteDownload": "Удалить загрузку",
+  "deleteDownloadConfirm": "Вы уверены, что хотите удалить загруженную аудиозапись для суры {surahName}?",
+  "@deleteDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "Доступно оффлайн",
+  "notDownloaded": "Не загружено",
+  "offlineDownloads": "Аудиозагрузки"
 }

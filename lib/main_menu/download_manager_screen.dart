@@ -11,6 +11,7 @@ import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/surah_source.dart';
 import 'package:hafiz_test/services/tarteel_audio_resolver.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
+import 'package:hafiz_test/util/l10n_extensions.dart';
 
 class DownloadManagerScreen extends StatefulWidget {
   const DownloadManagerScreen({super.key});
@@ -34,17 +35,49 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
   String _searchQuery = '';
   bool _isSearching = false;
 
+  final Map<int, bool> _downloadedStatus = {};
+
   @override
   void initState() {
     super.initState();
     _selectedReciterId = _storage.getReciterId();
     _resolveReciterSelection();
+    _downloadService.downloadProgress.addListener(_onProgressChanged);
   }
 
   @override
   void dispose() {
+    _downloadService.downloadProgress.removeListener(_onProgressChanged);
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onProgressChanged() {
+    _refreshDownloadStatus();
+  }
+
+  Future<void> _refreshDownloadStatus() async {
+    if (_currentSelection == null) return;
+    
+    final tempMap = <int, bool>{};
+    final futures = surahList.map((surah) async {
+      final isDownloaded = await _downloadService.isSurahDownloaded(
+        surah.number,
+        _selectedReciterId,
+        _currentSelection!,
+        surah,
+      );
+      tempMap[surah.number] = isDownloaded;
+    });
+    
+    await Future.wait(futures);
+    
+    if (mounted) {
+      setState(() {
+        _downloadedStatus.clear();
+        _downloadedStatus.addAll(tempMap);
+      });
+    }
   }
 
   Future<void> _resolveReciterSelection() async {
@@ -57,6 +90,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
     );
     if (mounted) {
       setState(() => _isLoadingSelection = false);
+      _refreshDownloadStatus();
     }
   }
 
@@ -84,7 +118,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
       selection: _currentSelection!,
       surah: fullSurah,
     );
-    setState(() {}); // Refresh UI
+    _refreshDownloadStatus();
   }
 
   Future<void> _deleteSurah(Surah baseSurah) async {
@@ -97,14 +131,14 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
         backgroundColor: isDark ? const Color(0xFF161C1A) : const Color(0xFFF4F7F6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Delete Download',
+          context.l10n.deleteDownload,
           style: GoogleFonts.cairo(
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : const Color(0xFF003028),
           ),
         ),
         content: Text(
-          'Are you sure you want to delete the downloaded audio for ${baseSurah.englishName}?',
+          context.l10n.deleteDownloadConfirm(baseSurah.englishName),
           style: TextStyle(
             color: isDark ? Colors.white70 : const Color(0xFF556660),
           ),
@@ -113,7 +147,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Cancel',
+              context.l10n.commonCancel,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white38 : Colors.grey[600],
@@ -122,9 +156,9 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(
+            child: Text(
+              context.l10n.commonYes,
+              style: const TextStyle(
                 color: Colors.redAccent,
                 fontWeight: FontWeight.bold,
               ),
@@ -144,6 +178,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
       final fullSurah = await _surahSource.getSurah(baseSurah.number);
       await _downloadService.deleteSurah(
           baseSurah.number, _selectedReciterId, _currentSelection!, fullSurah);
+      _refreshDownloadStatus();
     } finally {
       if (mounted) {
         setState(() {
@@ -159,16 +194,10 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
     final primaryAccent = theme.colorScheme.primary;
     const goldAccent = Color(0xFFD4AF37);
 
-    return FutureBuilder<bool>(
-      future: _currentSelection != null
-          ? _downloadService.isSurahDownloaded(
-               surah.number, _selectedReciterId, _currentSelection!, surah)
-          : Future.value(false),
-      builder: (context, snapshot) {
-        final isDownloaded = snapshot.data ?? false;
+    final isDownloaded = _downloadedStatus[surah.number] ?? false;
 
-        return ValueListenableBuilder<Map<String, double>>(
-          valueListenable: _downloadService.downloadProgress,
+    return ValueListenableBuilder<Map<String, double>>(
+      valueListenable: _downloadService.downloadProgress,
           builder: (context, progressMap, _) {
             final key = '${surah.number}_$_selectedReciterId';
             final progress = progressMap[key];
@@ -297,7 +326,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
                                       Icon(Icons.check_circle_rounded, size: 12, color: primaryAccent),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Ready Offline',
+                                        context.l10n.readyOffline,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
@@ -311,7 +340,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
                             ),
                           ] else ...[
                             Text(
-                              'Not Downloaded',
+                              context.l10n.notDownloaded,
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 color: isDark ? Colors.white38 : Colors.black38,
@@ -395,8 +424,6 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
             );
           },
         );
-      },
-    );
   }
 
   @override
@@ -473,7 +500,7 @@ class _DownloadManagerScreenState extends State<DownloadManagerScreen> {
                 ),
               )
             : Text(
-                'Offline Downloads',
+                context.l10n.offlineDownloads,
                 style: GoogleFonts.cairo(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,

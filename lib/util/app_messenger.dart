@@ -41,6 +41,7 @@ class AppMessenger {
 
     showModalBottomSheet(
       context: ctx,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent, // Allow custom rounded decorative border
       builder: (context) {
         final theme = Theme.of(context);
@@ -69,11 +70,15 @@ class AppMessenger {
             ],
           ),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // Elegant Top Handle
                   Container(
                     width: 48,
@@ -210,8 +215,9 @@ class AppMessenger {
                         elevation: 0,
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
+                        final navigator = Navigator.of(context);
+                        navigator.pop();
+                        navigator.push(
                           MaterialPageRoute(
                             builder: (context) => const DownloadManagerScreen(),
                           ),
@@ -254,10 +260,11 @@ class AppMessenger {
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   /// Shows a gorgeous one-time dialog prompting the user about the new offline downloads feature.
   static void showOfflineOnboardingPrompt() {
@@ -417,8 +424,9 @@ class AppMessenger {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
+                        final navigator = Navigator.of(context);
+                        navigator.pop();
+                        navigator.push(
                           MaterialPageRoute(
                             builder: (context) => const DownloadManagerScreen(),
                           ),
