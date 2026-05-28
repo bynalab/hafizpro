@@ -10,6 +10,8 @@ import 'package:hafiz_test/util/theme_controller.dart';
 import 'package:hafiz_test/locator.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 
+import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:hafiz_test/main_menu/quran_dashboard_page.dart';
 import 'package:hafiz_test/main_menu/test_menu_page.dart';
 import 'package:hafiz_test/main_menu/widgets.dart';
@@ -42,6 +44,23 @@ class _MainMenuShellState extends State<MainMenuShell> {
       if (next == _query) return;
       setState(() => _query = next);
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          _checkAndShowOfflineAudioPrompt();
+        }
+      });
+    });
+  }
+
+  void _checkAndShowOfflineAudioPrompt() {
+    final storage = getIt<IStorageService>();
+    final hasSeen = storage.getBool('has_seen_offline_audio_prompt') ?? false;
+    if (!hasSeen) {
+      AppMessenger.showOfflineOnboardingPrompt();
+      storage.setBool('has_seen_offline_audio_prompt', true);
+    }
   }
 
   @override
