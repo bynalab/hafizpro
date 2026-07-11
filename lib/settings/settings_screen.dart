@@ -12,6 +12,7 @@ import 'package:hafiz_test/settings/sheets/progress_tracking_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/settings/sheets/translation_picker_sheet.dart';
 import 'package:hafiz_test/main_menu/download_manager_screen.dart';
 import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
@@ -382,6 +383,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                     onTap: _pickLanguage,
+                  ),
+                  const SizedBox(height: 10),
+                  SettingsTile(
+                    leading: const LeadingCircle(Icons.translate_rounded),
+                    title: 'Translation',
+                    subtitle: controller.translationId == 'en_khattab' ? 'English (Mustafa Khattab)' : (controller.translationId == 'en_default' ? 'English (Default)' : 'Transliteration (Default)'),
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
+                    onTap: () async {
+                      final selected = await TranslationPickerSheet(
+                        selected: controller.translationId,
+                      ).openBottomSheet(context);
+                      if (selected != null) {
+                        await controller.setTranslationId(selected.id);
+                      }
+                    },
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(

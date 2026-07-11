@@ -24,6 +24,7 @@ class SettingsController extends ChangeNotifier {
 
   bool autoPlay = true;
   String? reciter;
+  String translationId = 'en_khattab';
   late ThemeMode themeMode;
 
   bool notificationsEnabled = true;
@@ -35,6 +36,7 @@ class SettingsController extends ChangeNotifier {
     try {
       autoPlay = _storage.checkAutoPlay();
       reciter = _storage.getReciterId();
+      translationId = _storage.getString('translation_id') ?? 'en_khattab';
       themeMode = ThemeMode.values.byName(_theme.mode);
 
       final rawEnabled = _storage.getString('notifications_enabled');
@@ -89,6 +91,15 @@ class SettingsController extends ChangeNotifier {
     AnalyticsService.trackSettingsChanged('reciter', oldValue, identifier);
     await _storage.setReciterId(identifier);
     await getIt<AudioCenter>().onReciterChanged();
+  }
+
+  Future<void> setTranslationId(String id) async {
+    final oldValue = translationId;
+    translationId = id;
+    notifyListeners();
+
+    AnalyticsService.trackSettingsChanged('translation_id', oldValue, id);
+    await _storage.setString('translation_id', id);
   }
 
   Future<void> setNotifications({

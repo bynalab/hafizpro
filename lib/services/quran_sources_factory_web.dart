@@ -66,7 +66,7 @@ class NetworkSurahSource implements SurahSource {
   Future<Surah> _withTextOverlay(Surah surah) async {
     try {
       final translationId =
-          storageServices.getString('translation_id') ?? 'en_default';
+          storageServices.getString('translation_id') ?? 'en_khattab';
       final transliterationId =
           storageServices.getString('transliteration_id') ?? 'tr_default';
 

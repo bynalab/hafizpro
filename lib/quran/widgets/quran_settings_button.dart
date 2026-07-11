@@ -5,6 +5,7 @@ import 'package:hafiz_test/util/app_colors.dart';
 import 'package:hafiz_test/util/reading_preferences.dart';
 import 'package:hafiz_test/widget/app_switch.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
+import 'package:hafiz_test/settings/sheets/translation_picker_sheet.dart';
 
 class QuranSettingsButton extends StatelessWidget {
   final IStorageService storage;
@@ -112,6 +113,21 @@ class QuranSettingsButton extends StatelessWidget {
                                 setSheetState(() =>
                                     prefs = prefs.copyWith(showTranslation: v));
                                 onChanged();
+                              },
+                            ),
+                            const SizedBox(height: 6),
+                            _ActionTile(
+                              title: 'Change Translation',
+                              subtitle: 'Select from available translations',
+                              icon: Icons.language_rounded,
+                              isDark: isDark,
+                              onTap: () async {
+                                final selected = storage.getString('translation_id') ?? 'en_khattab';
+                                final result = await TranslationPickerSheet(selected: selected).openBottomSheet(ctx);
+                                if (result != null) {
+                                  await storage.setString('translation_id', result.id);
+                                  onChanged();
+                                }
                               },
                             ),
                             const SizedBox(height: 6),
@@ -446,6 +462,94 @@ class _DenseSwitchTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ActionTile extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _ActionTile({
+    required this.title,
+    this.subtitle,
+    required this.icon,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final onPanel = isDark ? Colors.white : const Color(0xFF111827);
+    final muted = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final rowBg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF8FAFC);
+    final sub = subtitle;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(8, 8, 6, 8),
+          decoration: BoxDecoration(
+            color: rowBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : const Color(0xFFE5E7EB),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: onPanel),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.cairo(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                        color: onPanel,
+                      ),
+                    ),
+                    if (sub != null && sub.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        sub,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                          color: muted,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: muted,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

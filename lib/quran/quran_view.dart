@@ -665,22 +665,25 @@ class _QuranViewState extends State<QuranView> {
                               );
                               return;
                             }
-                            _syncReaderModeWithView();
-                            setState(() {});
-                            final layout = ReadingPreferences.fromStorage(
-                              _storage,
-                            ).readerViewMode;
-                            if (layout == QuranReaderViewMode.normal) {
-                              WidgetsBinding.instance
-                                  .addPostFrameCallback((_) {
-                                if (!mounted) return;
-                                final i =
-                                    viewModel.playingIndexNotifier.value;
-                                if (i != null) {
-                                  _scrollWithRetry(i, animated: false);
-                                }
-                              });
-                            }
+                            viewModel.initialize(widget.surah.number, showLoading: false).then((_) {
+                              if (!mounted) return;
+                              _syncReaderModeWithView();
+                              setState(() {});
+                              final layout = ReadingPreferences.fromStorage(
+                                _storage,
+                              ).readerViewMode;
+                              if (layout == QuranReaderViewMode.normal) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (!mounted) return;
+                                  final i =
+                                      viewModel.playingIndexNotifier.value;
+                                  if (i != null) {
+                                    _scrollWithRetry(i, animated: false);
+                                  }
+                                });
+                              }
+                            });
                           }
                         },
                       ),
