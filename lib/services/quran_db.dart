@@ -147,6 +147,22 @@ class QuranDb {
     return rows.map((r) => TranslationInfo.fromMap(r)).toList(growable: false);
   }
 
+  Future<TranslationInfo?> getTranslation(String id) async {
+    final db = _db;
+    if (db == null) return null;
+
+    final rows = await db.rawQuery(
+      'SELECT id, name, language, type FROM translations WHERE id = ? LIMIT 1;',
+      [id],
+    );
+
+    if (rows.isNotEmpty) {
+      return TranslationInfo.fromMap(rows.first);
+    }
+
+    return null;
+  }
+
   Future<List<QuranDbAyahRow>> getAllAyahsRaw() async {
     final db = _db;
     if (db == null) {

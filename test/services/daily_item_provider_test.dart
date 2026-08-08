@@ -8,21 +8,21 @@ class MockStorage extends Mock implements IStorageService {}
 void main() {
   late DailyItemProvider<String> provider;
   late MockStorage storage;
-  final Map<String, String> memoryStorage = {};
+  final Map<String, int> memoryStorage = {};
   final List<String> testItems = ['A', 'B', 'C', 'D', 'E'];
 
   setUp(() {
     storage = MockStorage();
     memoryStorage.clear();
 
-    when(() => storage.getString(any())).thenAnswer((invocation) {
+    when(() => storage.getInt(any())).thenAnswer((invocation) {
       final key = invocation.positionalArguments[0] as String;
       return memoryStorage[key];
     });
 
-    when(() => storage.setString(any(), any())).thenAnswer((invocation) async {
+    when(() => storage.setInt(any(), any())).thenAnswer((invocation) async {
       final key = invocation.positionalArguments[0] as String;
-      final val = invocation.positionalArguments[1] as String;
+      final val = invocation.positionalArguments[1] as int;
       memoryStorage[key] = val;
       return true;
     });
@@ -78,13 +78,13 @@ void main() {
       const offset = 2;
       final day = DateTime(2026, 3, 6);
 
-      memoryStorage['daily_item_test_offset'] = offset.toString();
+      memoryStorage['daily_item_test_offset'] = offset;
 
       final item1 = await provider.getItem(date: day);
 
       // Clear and re-force offset
       memoryStorage.clear();
-      memoryStorage['daily_item_test_offset'] = offset.toString();
+      memoryStorage['daily_item_test_offset'] = offset;
 
       final item2 = await provider.getItem(date: day);
 
