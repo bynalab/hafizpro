@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hafiz_test/adhkar/adhkar_config.dart';
 import 'package:hafiz_test/adhkar/adhkar_home_page.dart';
 import 'package:hafiz_test/adhkar/adhkar_settings_sheet.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -135,7 +135,7 @@ class _MainMenuShellState extends State<MainMenuShell> {
                     onOpenSettings: _openSettings,
                     onToggleTheme: _toggleTheme,
                   ),
-                  if (kIsWeb)
+                  if (AdhkarConfig.shouldShow)
                     AdhkarHomePage(
                       onOpenSettings: () {
                         const AdhkarSettingsSheet().openBottomSheet(context);
@@ -150,7 +150,7 @@ class _MainMenuShellState extends State<MainMenuShell> {
                   padding: const EdgeInsets.only(bottom: 18),
                   child: BottomPillNav(
                     index: _tabIndex,
-                    showAdhkar: kIsWeb,
+                    showAdhkar: AdhkarConfig.shouldShow,
                     onChanged: (i) => setState(() => _tabIndex = i),
                   ),
                 ),

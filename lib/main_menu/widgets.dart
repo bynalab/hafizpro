@@ -798,7 +798,7 @@ class BottomPillNav extends StatelessWidget {
   const BottomPillNav({
     super.key,
     required this.index,
-    this.showAdhkar = false,
+    this.showAdhkar = true,
     required this.onChanged,
   });
 
@@ -833,7 +833,9 @@ class BottomPillNav extends StatelessWidget {
                     colorFilter: ColorFilter.mode(
                       index == 0
                           ? Colors.white
-                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                          : (isDark
+                              ? const Color(0xFFBFE7EA)
+                              : AppColors.green500),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -852,7 +854,9 @@ class BottomPillNav extends StatelessWidget {
                     colorFilter: ColorFilter.mode(
                       index == 1
                           ? Colors.white
-                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                          : (isDark
+                              ? const Color(0xFFBFE7EA)
+                              : AppColors.green500),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -870,7 +874,9 @@ class BottomPillNav extends StatelessWidget {
                       size: 18,
                       color: index == 2
                           ? Colors.white
-                          : (isDark ? const Color(0xFFBFE7EA) : AppColors.green500),
+                          : (isDark
+                              ? const Color(0xFFBFE7EA)
+                              : AppColors.green500),
                     ),
                     onTap: () => onChanged(2),
                   ),
