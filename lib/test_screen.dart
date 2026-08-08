@@ -29,7 +29,7 @@ class TestScreen extends StatefulWidget {
 
   final bool isLoading;
   final Future<void> Function()? onRefresh;
-  final VoidCallback? onReadFull;
+  final Future<void> Function({int? ayahNumber})? onReadFull;
   final String readFullLabel;
   final VoidCallback? onNextBoundary;
   final VoidCallback? onPreviousBoundary;
@@ -511,64 +511,73 @@ class _TestPage extends State<TestScreen> {
                                 ),
                               ),
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 500),
-                                    switchInCurve: Curves.easeInOutCubic,
-                                    switchOutCurve: Curves.easeInOutCubic,
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> animation) {
-                                      final offsetValue =
-                                          _isNextDirection ? 1.2 : -1.2;
-                                      final inAnimation = Tween<Offset>(
-                                        begin: Offset(offsetValue, 0),
-                                        end: Offset.zero,
-                                      ).animate(animation);
+                                child: GestureDetector(
+                                  onTap: () {
+                                    widget.onReadFull?.call(
+                                      ayahNumber: currentAyah.numberInSurah,
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      switchInCurve: Curves.easeInOutCubic,
+                                      switchOutCurve: Curves.easeInOutCubic,
+                                      transitionBuilder: (Widget child,
+                                          Animation<double> animation) {
+                                        final offsetValue =
+                                            _isNextDirection ? 1.2 : -1.2;
+                                        final inAnimation = Tween<Offset>(
+                                          begin: Offset(offsetValue, 0),
+                                          end: Offset.zero,
+                                        ).animate(animation);
 
-                                      final outAnimation = Tween<Offset>(
-                                        begin: Offset(-offsetValue, 0),
-                                        end: Offset.zero,
-                                      ).animate(animation);
+                                        final outAnimation = Tween<Offset>(
+                                          begin: Offset(-offsetValue, 0),
+                                          end: Offset.zero,
+                                        ).animate(animation);
 
-                                      if (child.key ==
-                                          ValueKey(currentAyah.number)) {
-                                        return SlideTransition(
-                                            position: inAnimation,
-                                            child: FadeTransition(
-                                                opacity: animation,
-                                                child: child));
-                                      } else {
-                                        return SlideTransition(
-                                            position: outAnimation,
-                                            child: FadeTransition(
-                                                opacity: animation,
-                                                child: child));
-                                      }
-                                    },
-                                    child: Center(
-                                      key: ValueKey(currentAyah.number),
-                                      child: SingleChildScrollView(
-                                        child: Builder(
-                                          builder: (context) {
-                                            final text = currentAyah.text;
-                                            final fontSize =
-                                                _getVerseFontSize(text);
+                                        if (child.key ==
+                                            ValueKey(currentAyah.number)) {
+                                          return SlideTransition(
+                                              position: inAnimation,
+                                              child: FadeTransition(
+                                                  opacity: animation,
+                                                  child: child));
+                                        } else {
+                                          return SlideTransition(
+                                              position: outAnimation,
+                                              child: FadeTransition(
+                                                  opacity: animation,
+                                                  child: child));
+                                        }
+                                      },
+                                      child: Center(
+                                        key: ValueKey(currentAyah.number),
+                                        child: SingleChildScrollView(
+                                          child: Builder(
+                                            builder: (context) {
+                                              final text = currentAyah.text;
+                                              final fontSize =
+                                                  _getVerseFontSize(text);
 
-                                            return Text(
-                                              text,
-                                              textAlign: TextAlign.center,
-                                              textDirection: TextDirection.rtl,
-                                              style: GoogleFonts.amiri(
-                                                textStyle: TextStyle(
-                                                  fontSize: fontSize,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                  height: 2.0,
+                                              return Text(
+                                                text,
+                                                textAlign: TextAlign.center,
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                style: GoogleFonts.amiri(
+                                                  textStyle: TextStyle(
+                                                    fontSize: fontSize,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    height: 2.0,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -923,7 +932,7 @@ class _TestPage extends State<TestScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: widget.onReadFull,
+                        onPressed: () => widget.onReadFull?.call(),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(

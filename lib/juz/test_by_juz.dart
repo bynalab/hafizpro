@@ -213,12 +213,17 @@ class _TestPage extends State<TestByJuz> {
                 currentAyah: isLoading ? Ayah() : currentAyah,
                 isLoading: isLoading,
                 readFullLabel: context.l10n.testReadEntireJuz,
-                onReadFull: () async {
+                onReadFull: ({ayahNumber}) async {
                   final juz = findJuzByNumber(widget.juzNumber);
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => JuzQuranView(juz: juz),
+                      builder: (_) {
+                        return JuzQuranView(
+                          juz: juz,
+                          initialAyahNumber: ayahNumber,
+                        );
+                      },
                     ),
                   );
                 },

@@ -26,7 +26,7 @@ import 'package:hafiz_test/bookmark/bookmarks_page.dart';
 
 import 'package:hafiz_test/main_menu/widgets.dart';
 import 'package:hafiz_test/main_menu/widgets/quran_progress_card.dart';
-import 'package:hafiz_test/main_menu/widgets/takbeer_card.dart';
+// import 'package:hafiz_test/main_menu/widgets/takbeer_card.dart';
 
 class QuranDashboardPage extends StatefulWidget {
   const QuranDashboardPage({
@@ -191,8 +191,8 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                       _ContinueLastTestCard(lastRead: lastRead),
                     const SizedBox(height: 10),
                     _ContinueReadingCard(bookmark: bookmark),
-                    const SizedBox(height: 10),
-                    const TakbeerCard(),
+                    // const SizedBox(height: 10),
+                    // const TakbeerCard(),
                     ListenableBuilder(
                       listenable: _audioCenter,
                       builder: (context, _) {
@@ -316,8 +316,7 @@ class _QuranDashboardPageState extends State<QuranDashboardPage> {
                           builder: (_) {
                             return QuranView(
                               surah: surah,
-                              initialAyahNumber:
-                                  surahSearch.initialAyahNumber,
+                              initialAyahNumber: surahSearch.initialAyahNumber,
                             );
                           },
                         ),

@@ -295,7 +295,7 @@ class _TestPage extends State<TestBySurah> {
                 surah: surah,
                 currentAyah: isLoading ? Ayah() : currentAyah,
                 isLoading: isLoading,
-                onReadFull: () async {
+                onReadFull: ({ayahNumber}) async {
                   final surahNumber = _currentSurahNumber ?? 0;
                   final surahName = surah.englishName;
                   if (surahNumber <= 0) return;
@@ -304,6 +304,7 @@ class _TestPage extends State<TestBySurah> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => QuranView(
+                        initialAyahNumber: ayahNumber,
                         surah: Surah(
                           number: surahNumber,
                           englishName: surahName,
