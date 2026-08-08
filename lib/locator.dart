@@ -24,11 +24,15 @@ final getIt = GetIt.instance;
 Future<void> _restoreNotificationScheduleIfEnabled() async {
   final storage = getIt<IStorageService>();
   final rawEnabled = storage.getString('notifications_enabled');
-  final enabled = rawEnabled == 'true';
+  if (rawEnabled == null) {
+    await storage.setString('notifications_enabled', 'true');
+  }
+
+  final enabled = storage.getString('notifications_enabled') != 'false';
   if (!enabled) return;
 
   final rawTime = storage.getString('notification_time');
-  int hour = 20;
+  int hour = 9;
   int minute = 0;
   if (rawTime != null && rawTime.contains(':')) {
     final parts = rawTime.split(':');
@@ -36,13 +40,12 @@ Future<void> _restoreNotificationScheduleIfEnabled() async {
       hour = int.tryParse(parts[0]) ?? hour;
       minute = int.tryParse(parts[1]) ?? minute;
     }
+  } else if (rawTime == null) {
+    await storage.setString('notification_time', '9:0');
   }
 
   try {
     final notifications = getIt<NotificationService>();
-    final osEnabled = await notifications.areNotificationsEnabled();
-    if (!osEnabled) return;
-
     await notifications
         .scheduleDailyMotivation(TimeOfDay(hour: hour, minute: minute));
   } catch (e) {

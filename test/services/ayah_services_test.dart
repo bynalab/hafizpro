@@ -18,6 +18,7 @@ void main() {
     late MockIStorageService mockStorageServices;
 
     setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
       mockNetworkServices = MockNetworkServices();
       mockStorageServices = MockIStorageService();
       ayahServices = AyahServices(

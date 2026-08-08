@@ -181,7 +181,7 @@ void main() {
 
         // Act
         await expectLater(
-          () async => await surahServices.getSurah(surahNumber),
+          surahServices.getSurah(surahNumber),
           throwsA(isA<Exception>()),
         );
 
@@ -207,8 +207,8 @@ void main() {
             any(), any(), any(), any())).thenAnswer((_) async => false);
 
         // Act & Assert
-        expect(
-          () async => await surahServices.getSurah(surahNumber),
+        await expectLater(
+          surahServices.getSurah(surahNumber),
           throwsA(isA<DioException>()),
         );
       });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hafiz_test/main_menu.dart';
 import 'package:hafiz_test/splash_screen.dart';
+import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'test_helper.dart';
 
 void main() {
@@ -16,7 +17,11 @@ void main() {
 
   testWidgets('SplashScreen builds and navigates to MainMenu', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(home: SplashScreen()),
+      const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: SplashScreen(),
+      ),
     );
 
     expect(find.text('Master the Quran, one Ayah at a time'), findsOneWidget);
