@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:just_audio/just_audio.dart';
 
 class BottomAudioControls extends StatelessWidget {
@@ -523,6 +524,9 @@ class BottomAudioControls extends StatelessWidget {
                     next = LoopMode.off;
                   }
                   await audioPlayer.setLoopMode(next);
+                  if (context.mounted) {
+                    AppMessenger.showLoopToast(context, next);
+                  }
                 },
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints.tightFor(

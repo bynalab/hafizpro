@@ -15,6 +15,7 @@ import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/services/audio_services.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/util/util.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/services/rating_service.dart';
 import 'package:hafiz_test/services/analytics_service.dart';
@@ -869,6 +870,9 @@ class _TestPage extends State<TestScreen> {
 
                                     AnalyticsService.trackRepeatSwitch(loop,
                                         audioName: currentAudioName);
+
+                                    AppMessenger.showLoopToast(
+                                        context, loopMode);
 
                                     setState(() {});
                                   },
