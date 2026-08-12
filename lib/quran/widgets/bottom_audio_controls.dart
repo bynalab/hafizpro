@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/services/audio_center.dart';
 import 'package:hafiz_test/util/app_colors.dart';
+import 'package:hafiz_test/util/app_messenger.dart';
 import 'package:just_audio/just_audio.dart';
 
 class BottomAudioControls extends StatelessWidget {
@@ -502,57 +503,72 @@ class BottomAudioControls extends StatelessWidget {
       stream: audioPlayer.loopModeStream,
       builder: (context, snap) {
         final loopMode = snap.data ?? LoopMode.off;
-        final isLooping = loopMode == LoopMode.one;
+        final isLooping = loopMode != LoopMode.off;
+        final isLoopingOne = loopMode == LoopMode.one;
 
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            IconButton(
-              onPressed: () async {
-                final next =
-                    loopMode == LoopMode.one ? LoopMode.off : LoopMode.one;
-                await audioPlayer.setLoopMode(next);
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints.tightFor(
-                width: 40,
-                height: 40,
+        return Tooltip(
+          message: loopMode == LoopMode.all
+              ? 'Repeat Surah'
+              : (loopMode == LoopMode.one ? 'Repeat Verse' : 'Repeat Off'),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final LoopMode next;
+                  if (loopMode == LoopMode.off) {
+                    next = LoopMode.all;
+                  } else if (loopMode == LoopMode.all) {
+                    next = LoopMode.one;
+                  } else {
+                    next = LoopMode.off;
+                  }
+                  await audioPlayer.setLoopMode(next);
+                  if (context.mounted) {
+                    AppMessenger.showLoopToast(context, next);
+                  }
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints.tightFor(
+                  width: 40,
+                  height: 40,
+                ),
+                icon: Icon(
+                  Icons.repeat_rounded,
+                  size: 24,
+                  color: isLooping ? onBar : mutedOnBar,
+                ),
               ),
-              icon: Icon(
-                Icons.repeat_rounded,
-                size: 24,
-                color: isLooping ? onBar : mutedOnBar,
-              ),
-            ),
-            if (isLooping)
-              Positioned(
-                top: 2,
-                right: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: onBar,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 14,
-                    minHeight: 14,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '1',
-                      style: GoogleFonts.cairo(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? const Color(0xFF1D353B)
-                            : const Color(0xFF78B7C6),
+              if (isLoopingOne)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: onBar,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 14,
+                      minHeight: 14,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '1',
+                        style: GoogleFonts.cairo(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? const Color(0xFF1D353B)
+                              : const Color(0xFF78B7C6),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );

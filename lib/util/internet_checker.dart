@@ -36,7 +36,6 @@ Future<bool> hasInternetConnection() async {
     final code = res.statusCode;
     return code != null && code >= 200 && code < 400;
   } catch (_) {
-    // If the platform cannot report connectivity, default to allowing the try.
-    return true;
+    return false;
   }
 }

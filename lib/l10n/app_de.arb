@@ -159,6 +159,7 @@
   "customSurahSelectContinue": "Weiter",
   "bottomNavQuran": "Quran",
   "bottomNavTest": "Test",
+  "bottomNavAdhkar": "Adhkar",
   "segmentSurah": "Sure",
   "segmentJuz": "Dschuz",
   "searchBySurahHint": "Nach Sure suchen",
@@ -373,5 +374,49 @@
         "type": "int"
       }
     }
-  }
+  },
+  "audioDownloadsTitle": "Audio-Downloads",
+  "audioDownloadsSubtitle": "Offline-Audio-Rezitationen verwalten",
+  "deleteDownload": "Download löschen",
+  "deleteDownloadConfirm": "Sind Sie sicher, dass Sie das heruntergeladene Audio für {surahName} löschen möchten?",
+  "@deleteDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "Offline verfügbar",
+  "notDownloaded": "Nicht heruntergeladen",
+  "offlineDownloads": "Offline-Downloads",
+  "cancelDownloadTitle": "Download abbrechen",
+  "cancelDownloadConfirm": "Möchten Sie den Download von {surahName} wirklich abbrechen?",
+  "@cancelDownloadConfirm": {
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "dialogNo": "Nein",
+  "dialogYesCancel": "Ja, abbrechen",
+  "searchSurahHint": "Sure suchen...",
+  "takbeerLooping": "Wiederholt endlos...",
+  "takbeerPlayHint": "Tippen Sie auf Abspielen. Es wird endlos wiederholt.",
+  "takbeerErrorLaunching": "Fehler beim Starten des Takbeer: {error}",
+  "@takbeerErrorLaunching": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quranSettingsFontSize": "Schriftgr\u00f6\u00dfe",
+  "quranSettingsArabicFont": "Arabische Schriftart",
+  "quranSettingsLayout": "Layout",
+  "quranSettingsLayoutList": "Liste",
+  "quranSettingsLayoutFocus": "Fokus",
+  "quranSettingsLayoutMushaf": "Moshaf",
+  "ayahFinderStartListening": "H\u00f6ren starten",
+  "ayahFinderStopListening": "H\u00f6ren beenden"
 }

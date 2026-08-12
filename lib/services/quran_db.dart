@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:hafiz_test/model/ayah.model.dart';
 import 'package:hafiz_test/model/surah.model.dart';
+import 'package:hafiz_test/model/translation.model.dart';
 
 class QuranDbAyahRow {
   final int ayahId;
@@ -65,9 +66,9 @@ class QuranDbAyahRow {
 
 class QuranDb {
   static const String assetPath = 'assets/quran-offline.sqlite';
-  static const String _fileName = 'quran-offline-v1.sqlite';
+  static const String _fileName = 'quran-offline-v2.sqlite';
 
-  static const String defaultTranslationId = 'en_default';
+  static const String defaultTranslationId = 'en_khattab';
   static const String defaultTransliterationId = 'tr_default';
 
   Database? _db;
@@ -131,6 +132,35 @@ class QuranDb {
         .where((id) => id != null && id.isNotEmpty)
         .cast<String>()
         .toList(growable: false);
+  }
+
+  Future<List<TranslationInfo>> getTranslations() async {
+    final db = _db;
+    if (db == null) {
+      throw StateError('QuranDb not initialized. Call init() first.');
+    }
+
+    final rows = await db.rawQuery(
+      'SELECT id, name, language, type FROM translations WHERE type = "translation" ORDER BY name ASC;',
+    );
+
+    return rows.map((r) => TranslationInfo.fromMap(r)).toList(growable: false);
+  }
+
+  Future<TranslationInfo?> getTranslation(String id) async {
+    final db = _db;
+    if (db == null) return null;
+
+    final rows = await db.rawQuery(
+      'SELECT id, name, language, type FROM translations WHERE id = ? LIMIT 1;',
+      [id],
+    );
+
+    if (rows.isNotEmpty) {
+      return TranslationInfo.fromMap(rows.first);
+    }
+
+    return null;
   }
 
   Future<List<QuranDbAyahRow>> getAllAyahsRaw() async {

@@ -46,6 +46,14 @@ class NetworkServices {
 
   Future<bool> urlExists(String url) async {
     try {
+      return await _checkUrlExistsInternal(url).timeout(const Duration(seconds: 4));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> _checkUrlExistsInternal(String url) async {
+    try {
       await head(url);
       return true;
     } on DioException catch (e) {

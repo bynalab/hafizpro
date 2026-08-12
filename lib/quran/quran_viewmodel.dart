@@ -43,9 +43,9 @@ class QuranViewModel {
 
   AudioPlayer get audioPlayer => audioCenter.audioPlayer;
 
-  Future<void> initialize(int surahNumber) async {
+  Future<void> initialize(int surahNumber, {bool showLoading = true}) async {
     try {
-      isLoading = true;
+      if (showLoading) isLoading = true;
       surah = await surahService.getSurah(surahNumber);
       if (surah?.ayahs.isEmpty ?? true) {
         throw Exception('Surah $surahNumber has no ayahs');

@@ -535,6 +535,10 @@
   "@bottomNavTest": {
     "description": "Bottom navigation label for tests."
   },
+  "bottomNavAdhkar": "Adhkar",
+  "@bottomNavAdhkar": {
+    "description": "Bottom navigation label for Adhkar (web)."
+  },
   "segmentSurah": "Surah",
   "@segmentSurah": {
     "description": "Segment control label for surah."
@@ -1072,5 +1076,112 @@
         "type": "int"
       }
     }
+  },
+  "audioDownloadsTitle": "Audio Downloads",
+  "@audioDownloadsTitle": {
+    "description": "Title for the audio downloads settings entry."
+  },
+  "audioDownloadsSubtitle": "Manage offline audio recitations",
+  "@audioDownloadsSubtitle": {
+    "description": "Subtitle explaining audio downloads management."
+  },
+  "deleteDownload": "Delete Download",
+  "@deleteDownload": {
+    "description": "Title of the delete confirmation dialog."
+  },
+  "deleteDownloadConfirm": "Are you sure you want to delete the downloaded audio for {surahName}?",
+  "@deleteDownloadConfirm": {
+    "description": "Confirmation message for deleting a surah download.",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "readyOffline": "Ready Offline",
+  "@readyOffline": {
+    "description": "Label for successfully downloaded offline content."
+  },
+  "notDownloaded": "Not Downloaded",
+  "@notDownloaded": {
+    "description": "Label for content not yet downloaded."
+  },
+  "offlineDownloads": "Offline Downloads",
+  "@offlineDownloads": {
+    "description": "AppBar title for download manager screen."
+  },
+  "cancelDownloadTitle": "Cancel Download",
+  "@cancelDownloadTitle": {
+    "description": "Title of the cancel in-progress download dialog."
+  },
+  "cancelDownloadConfirm": "Are you sure you want to cancel the download for {surahName}?",
+  "@cancelDownloadConfirm": {
+    "description": "Confirmation message for cancelling an in-progress surah download.",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "dialogNo": "No",
+  "@dialogNo": {
+    "description": "Negative/dismiss button label in confirmation dialogs."
+  },
+  "dialogYesCancel": "Yes, Cancel",
+  "@dialogYesCancel": {
+    "description": "Affirmative button to confirm cancellation in dialogs."
+  },
+  "searchSurahHint": "Search Surah...",
+  "@searchSurahHint": {
+    "description": "Hint text in the surah search field on the download manager screen."
+  },
+  "takbeerLooping": "Looping endlessly...",
+  "@takbeerLooping": {
+    "description": "Hint shown below the play button while Takbeer audio is looping."
+  },
+  "takbeerPlayHint": "Tap play to begin. It will loop endlessly.",
+  "@takbeerPlayHint": {
+    "description": "Hint shown below the play button before Takbeer playback starts."
+  },
+  "takbeerErrorLaunching": "Error launching Takbeer: {error}",
+  "@takbeerErrorLaunching": {
+    "description": "Snackbar shown when Takbeer audio fails to start.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "quranSettingsFontSize": "Font size",
+  "@quranSettingsFontSize": {
+    "description": "Section header for Arabic font size slider in reading preferences."
+  },
+  "quranSettingsArabicFont": "Arabic font",
+  "@quranSettingsArabicFont": {
+    "description": "Section header for Arabic font family picker in reading preferences."
+  },
+  "quranSettingsLayout": "Layout",
+  "@quranSettingsLayout": {
+    "description": "Section header for reader layout picker in reading preferences."
+  },
+  "quranSettingsLayoutList": "List",
+  "@quranSettingsLayoutList": {
+    "description": "Label for the List (normal) reader layout option."
+  },
+  "quranSettingsLayoutFocus": "Focus",
+  "@quranSettingsLayoutFocus": {
+    "description": "Label for the Focus (verse-focus) reader layout option."
+  },
+  "quranSettingsLayoutMushaf": "Mushaf",
+  "@quranSettingsLayoutMushaf": {
+    "description": "Label for the Mushaf reader layout option."
+  },
+  "ayahFinderStartListening": "Start listening",
+  "@ayahFinderStartListening": {
+    "description": "Semantics label on the ayah-finder mic button when idle."
+  },
+  "ayahFinderStopListening": "Stop listening",
+  "@ayahFinderStopListening": {
+    "description": "Semantics label on the ayah-finder mic button when actively listening."
   }
 }

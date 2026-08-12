@@ -15,11 +15,13 @@ class NotificationSheetResult {
 class NotificationsSheet extends StatelessWidget {
   final bool initialEnabled;
   final TimeOfDay initialTime;
+  final Future<void> Function()? onTestNotification;
 
   const NotificationsSheet({
     super.key,
     required this.initialEnabled,
     required this.initialTime,
+    this.onTestNotification,
   });
 
   Future<NotificationSheetResult?> openBottomSheet(BuildContext context) {
@@ -291,6 +293,43 @@ class NotificationsSheet extends StatelessWidget {
                                 isDark ? Colors.white : const Color(0xFF111827),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                ],
+                if (onTestNotification != null) ...[
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF2A2A2A)
+                              : const Color(0xFFE5E7EB),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: onTestNotification,
+                      icon: Icon(
+                        Icons.notifications_active_outlined,
+                        size: 18,
+                        color: isDark
+                            ? const Color(0xFF9CA3AF)
+                            : const Color(0xFF6B7280),
+                      ),
+                      label: Text(
+                        'Send test notification',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isDark
+                              ? const Color(0xFF9CA3AF)
+                              : const Color(0xFF6B7280),
+                        ),
                       ),
                     ),
                   ),

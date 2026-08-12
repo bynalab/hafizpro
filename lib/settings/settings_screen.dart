@@ -12,6 +12,10 @@ import 'package:hafiz_test/settings/sheets/progress_tracking_sheet.dart';
 import 'package:hafiz_test/settings/sheets/reciter_picker_sheet.dart';
 import 'package:hafiz_test/settings/widgets/leading_circle.dart';
 import 'package:hafiz_test/settings/widgets/settings_tile.dart';
+import 'package:hafiz_test/settings/sheets/translation_picker_sheet.dart';
+import 'package:hafiz_test/model/translation.model.dart';
+import 'package:hafiz_test/services/quran_db.dart';
+import 'package:hafiz_test/main_menu/download_manager_screen.dart';
 import 'package:hafiz_test/l10n/app_localizations.dart';
 import 'package:hafiz_test/util/l10n_extensions.dart';
 import 'package:hafiz_test/util/locale_notifier.dart';
@@ -352,6 +356,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
                   SettingsTile(
+                    leading:
+                        const LeadingCircle(Icons.download_for_offline_rounded),
+                    title: context.l10n.audioDownloadsTitle,
+                    subtitle: context.l10n.audioDownloadsSubtitle,
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const DownloadManagerScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  SettingsTile(
                     leading: const LeadingCircle(Icons.language_rounded),
                     title: context.l10n.language,
                     subtitle: _languageSubtitleForCode(
@@ -365,11 +387,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: _pickLanguage,
                   ),
                   const SizedBox(height: 10),
+                  FutureBuilder<TranslationInfo?>(
+                    future: getIt.isRegistered<QuranDb>()
+                        ? getIt<QuranDb>().getTranslation(controller.translationId)
+                        : Future.value(null),
+                    builder: (context, snapshot) {
+                      final subtitleName = snapshot.data?.name ?? controller.translationId;
+
+                      return SettingsTile(
+                        leading: const LeadingCircle(Icons.translate_rounded),
+                        title: 'Translation',
+                        subtitle: subtitleName,
+                        trailing: Icon(
+                          Icons.chevron_right_rounded,
+                          color: isDark ? Colors.white : const Color(0xFF111827),
+                        ),
+                        onTap: () async {
+                          final selected = await TranslationPickerSheet(
+                            selected: controller.translationId,
+                          ).openBottomSheet(context);
+                          if (selected != null) {
+                            await controller.setTranslationId(selected.id);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
                   SettingsTile(
                     leading: const LeadingCircle(Icons.track_changes_rounded),
                     title: context.l10n.progressTrackingTitle,
-                    subtitle:
-                        _progressTrackingModeLabel(controller.progressTrackingMode),
+                    subtitle: _progressTrackingModeLabel(
+                        controller.progressTrackingMode),
                     trailing: Icon(
                       Icons.chevron_right_rounded,
                       color: isDark ? Colors.white : const Color(0xFF111827),
@@ -399,6 +448,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final result = await NotificationsSheet(
                         initialEnabled: controller.notificationsEnabled,
                         initialTime: controller.notificationTime,
+                        onTestNotification: controller.testNotification,
                       ).openBottomSheet(context);
                       if (result == null) return;
                       try {

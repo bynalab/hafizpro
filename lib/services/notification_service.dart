@@ -256,6 +256,48 @@ class NotificationService {
     if (kIsWeb) return;
     await _plugin.cancel(dailyNotificationId);
   }
+
+  /// Show an immediate test notification so users can see how it looks.
+  Future<void> showTestNotification() async {
+    try {
+      final granted = await requestPermissions();
+      if (!granted) return;
+
+      final enabled = await areNotificationsEnabled();
+      if (!enabled) return;
+
+      const androidDetails = AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        channelDescription: _channelDescription,
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: '@drawable/notification_logo',
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
+      const details = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      final message = await _pickMessage(DateTime.now());
+      await _plugin.show(
+        0,
+        'Hafiz Pro',
+        message,
+        details,
+      );
+    } catch (e) {
+      debugPrint('Error showing test notification: $e');
+      rethrow;
+    }
+  }
 }
 
 extension _TZDateTimeMinuteComparison on tz.TZDateTime {

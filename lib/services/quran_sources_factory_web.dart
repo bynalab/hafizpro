@@ -6,8 +6,8 @@ import 'package:hafiz_test/services/network.services.dart';
 import 'package:hafiz_test/services/quran_api_providers.dart';
 import 'package:hafiz_test/services/storage/abstract_storage_service.dart';
 import 'package:hafiz_test/services/quran_sources.dart';
-import 'package:hafiz_test/services/quran_search_service.dart';
 import 'package:hafiz_test/services/quran_db.dart';
+import 'package:hafiz_test/services/quran_search_service.dart';
 import 'package:hafiz_test/services/surah_source.dart';
 
 class NetworkSurahSource implements SurahSource {
@@ -66,7 +66,7 @@ class NetworkSurahSource implements SurahSource {
   Future<Surah> _withTextOverlay(Surah surah) async {
     try {
       final translationId =
-          storageServices.getString('translation_id') ?? 'en_default';
+          storageServices.getString('translation_id') ?? 'en_khattab';
       final transliterationId =
           storageServices.getString('transliteration_id') ?? 'tr_default';
 
@@ -104,8 +104,14 @@ Future<QuranSources> createQuranSources({
     storageServices: storageServices,
   );
 
-  final searchService =
-      QuranSearchService(db: QuranDb()); // Will fail but keeps types happy
+  final searchService = QuranSearchService.network(
+    networkServices: networkServices,
+  );
+  try {
+    await searchService.init();
+  } catch (e, st) {
+    debugPrint('QuranSearchService web init failed: $e\n$st');
+  }
 
   return QuranSources(
     surahSource: source,
